@@ -232,6 +232,15 @@ body.navigating .dest-card{max-height:38%}
   .nav-text{font-size:12.5px}
   body.navigating .map-search{top:120px}
 }
+
+.niyi-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.niyi-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #20c47766;background:#20c47718;color:#9be3bf;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;text-decoration:none;cursor:pointer}
+.niyi-action:hover{border-color:#20c477;background:#20c47728;color:#fff}
+.niyi-action.btnish{font:inherit}
+.niyi-mic{width:40px;height:40px;border-radius:11px;border:1px solid var(--line2);background:#222c33;color:var(--text);flex:none;font-size:16px;padding:0}
+.niyi-mic[aria-pressed="true"]{border-color:#ff625c99;color:#ffaaa6;background:#ff625c18}
+.niyi-mic[hidden]{display:none}
+.niyi-mic-note{font-size:10.5px;color:var(--muted);padding:0 12px 8px;line-height:1.4}
 </style>
 </head>
 <body class="welcome-open">
@@ -1310,7 +1319,7 @@ var tips=[
   "Obey traffic signs; they are there to protect you.",
   'Phones down, eyes on the road.'
 ];
-var chips=['How does it work?','Set destination','Navigation','Safety tip','GPS accuracy','Contact'];
+var chips=['How does it work?','Set destination','Navigation','Safety tip','GPS accuracy','Contact us'];
 
 function escText(s){return String(s==null?'':s)}
 function addMsg(text,who){
@@ -1321,6 +1330,46 @@ function addMsg(text,who){
   msgs.scrollTop=msgs.scrollHeight;
   return d;
 }
+function addBotRich(text,actions){
+  var d=document.createElement('div');
+  d.className='niyi-msg bot';
+  var p=document.createElement('div');
+  p.textContent=escText(text);
+  d.appendChild(p);
+  if(actions&&actions.length){
+    var row=document.createElement('div');
+    row.className='niyi-actions';
+    actions.forEach(function(a){
+      var el;
+      if(a.href){
+        el=document.createElement('a');
+        el.className='niyi-action';
+        el.href=a.href;
+        if(a.external){el.target='_blank';el.rel='noopener'}
+        el.textContent=a.label;
+      }else{
+        el=document.createElement('button');
+        el.type='button';
+        el.className='niyi-action btnish';
+        el.textContent=a.label;
+        el.addEventListener('click',function(){if(a.onClick)a.onClick()});
+      }
+      row.appendChild(el);
+    });
+    d.appendChild(row);
+  }
+  msgs.appendChild(d);
+  msgs.scrollTop=msgs.scrollHeight;
+  return d;
+}
+function contactActions(){
+  return [
+    {label:'Call',href:'tel:+2348053529802'},
+    {label:'Email',href:'mailto:info@adeniyiltd.com?subject=Curve%20Guide'},
+    {label:'WhatsApp',href:'https://wa.me/2348053529802?text=Hello%2C%20I%27m%20contacting%20you%20from%20Curve%20Guide',external:true}
+  ];
+}
+
 function renderChips(){
   chipsEl.textContent='';
   chips.forEach(function(label){
@@ -1350,8 +1399,8 @@ function answer(q){
     return 'Search a destination, tap Route, then Start navigation. You will see the next turn banner and hear voice prompts. GPS must be on; the map follows you. Say "stop navigation" or tap Stop. Always obey road signs — this is a free prototype using OSRM + browser speech.';
   if(/destin|search|route|how do i (set|find)|go to|directions?/.test(t))
     return 'Type a place in Search destination on the map (at least 3 letters). Pick a result, then tap Route, then Start navigation for voice guidance. You can also long-press or right-click the map to drop a pin.';
-  if(/contact|phone|email|call|whatsapp|reach/.test(t))
-    return 'You can reach Adeniyi Investments & Property Ltd. at +234 805 352 9802 or info@adeniyiltd.com.';
+  if(/contact|phone|email|call|whatsapp|reach|contact us/.test(t))
+    return 'You can reach Adeniyi Investments & Property Ltd. at +234 805 352 9802 or info@adeniyiltd.com. Ask Contact us for Call, Email, and WhatsApp buttons.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
     return 'Curve Guide is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
   if(/disclaim|liabilit|certified|safe to use|replace|prototype/.test(t))
@@ -1410,6 +1459,14 @@ function ask(text){
     return;
   }
   addMsg(q,'user');
+  var t=q.toLowerCase();
+  if(/contact|phone|email|call|whatsapp|reach|help me contact|contact us/.test(t)){
+    var msg='You can reach Adeniyi Investments & Property Ltd. Tap a button below.';
+    addBotRich(msg, contactActions());
+    speak(msg);
+    renderChips();
+    return;
+  }
   var a=answer(q);
   addMsg(a,'bot');
   speak(a);
