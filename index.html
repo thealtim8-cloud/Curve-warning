@@ -1759,7 +1759,11 @@ function speak(text){
   }catch(e){}
 }
 function extractPlace(q){
-  var m=String(q||'').match(/^(?:take me to|go to|directions to|navigate to|find|search for|search)\s+(.+)$/i);
+  var s=String(q||'').trim();
+  if(/^(take me home|go home|home)$/i.test(s))return null;
+  if(/^(take me to school|go to school)$/i.test(s))return null;
+  if(/^(take me to work|go to work)$/i.test(s))return null;
+  var m=s.match(/^(?:take me to|go to|directions to|navigate to|find|search for|search)\s+(.+)$/i);
   return m?m[1].replace(/[?.!]+$/,'').trim():null;
 }
 function confirm(msg){addBotRich(msg);speak(msg);return msg}
