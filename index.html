@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
-<title>Curve Guide 7.0 | Intelligent Road Safety System</title>
+<title>Curve Guide 7.0.1 | Intelligent Road Safety System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -181,7 +181,7 @@ body.welcome-open{overflow:hidden}
 .niyi-header-btn:hover{border-color:#20c477;background:#20c47728;color:#fff}
 .niyi-header-btn svg{width:16px;height:16px;flex:none}
 @keyframes niyiPulse{0%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 #20c47766}70%{box-shadow:0 10px 28px -8px #000c,0 0 0 14px #20c47700}100%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 #20c47700}}
-.niyi-fab.niyi-pulse{animation:niyiPulse 1.2s ease-out 2}
+.niyi-fab.niyi-pulse,.niyi-header-btn.niyi-pulse{animation:niyiPulse 1.2s ease-out 2}
 @media(max-width:420px){.pill{display:none}.niyi-header-btn{padding:8px 11px;font-size:12px}.header-actions{gap:0}}
 /* Destination search */
 .map-search{position:absolute;z-index:5;left:12px;right:12px;top:52px;pointer-events:none}
@@ -264,13 +264,95 @@ body.navigating .dest-card{max-height:38%}
 .emerg-sheet.open{display:flex}
 .install-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid #20c47744;background:#20c47712;font-size:12px}
 .install-bar.show{display:flex}
+
+/* ===== 7.0.1 Map-first professional shell ===== */
+:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--radius-sm:12px;--radius-md:16px;--radius-lg:22px;--shadow-float:0 8px 28px -10px #000c,0 0 0 1px #ffffff0f;--shadow-soft:0 4px 16px -8px #000a;--topbar-h:56px}
+html,body{height:100%;overflow:hidden}
+body{padding:0}
+.app.map-first{width:100%;max-width:none;margin:0;padding:0;height:100%;display:flex;flex-direction:column;gap:0}
+.topbar{flex:none;height:var(--topbar-h);display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:0 var(--space-3);background:#0d1114f2;border-bottom:0;box-shadow:var(--shadow-soft);z-index:20;position:relative}
+.topbar .brand{gap:10px;min-width:0}
+.topbar .logo-img{width:36px;height:36px;border-radius:10px;box-shadow:none}
+.topbar h1{font-size:16px;font-weight:750;letter-spacing:-.3px}
+.topbar .tagline{display:none}
+.topbar .subtitle{display:none}
+.topbar-actions{display:flex;align-items:center;gap:8px;flex:none}
+.topbar .niyi-header-btn{padding:8px 12px;font-size:12px;box-shadow:none;border-color:#20c47755}
+.menu-btn{border:0;background:#1c252b;color:var(--text);border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:700;box-shadow:var(--shadow-soft)}
+.menu-btn:hover{background:#243038}
+.map-stage{flex:1;min-height:0;position:relative}
+.map-first .map-panel{border:0;border-radius:0;box-shadow:none;background:transparent;height:100%}
+.map-first .map-panel .panel-head{display:none}
+.map-first .map-wrap{height:100%!important;min-height:0!important;border-radius:0}
+.map-first .dashboard{display:block;height:100%;gap:0}
+.map-first .side-stack,.map-first .hero,.map-first .notice,.map-first .site-footer,.map-first .pill{display:none!important}
+.menu-sec .install-bar{display:flex!important}
+/* Floating search */
+.map-first .map-search{top:12px;left:12px;right:12px}
+.map-first .dest-search{border:0;box-shadow:var(--shadow-float);backdrop-filter:none;background:#12181cf7;border-radius:var(--radius-md);padding:12px 14px 12px 40px}
+.map-first .dest-results{border:0;box-shadow:var(--shadow-float);border-radius:var(--radius-md)}
+/* HUD metrics */
+.hud{position:absolute;z-index:6;left:12px;top:64px;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:min(220px,56vw)}
+.hud-chip{pointer-events:none;background:#12181cf2;box-shadow:var(--shadow-float);border-radius:var(--radius-sm);padding:10px 12px;min-width:110px}
+.hud-chip .label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.hud-chip .value{font-size:22px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.hud-chip .value small{font-size:12px;font-weight:600;color:var(--muted);margin-left:2px}
+.hud-chip.warn{background:#2a1a12f2}
+.hud-chip.warn .value{color:#ffd08a;font-size:14px;font-weight:700;line-height:1.3}
+.map-first .map-status{display:none}
+/* Compact GPS + SOS on map */
+.gps-pill{position:absolute;z-index:6;left:12px;bottom:88px;border:0;border-radius:999px;padding:12px 18px;font-size:13px;font-weight:750;background:linear-gradient(180deg,#27d083,var(--green2));color:#06150d;box-shadow:var(--shadow-float)}
+.gps-pill:disabled{opacity:.45}
+.gps-pill.stop{background:#2a3238;color:#eef3f5}
+.map-first .map-controls{right:12px;bottom:88px;gap:8px}
+.map-first .icon-btn{width:44px;height:44px;border:0;border-radius:14px;background:#12181cf2;box-shadow:var(--shadow-float);backdrop-filter:none}
+.map-first .dest-card{left:12px;right:12px;bottom:12px;border:0;border-radius:var(--radius-lg);box-shadow:var(--shadow-float);backdrop-filter:none;background:#12181cf7;max-height:42%}
+.map-first .nav-banner{top:12px}
+.map-first .nav-banner-main{border:0;box-shadow:var(--shadow-float);backdrop-filter:none}
+.map-first .emerg-fab{width:44px;height:44px;left:12px;bottom:28px;font-size:10px;letter-spacing:.3px;border:0;box-shadow:var(--shadow-float)}
+/* Hide Niyi FAB — header Ask Niyi only */
+.map-first .niyi-fab{display:none!important}
+.map-first .niyi-panel{bottom:16px;right:12px}
+/* Menu sheet */
+.menu-backdrop{position:fixed;inset:0;z-index:70;background:#0008;opacity:0;pointer-events:none;transition:opacity .2s}
+.menu-backdrop.open{opacity:1;pointer-events:auto}
+.menu-sheet{position:fixed;z-index:71;left:0;right:0;bottom:0;max-height:min(86dvh,720px);background:#12181c;border-radius:22px 22px 0 0;box-shadow:0 -12px 40px -12px #000d;transform:translateY(105%);transition:transform .25s ease;display:flex;flex-direction:column;padding:0 0 env(safe-area-inset-bottom)}
+.menu-sheet.open{transform:translateY(0)}
+.menu-grab{width:40px;height:4px;border-radius:99px;background:#33414b;margin:10px auto 6px}
+.menu-head{display:flex;align-items:center;justify-content:space-between;padding:4px 16px 12px;border-bottom:1px solid #ffffff0d}
+.menu-head h2{margin:0;font-size:16px;font-weight:750}
+.menu-close{border:0;background:#1c252b;color:var(--text);width:36px;height:36px;border-radius:99px;font-size:16px}
+.menu-body{overflow:auto;padding:8px 16px 24px;display:grid;gap:14px}
+.menu-sec{padding:14px;border-radius:var(--radius-md);background:#0d1114;box-shadow:inset 0 0 0 1px #ffffff08}
+.menu-sec h3{margin:0 0 10px;font-size:11px;font-weight:750;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.menu-sec .actions{margin-top:10px}
+.menu-sec .small{line-height:1.55}
+.more-info{margin-top:8px}
+.more-info summary{cursor:pointer;color:#9be3bf;font-weight:600;font-size:12.5px}
+.menu-sec .tips{border:0;background:transparent;box-shadow:none}
+.menu-sec .panel-head{padding:0 0 8px;border:0}
+.menu-sec .credit-card{display:inline-block}
+.offline-banner{position:fixed;top:var(--topbar-h);left:0;right:0;z-index:25}
+@media(min-width:760px){
+  .map-first .map-search{left:20px;right:auto;width:min(420px,40vw)}
+  .hud{left:20px;top:72px}
+  .gps-pill{left:20px}
+  .map-first .emerg-fab{left:20px}
+  .map-first .dest-card{left:20px;right:auto;width:min(400px,42vw)}
+  .menu-sheet{left:auto;right:16px;bottom:16px;width:min(400px,92vw);border-radius:22px;max-height:min(80vh,680px)}
+}
+/* Kill expensive blur on small screens */
+@media(max-width:759px){
+  .welcome{backdrop-filter:none}
+  .status-chip,.icon-btn,.dest-search,.dest-card,.nav-banner-main{backdrop-filter:none!important}
+}
 </style>
 </head>
 <body class="welcome-open">
 <div class="offline-banner" id="offlineBanner">Offline — map tiles may not load</div>
 <div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="welcomeIntro">
   <div class="welcome-card" tabindex="-1" id="welcomeCard">
-    <video class="welcome-video" id="welcomeVideo" autoplay muted loop playsinline preload="auto" poster="assets/welcome-poster.jpg" aria-label="Curve Guide — Safer turns. Smarter drives." disablepictureinpicture><source src="assets/welcome.mp4" type="video/mp4"></video>
+    <video class="welcome-video" id="welcomeVideo" autoplay muted loop playsinline preload="metadata" poster="assets/welcome-poster.jpg" aria-label="Curve Guide — Safer turns. Smarter drives." disablepictureinpicture><source src="assets/welcome.mp4" type="video/mp4"></video>
     <h2 id="welcomeTitle">Welcome to Curve Guide</h2>
     <p class="welcome-intro" id="welcomeIntro">Curve Guide is a product of the Automotive Division of <strong>Adeniyi Investments &amp; Property Ltd.</strong>, built to help prevent road accidents on dangerous bends and curves. By giving drivers early awareness of sharp turns ahead, it supports safer, more confident driving on Nigerian roads. Curve Guide is currently a prototype: it is designed to supplement, never replace, careful and attentive driving.</p>
     <p class="welcome-quote" id="welcomeQuote" aria-live="off">“Prevention is better than cure.”</p>
@@ -291,35 +373,37 @@ body.navigating .dest-card{max-height:38%}
     <div class="contact-line welcome-contact">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
   </div>
 </div>
-<div class="app">
-  <header>
+<div class="app map-first">
+  <header class="topbar">
     <div class="brand">
       <img class="logo-img" src="assets/curveguide-logo.png" alt="Curve Guide logo">
       <div>
         <h1>Curve Guide</h1>
         <div class="tagline">Safer turns. Smarter drives.</div>
-        <div class="subtitle">Intelligent Road Safety System · Development prototype v7.0</div>
+        <div class="subtitle">Prototype v7.0.1</div>
       </div>
     </div>
-    <div class="header-actions">
-      <button type="button" class="btn night-toggle" id="nightToggle" title="Night map mode" aria-pressed="false">Night</button>
+    <div class="topbar-actions">
       <button type="button" class="niyi-header-btn" id="niyiHeaderBtn" aria-controls="niyiPanel" title="Ask Niyi">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
         Ask Niyi
       </button>
-      <div class="pill">PROTOTYPE · v7.0 3D</div>
+      <button type="button" class="menu-btn" id="menuOpen" aria-controls="menuSheet" aria-expanded="false">Menu</button>
     </div>
   </header>
-  <div class="install-bar" id="installBar"><span id="installText">Install Curve Guide on your phone for quicker access.</span><button type="button" class="btn primary" id="installBtn">Install</button></div>
-  <div class="hero" role="note"><div><b>Arrive alive.</b> Real-time curve awareness for safer journeys on Nigerian roads.</div><div class="hero-items"><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Safety first</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Satellite &amp; 3D</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>On-device GPS</span></div></div>
 
-  <main class="dashboard">
+  <main class="dashboard map-stage">
     <section class="panel map-panel" aria-label="Map">
       <div class="panel-head">
-        <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Live road view</h2>
-        <span class="small" id="mapMode">3D perspective</span>
+        <h2>Live road view</h2>
+        <span class="small" id="mapMode">Map</span>
       </div>
       <div class="map-wrap">
+        <div class="hud" aria-label="Driving metrics">
+          <div class="hud-chip"><div class="label">Speed</div><div class="value"><span id="speed">—</span><small id="speedUnit">km/h</small></div></div>
+          <div class="hud-chip warn" id="hudCurve"><div class="label">Curve / bend</div><div class="value" id="curveDistance">—</div></div>
+        </div>
+        <button type="button" class="gps-pill" id="gps">Start GPS</button>
         <div id="map" aria-label="Interactive map"></div>
         <div class="map-status">
           <div class="status-chip"><span class="status-dot" id="statusDot"></span><span id="topStatus">Map loading…</span></div>
@@ -328,9 +412,6 @@ body.navigating .dest-card{max-height:38%}
         <div class="map-controls">
           <button class="icon-btn" id="zin" aria-label="Zoom in" title="Zoom in">+</button>
           <button class="icon-btn" id="zout" aria-label="Zoom out" title="Zoom out">−</button>
-          <button class="icon-btn" id="tilt" aria-label="Toggle 3D tilt" title="Toggle 3D tilt">3D</button>
-          <button class="icon-btn" id="orient" aria-label="Change map orientation" title="Change orientation">↗</button>
-          <button class="icon-btn map-type" id="mapType" aria-label="Toggle satellite view" aria-pressed="false" title="Switch to satellite view">Sat</button>
         </div>
         <div class="map-search" id="mapSearchWrap">
           <div class="dest-search-wrap">
@@ -368,77 +449,81 @@ body.navigating .dest-card{max-height:38%}
           </details>
           <div class="bend-list" id="bendList" hidden></div>
           <div class="speed-bend-banner" id="speedBendBanner" role="alert">Slow down — sharp bend ahead</div>
-          <div class="small" id="favHint" style="margin-top:8px">Favourites (Home/School/Work) are saved on this phone only.</div><div class="fav-row" id="favRow"></div>
-          <div class="hazard-row">
-            <button type="button" class="btn" id="reportHazard">Report danger spot</button>
-          </div>
-          <p class="dest-note">Routing by OpenStreetMap/OSRM demo — free test service, may be slow or unavailable. Voice uses your browser speechSynthesis (prototype guidance, not a certified navigation system).</p>
+          <p class="dest-note">OSRM demo routing · prototype voice guidance</p>
         </div>
       </div>
     </section>
 
-    <div class="side-stack">
-      <section class="metrics" aria-label="Driving metrics">
-        <div class="metric"><div class="metric-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 14l4-4"/><path d="M3.3 17a9 9 0 1 1 17.4 0"/></svg>Speed</div><div class="metric-value"><span id="speed">—</span> <span class="metric-unit" id="speedUnit">km/h</span></div></div>
-        <div class="metric"><div class="metric-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Heading</div><div class="metric-value"><span id="heading">—</span><span class="metric-unit">°</span></div></div>
-        <div class="metric"><div class="metric-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20c0-6 4-6 7-8s7-2 7-8"/><circle cx="19" cy="4" r="1"/></svg>Next curve</div><div class="metric-value" id="curveDistance">— <span class="metric-unit">m</span></div></div>
-      </section>
+    
+  </main>
 
-      <section class="panel">
-        <div class="content">
-          <div class="row">
-            <div class="section-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Curve awareness</div>
-            <span class="small" id="analysisState">Not active</span>
-          </div>
-          <div class="status-box warn" id="warningBox" role="status" aria-live="polite">
-            Curve analysis is a development feature. Start GPS to test the prototype; do not rely on its warnings for driving decisions.
-          </div>
-          <div class="actions">
-            <button class="btn primary" id="gps">Start GPS</button>
-            <button class="btn" id="stopGps" disabled>Stop GPS</button>
-            <button class="btn" id="follow">Follow: On</button>
-            <button class="btn" id="unit">Units: km/h</button>
-          </div>
+  <div class="menu-backdrop" id="menuBackdrop" hidden></div>
+  <aside class="menu-sheet" id="menuSheet" role="dialog" aria-modal="true" aria-labelledby="menuTitle" hidden>
+    <div class="menu-grab" aria-hidden="true"></div>
+    <div class="menu-head">
+      <h2 id="menuTitle">Menu</h2>
+      <button type="button" class="menu-close" id="menuClose" aria-label="Close menu">✕</button>
+    </div>
+    <div class="menu-body">
+      <div class="menu-sec" id="menuDrive">
+        <h3>Drive</h3>
+        <div class="row"><span class="small" id="analysisState">Not active</span><span class="small" id="routeState">No route yet</span></div>
+        <div class="status-box warn" id="warningBox" role="status" aria-live="polite">Prototype — start GPS before a trip. Do not rely on warnings alone.</div>
+        <div class="actions">
+          <button class="btn" id="stopGps" disabled>Stop GPS</button>
+          <button class="btn" id="follow">Follow: On</button>
+          <button class="btn" id="unit">Units: km/h</button>
+          <button class="btn" id="recenter">Recenter</button>
+          <button class="btn" id="clearRoute">Clear GPS trail</button>
         </div>
-      </section>
-
-      <section class="panel">
-        <div class="content">
-          <div class="row">
-            <div class="section-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h8"/></svg>Route &amp; map data</div>
-            <span class="small" id="routeState">No route yet</span>
-          </div>
-          <div class="small" style="line-height:1.6;margin-top:9px">The map uses community map data. Destination search uses Nominatim; driving routes use the public OSRM demo. Road geometry, routes, and curve estimates may be incomplete or inaccurate.</div>
-          <div class="actions">
-            <button class="btn" id="recenter">Recenter map</button>
-            <button class="btn" id="clearRoute">Clear route</button>
-          </div>
+        <p class="small" style="margin-top:10px">Heading: <span id="heading">—</span>°</p>
+      </div>
+      <div class="menu-sec" id="menuMap">
+        <h3>Map</h3>
+        <div class="actions">
+          <button class="btn night-toggle" id="nightToggle" title="Night map mode" aria-pressed="false">Night mode</button>
+          <button class="btn" id="tilt">3D</button>
+          <button class="btn" id="orient">↗ Heading-up</button>
+          <button class="btn" id="mapType" aria-pressed="false">Satellite</button>
         </div>
-      </section>
-      <section class="panel tips" aria-label="Road safety tips" aria-roledescription="carousel">
-        <div class="panel-head"><h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h4v4c0 3-2 5-4 6M14 7h4v4c0 3-2 5-4 6"/></svg>Road Safety Tips</h2><span class="small" id="tipCount">1 / 12</span></div>
+        <p class="small" style="margin-top:10px">Map style &amp; camera. Zoom stays on the map.</p>
+      </div>
+      <div class="menu-sec" id="menuPlaces">
+        <h3>Places &amp; reports</h3>
+        <div class="small" id="favHint">Favourites are saved on this phone only.</div>
+        <div class="fav-row" id="favRow"></div>
+        <div class="hazard-row" style="margin-top:8px">
+          <button type="button" class="btn" id="reportHazard">Report danger spot</button>
+        </div>
+        <p class="small" style="margin-top:8px">Danger spots stay on this device — sharing with other drivers coming later.</p>
+      </div>
+      <div class="menu-sec tips" aria-label="Road safety tips">
+        <div class="panel-head"><h3 style="margin:0">Road safety tips</h3><span class="small" id="tipCount">1 / 12</span></div>
         <div class="tips-body">
           <blockquote class="tip-quote" id="tipQuote" aria-live="polite">Prevention is better than cure.</blockquote>
           <div class="tips-nav"><div class="tip-dots" id="tipDots"></div><div class="tip-arrows"><button class="tip-arrow" id="tipPrev" aria-label="Previous tip">&#8249;</button><button class="tip-arrow" id="tipNext" aria-label="Next tip">&#8250;</button></div></div>
         </div>
-      </section>
+      </div>
+      <div class="menu-sec" id="menuApp">
+        <h3>App</h3>
+        <div class="install-bar show" id="installBar" style="display:flex"><span id="installText">Install Curve Guide for quicker access.</span><button type="button" class="btn primary" id="installBtn">Install</button></div>
+        <p class="small" style="margin-top:10px">Curve Guide 7.0.1 · Prototype · Arrive alive.</p>
+        <details class="more-info"><summary>More info &amp; safety</summary>
+          <p class="small" style="margin-top:8px">Experimental road-awareness prototype, not a certified driver-assistance or navigation system. GPS, maps, routes, and curve estimates can be wrong or delayed. Do not operate while driving. Always obey road signs and conditions. Search: Nominatim · Routing: OSRM demo · Map data © OpenStreetMap.</p>
+        </details>
+      </div>
+      <div class="menu-sec" id="menuAbout">
+        <h3>Adeniyi</h3>
+        <div class="credit" style="justify-items:start">
+          <div class="credit-label">An Automotive Division of</div>
+          <a class="credit-card" href="https://adeniyiltd.com/" target="_blank" rel="noopener" title="Visit Adeniyi Investments &amp; Property Ltd."><img src="assets/adeniyi-logo.png" alt="Adeniyi Investments &amp; Property Ltd."></a>
+          <div class="credit-copy" style="text-align:left">&copy; 2026 Curve Guide — <a href="https://adeniyiltd.com/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Adeniyi Investments &amp; Property Ltd.</a></div>
+          <div class="contact-line" style="text-align:left">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
+        </div>
+        <footer style="text-align:left;padding-top:8px">Map data © OpenStreetMap · Routing © OSRM</footer>
+      </div>
     </div>
-  </main>
-
-  <section class="panel notice">
-    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.01"/></svg><div><strong>Safety notice:</strong> Curve Guide is an experimental road-awareness prototype, not a certified driver-assistance or navigation system. GPS accuracy, map data, device sensors, and curve estimates can be wrong or delayed. Never interact with this page while driving; set it up before a trip and have a passenger operate it. Always obey road signs, speed limits, and actual road conditions.</div>
-  </section>
-  <div class="site-footer">
-  <div class="credit">
-    <div class="credit-label">An Automotive Division of</div>
-    <a class="credit-card" href="https://adeniyiltd.com/" target="_blank" rel="noopener" title="Visit Adeniyi Investments &amp; Property Ltd." style="display:inline-block"><img src="assets/adeniyi-logo.png" alt="Adeniyi Investments &amp; Property Ltd."></a>
-    <div class="credit-copy">&copy; 2026 Curve Guide — Automotive Division of <a href="https://adeniyiltd.com/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Adeniyi Investments &amp; Property Ltd.</a> All rights reserved.</div>
-    <div class="contact-line">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
-  </div>
-  <footer>Curve Guide 7.0 · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
-  </div>
-</div>
-
+  </aside>
 
 <button type="button" class="emerg-fab" id="emergFab" title="Emergency">SOS</button>
 <div class="emerg-sheet" id="emergSheet" hidden>
@@ -474,7 +559,7 @@ body.navigating .dest-card{max-height:38%}
 <script>
 (function(){
 'use strict';
-var map=null, carMarker=null, watchId=null, ready=false, follow=true, tilted=true, headingUp=true, useMph=false;
+var map=null, carMarker=null, watchId=null, ready=false, follow=true, tilted=!(window.matchMedia&&matchMedia('(max-width:759px)').matches), headingUp=true, useMph=false;
 var SETTINGS_KEY='curveGuide.settings';
 function loadSettings(){
   try{
@@ -574,7 +659,7 @@ function initMap(){
       style:nightMode?STYLE_NIGHT:STYLE_DAY,
       center:[3.3792,6.5244],
       zoom:13,
-      pitch:55,
+      pitch:tilted?50:0,
       bearing:0,
       antialias:true,
       attributionControl:true
@@ -626,7 +711,7 @@ function initMap(){
           }catch(e){/* The base map remains usable if 3D building data is not available. */}
         }
         setupSatellite();
-        ready=true;setStatus('Map ready · 3D view enabled','good');setText('mapMode','3D perspective');setFollow(true);bindMapDestinationGestures();paintHazards();
+        ready=true;setStatus('Map ready','good');setText('mapMode',tilted?'3D':'2D');setText('tilt',tilted?'3D':'2D');setFollow(true);bindMapDestinationGestures();paintHazards();
         if(!sourceId)setText('mapMode','Tilted map');
       }catch(e){setStatus('Map loaded with limited features','warn')}
     });
@@ -665,22 +750,25 @@ function maybeEstimateCurve(pos){
   }
   lastHeading=h;
 }
+var lastCamAt=0, lastBendUiAt=0, lastStatusAt=0, lastDestMetaAt=0;
 function onPosition(pos){
   previous=current;current=pos;
   var coord=[pos.coords.longitude,pos.coords.latitude];
   if(!Number.isFinite(coord[0])||!Number.isFinite(coord[1]))return;
-  if(!(pos.coords.accuracy>50)&&(route.length===0||distance(route[route.length-1],coord)>3)){route.push(coord);if(route.length>1500)route.shift();updateRoute()}
+  if(!(pos.coords.accuracy>50)&&(route.length===0||distance(route[route.length-1],coord)>4)){route.push(coord);if(route.length>800)route.shift();updateRoute()}
   if(carMarker)carMarker.setLngLat(coord);
   updateMetrics(pos);maybeEstimateCurve(pos);
-  if(follow&&map){
+  var now=Date.now();
+  if(follow&&map&&now-lastCamAt>450){
+    lastCamAt=now;
     var h=Number.isFinite(pos.coords.heading)&&pos.coords.heading>=0?pos.coords.heading:(lastHeading||0);
-    map.easeTo({center:coord,zoom:Math.max(map.getZoom(),16),pitch:tilted?55:0,bearing:headingUp?h:0,duration:700,essential:true});
+    map.easeTo({center:coord,zoom:Math.max(map.getZoom(),16),pitch:tilted?50:0,bearing:headingUp?h:0,duration:380,essential:true});
   }
-  setStatus(navigating?'Navigating':'GPS position updated','good');
-  if(destination)updateDestMeta();
+  if(now-lastStatusAt>2000){lastStatusAt=now;setStatus(navigating?'Navigating':'GPS active','good')}
+  if(destination&&now-lastDestMetaAt>1500){lastDestMetaAt=now;updateDestMeta()}
   if(navigating)onNavPosition(pos);
-  if(routeBends.length&&current){
-    updateBendListFromPos([pos.coords.longitude,pos.coords.latitude]);
+  if(routeBends.length){
+    if(now-lastBendUiAt>2000){lastBendUiAt=now;updateBendListFromPos(coord)}
     checkBendSpeedWarning(pos);
   }
 }
@@ -691,21 +779,24 @@ function onGpsError(err){
   setStatus('GPS unavailable','danger');setText('gpsChip','GPS off');setWarning(msg,'warn');
   setText('analysisState','Not active');
   if(watchId!==null&&navigator.geolocation)navigator.geolocation.clearWatch(watchId);
-  watchId=null;$('gps').disabled=false;$('stopGps').disabled=true;
+  watchId=null;var gb=$('gps');if(gb){gb.textContent='Start GPS';gb.classList.remove('stop');gb.disabled=false}$('stopGps').disabled=true;
   var chip=$('gpsChip');if(chip)chip.classList.remove('acc-good','acc-fair','acc-poor');
 }
 function startGps(){
   if(!navigator.geolocation){setWarning('This browser does not support geolocation.','warn');return}
-  if(watchId!==null)return;
+  if(watchId!==null){stopGps();return}
   setStatus('Requesting GPS','warn');setWarning('Waiting for your device to provide a GPS position…','warn');
-  watchId=navigator.geolocation.watchPosition(onPosition,onGpsError,{enableHighAccuracy:true,maximumAge:1500,timeout:15000});
-  $('gps').disabled=true;$('stopGps').disabled=false;setText('analysisState','Waiting for GPS');
+  watchId=navigator.geolocation.watchPosition(onPosition,onGpsError,{enableHighAccuracy:true,maximumAge:2000,timeout:15000});
+  var gb=$('gps'); if(gb){gb.textContent='Stop GPS'; gb.classList.add('stop'); gb.disabled=false}
+  $('stopGps').disabled=false;setText('analysisState','Waiting for GPS');
 }
 function stopGps(){
   if(navigating)stopNavigation();
   if(watchId!==null)navigator.geolocation.clearWatch(watchId);
-  watchId=null;$('gps').disabled=false;$('stopGps').disabled=true;
-  setText('gpsChip','GPS off');$('gpsChip').classList.remove('acc-good','acc-fair','acc-poor');setText('analysisState','Not active');
+  watchId=null;
+  var gb=$('gps'); if(gb){gb.textContent='Start GPS'; gb.classList.remove('stop'); gb.disabled=false}
+  $('stopGps').disabled=true;
+  setText('gpsChip','GPS off');var chip=$('gpsChip'); if(chip)chip.classList.remove('acc-good','acc-fair','acc-poor');setText('analysisState','Not active');
   setStatus('GPS stopped','warn');setWarning('GPS tracking is stopped. Curve Guide is not a certified safety system.','warn');
 }
 function clearRoute(){route=[];updateRoute();updateCurveFeature(null);setText('curveDistance','—');setText('analysisState',watchId===null?'Not active':'Monitoring')}
@@ -1652,6 +1743,7 @@ document.getElementById('tipPrev').addEventListener('click',function(){show(i-1)
 document.getElementById('tipNext').addEventListener('click',function(){show(i+1);restart()});
 var card=q.parentNode.parentNode;card.addEventListener('mouseenter',function(){clearInterval(timer)});card.addEventListener('mouseleave',restart);
 paint();restart();
+document.addEventListener('visibilitychange',function(){if(document.hidden)clearInterval(timer);else restart()});
 var wq=document.getElementById('welcomeQuote'),w=document.getElementById('welcome'),j=0;
 if(!rm)var wt=setInterval(function(){if(w.hidden){clearInterval(wt);return}j=(j+1)%T.length;wq.classList.add('fade');setTimeout(function(){wq.textContent='“'+T[j]+'”';wq.classList.remove('fade')},FD)},4500);
 })();
@@ -1911,7 +2003,7 @@ function pickPlace(it){
 }
 function answer(q){
   var t=String(q||'').toLowerCase().trim();
-  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 7.0.";
+  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 7.0.1.";
   var explained=explainButton(t);
   if(explained)return explained;
   if(/voice|speak|mute|unmute|speech|talk|announce|mic|microphone/.test(t))
@@ -1921,7 +2013,7 @@ function answer(q){
   if(/destin|search|route|how do i (set|find)|directions?/.test(t)&&!extractPlace(q))
     return 'Say “go to …” or “take me to …”, or type in Search destination on the map. Then Route and Start navigation.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
-    return 'Curve Guide 7.0 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
+    return 'Curve Guide 7.0.1 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
   if(/disclaim|liabilit|certified|safe to use|replace|prototype/.test(t))
     return 'Curve Guide is an experimental prototype, not a certified safety or navigation system. Warnings and routes can be wrong. Always obey the road.';
   if(/gps|accur|±|plus.?minus|poor|fair|green|yellow|red chip/.test(t))
@@ -1938,7 +2030,7 @@ function answer(q){
     return tip+' (Ask for another safety tip anytime.)';
   }
   if(/hello|hi\b|hey|good (morning|afternoon|evening)/.test(t))
-    return "Hi! I'm Niyi for Curve Guide 7.0 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
+    return "Hi! I'm Niyi for Curve Guide 7.0.1 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
   return "I'm still learning — I match simple keywords and a few page actions. Try: go to …, start GPS, satellite, Contact us, or Navigation.";
 }
 function refreshDriveNote(){
@@ -1969,7 +2061,7 @@ function closePanel(){
   if(headerBtn)headerBtn.setAttribute('aria-expanded','false');
   if(window.speechSynthesis)try{window.speechSynthesis.cancel()}catch(e){}
   stopMic();
-  fab.focus();
+  if(headerBtn)headerBtn.focus(); else if(fab)fab.focus();
 }
 function ask(text){
   var q=String(text||'').trim();
@@ -2057,8 +2149,8 @@ function maybePulseNiyi(){
     sessionStorage.setItem('curveGuide.niyiPulse','1');
   }catch(e){}
   if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  fab.classList.add('niyi-pulse');
-  setTimeout(function(){fab.classList.remove('niyi-pulse')},2600);
+  var pulseEl=headerBtn||fab;
+  if(pulseEl){pulseEl.classList.add('niyi-pulse');setTimeout(function(){pulseEl.classList.remove('niyi-pulse')},2600)}
 }
 window.__cgPulseNiyi=maybePulseNiyi;
 
@@ -2082,7 +2174,7 @@ if(!('speechSynthesis' in window)){
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'&&panel.classList.contains('open'))closePanel();
 });
-setInterval(refreshDriveNote,1500);
+setInterval(function(){if(panel.classList.contains('open'))refreshDriveNote()},3000);
 })();
 </script>
 
@@ -2169,6 +2261,33 @@ setInterval(refreshDriveNote,1500);
     }else share(null,null);
   });
   window.__cgOpenEmergency=open;
+})();
+</script>
+
+<script>
+(function(){
+  var openBtn=document.getElementById('menuOpen');
+  var closeBtn=document.getElementById('menuClose');
+  var sheet=document.getElementById('menuSheet');
+  var backdrop=document.getElementById('menuBackdrop');
+  function openMenu(){
+    if(!sheet)return;
+    sheet.hidden=false; if(backdrop){backdrop.hidden=false; backdrop.classList.add('open')}
+    requestAnimationFrame(function(){sheet.classList.add('open')});
+    if(openBtn)openBtn.setAttribute('aria-expanded','true');
+  }
+  function closeMenu(){
+    if(!sheet)return;
+    sheet.classList.remove('open');
+    if(backdrop)backdrop.classList.remove('open');
+    if(openBtn)openBtn.setAttribute('aria-expanded','false');
+    setTimeout(function(){sheet.hidden=true; if(backdrop)backdrop.hidden=true},250);
+  }
+  if(openBtn)openBtn.addEventListener('click',openMenu);
+  if(closeBtn)closeBtn.addEventListener('click',closeMenu);
+  if(backdrop)backdrop.addEventListener('click',closeMenu);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&sheet&&sheet.classList.contains('open'))closeMenu()});
+  window.__cgOpenMenu=openMenu; window.__cgCloseMenu=closeMenu;
 })();
 </script>
 </body>
