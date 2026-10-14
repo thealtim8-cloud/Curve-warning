@@ -241,9 +241,29 @@ body.navigating .dest-card{max-height:38%}
 .niyi-mic[aria-pressed="true"]{border-color:#ff625c99;color:#ffaaa6;background:#ff625c18}
 .niyi-mic[hidden]{display:none}
 .niyi-mic-note{font-size:10.5px;color:var(--muted);padding:0 12px 8px;line-height:1.4}
+
+/* Route bends + hazards + favs + night + offline + emergency */
+.bend-list{margin:8px 0;padding:8px 10px;border-radius:10px;background:#13191d;border:1px solid var(--line);font-size:11.5px;line-height:1.45;color:#cfd8dd}
+.bend-list strong{color:#9be3bf}
+.bend-item{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid #ffffff0d}
+.bend-item:last-child{border-bottom:0}
+.bend-tag{font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px}
+.bend-tag.mild{color:#ffd08a}.bend-tag.moderate{color:#ffb347}.bend-tag.sharp{color:#ff625c}
+.speed-bend-banner{display:none;margin-top:6px;padding:8px 10px;border-radius:10px;background:#ff625c22;border:1px solid #ff625c66;color:#ffd0ce;font-size:12px;font-weight:700}
+.speed-bend-banner.open{display:block}
+.fav-row,.hazard-row,.emerg-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.offline-banner{display:none;position:sticky;top:0;z-index:60;padding:8px 12px;background:#ffb34722;border-bottom:1px solid #ffb34755;color:#ffd08a;font-size:12px;font-weight:600;text-align:center}
+.offline-banner.show{display:block}
+.night-toggle.active{border-color:#7aa2ff;color:#a8c4ff}
+.emerg-fab{position:fixed;z-index:41;left:max(14px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;border:1px solid #ff625c88;background:linear-gradient(180deg,#3a1818,#1a0f0f);color:#ffaaa6;font-weight:800;font-size:11px;box-shadow:0 10px 28px -8px #000c}
+.emerg-sheet{position:fixed;z-index:55;left:12px;right:12px;bottom:max(16px,env(safe-area-inset-bottom));display:none;flex-direction:column;gap:8px;padding:14px;border-radius:16px;background:#14191df5;border:1px solid #ff625c55;box-shadow:0 20px 50px -16px #000e}
+.emerg-sheet.open{display:flex}
+.install-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid #20c47744;background:#20c47712;font-size:12px}
+.install-bar.show{display:flex}
 </style>
 </head>
 <body class="welcome-open">
+<div class="offline-banner" id="offlineBanner">Offline — map tiles may not load</div>
 <div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="welcomeIntro">
   <div class="welcome-card" tabindex="-1" id="welcomeCard">
     <video class="welcome-video" id="welcomeVideo" autoplay muted loop playsinline preload="auto" poster="assets/welcome-poster.jpg" aria-label="Curve Guide — Safer turns. Smarter drives." disablepictureinpicture><source src="assets/welcome.mp4" type="video/mp4"></video>
@@ -278,6 +298,7 @@ body.navigating .dest-card{max-height:38%}
       </div>
     </div>
     <div class="header-actions">
+      <button type="button" class="btn night-toggle" id="nightToggle" title="Night map mode" aria-pressed="false">Night</button>
       <button type="button" class="niyi-header-btn" id="niyiHeaderBtn" aria-controls="niyiPanel" title="Ask Niyi">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
         Ask Niyi
@@ -285,6 +306,7 @@ body.navigating .dest-card{max-height:38%}
       <div class="pill">PROTOTYPE · v6.0 3D</div>
     </div>
   </header>
+  <div class="install-bar" id="installBar"><span id="installText">Install Curve Guide on your phone for quicker access.</span><button type="button" class="btn primary" id="installBtn">Install</button></div>
   <div class="hero" role="note"><div><b>Arrive alive.</b> Real-time curve awareness for safer journeys on Nigerian roads.</div><div class="hero-items"><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Safety first</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Satellite &amp; 3D</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>On-device GPS</span></div></div>
 
   <main class="dashboard">
@@ -340,6 +362,12 @@ body.navigating .dest-card{max-height:38%}
             <summary id="destStepsSummary">Turn-by-turn (text)</summary>
             <ol id="destStepsList"></ol>
           </details>
+          <div class="bend-list" id="bendList" hidden></div>
+          <div class="speed-bend-banner" id="speedBendBanner" role="alert">Slow down — sharp bend ahead</div>
+          <div class="fav-row" id="favRow"></div>
+          <div class="hazard-row">
+            <button type="button" class="btn" id="reportHazard">Report danger spot</button>
+          </div>
           <p class="dest-note">Routing by OpenStreetMap/OSRM demo — free test service, may be slow or unavailable. Voice uses your browser speechSynthesis (prototype guidance, not a certified navigation system).</p>
         </div>
       </div>
@@ -408,6 +436,14 @@ body.navigating .dest-card{max-height:38%}
 </div>
 
 
+<button type="button" class="emerg-fab" id="emergFab" title="Emergency">SOS</button>
+<div class="emerg-sheet" id="emergSheet" hidden>
+  <strong style="font-size:14px">Emergency options</strong>
+  <span class="small">Confirm before calling. Location share uses WhatsApp with a Google Maps link from your GPS (when available).</span>
+  <button type="button" class="btn primary" id="emergCall">Call 112 (Nigeria emergency)</button>
+  <button type="button" class="btn" id="emergWhatsApp">Share my location on WhatsApp</button>
+  <button type="button" class="btn" id="emergClose">Close</button>
+</div>
 <button type="button" class="niyi-fab" id="niyiFab" aria-expanded="false" aria-controls="niyiPanel" title="Ask Niyi">Niyi</button>
 <div class="niyi-panel" id="niyiPanel" role="dialog" aria-modal="false" aria-labelledby="niyiTitle" hidden>
   <div class="niyi-head">
@@ -550,6 +586,16 @@ function initMap(){
         map.addLayer({id:'curve-guide-curve',type:'circle',source:'curve',paint:{'circle-radius':9,'circle-color':'#ff625c','circle-stroke-color':'#ffffff','circle-stroke-width':2}});
         map.addSource('directions',{type:'geojson',data:EMPTY});
         map.addLayer({id:'curve-guide-directions',type:'line',source:'directions',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#4ea1ff','line-width':5,'line-opacity':0.92}});
+        map.addSource('bends',{type:'geojson',data:EMPTY});
+        map.addLayer({id:'curve-guide-bends',type:'circle',source:'bends',paint:{
+          'circle-radius':['match',['get','sharpness'],'sharp',9,'moderate',7,6],
+          'circle-color':['match',['get','sharpness'],'sharp','#ff625c','moderate','#ffb347','#ffd08a'],
+          'circle-stroke-color':'#ffffff','circle-stroke-width':1.5,'circle-opacity':0.95
+        }});
+        map.addSource('hazards',{type:'geojson',data:EMPTY});
+        map.addLayer({id:'curve-guide-hazards',type:'circle',source:'hazards',paint:{
+          'circle-radius':8,'circle-color':'#c084fc','circle-stroke-color':'#fff','circle-stroke-width':2
+        }});
         // Add 3D buildings only when the public vector style exposes the expected source and layer.
         var style=map.getStyle(), sources=style&&style.sources?style.sources:{};
         var vectorSource=Object.keys(sources).find(function(k){return sources[k]&&sources[k].type==='vector'&&sources[k]['url']});
@@ -628,6 +674,10 @@ function onPosition(pos){
   setStatus(navigating?'Navigating':'GPS position updated','good');
   if(destination)updateDestMeta();
   if(navigating)onNavPosition(pos);
+  if(routeBends.length&&current){
+    updateBendListFromPos([pos.coords.longitude,pos.coords.latitude]);
+    checkBendSpeedWarning(pos);
+  }
 }
 function onGpsError(err){
   var msg='GPS unavailable. Check location permission and device settings.';
@@ -784,6 +834,10 @@ function ensureDestMarker(coord){
 }
 function clearDirectionsLayer(){
   if(ready&&map&&map.getSource('directions'))map.getSource('directions').setData(EMPTY);
+  routeBends=[];
+  if(ready&&map&&map.getSource('bends'))map.getSource('bends').setData(EMPTY);
+  var bl=$('bendList'); if(bl){bl.hidden=true;bl.textContent=''}
+  var sb=$('speedBendBanner'); if(sb)sb.classList.remove('open');
   var steps=$('destSteps'),list=$('destStepsList');
   if(steps){steps.hidden=true;steps.open=false}
   if(list)list.textContent='';
@@ -838,6 +892,146 @@ function showSteps(steps){
   if(sum)sum.textContent='Turn-by-turn ('+slim.length+' steps)';
   box.hidden=!slim.length;
 }
+
+/* Route bend analysis + speed-on-bend warnings */
+var routeBends=[], lastBendWarnAt=0, lastBendWarnKey='';
+function resampleRoute(coords, stepM){
+  if(!coords||coords.length<2)return [];
+  var out=[coords[0]], acc=0;
+  for(var i=1;i<coords.length;i++){
+    var a=coords[i-1], b=coords[i], seg=distance(a,b);
+    if(seg<=0)continue;
+    var remain=stepM-acc;
+    while(remain<=seg){
+      var t=remain/seg;
+      out.push([a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t]);
+      seg-=remain; a=out[out.length-1]; remain=stepM; acc=0;
+    }
+    acc+=seg;
+  }
+  out.push(coords[coords.length-1]);
+  return out;
+}
+function analyseRouteBends(coords){
+  routeBends=[];
+  var samples=resampleRoute(coords, 20);
+  if(samples.length<5){paintBends();return routeBends}
+  var along=0, alongs=[0];
+  for(var i=1;i<samples.length;i++){along+=distance(samples[i-1],samples[i]); alongs.push(along)}
+  var windowM=50;
+  for(var i=1;i<samples.length-1;i++){
+    // find points ~windowM before/after
+    var back=i, fwd=i;
+    while(back>0 && alongs[i]-alongs[back]<windowM/2)back--;
+    while(fwd<samples.length-1 && alongs[fwd]-alongs[i]<windowM/2)fwd++;
+    if(back===i||fwd===i)continue;
+    var b1=bearing(samples[back], samples[i]);
+    var b2=bearing(samples[i], samples[fwd]);
+    var turn=Math.abs(angleDiff(b2,b1));
+    if(turn<28)continue;
+    var chord=distance(samples[back], samples[fwd]);
+    var ang=turn*Math.PI/180;
+    var radius=ang>0.05?(chord/(2*Math.sin(ang/2))):999;
+    var sharpness=turn>=70||radius<40?'sharp':(turn>=45||radius<80?'moderate':'mild');
+    // de-dupe nearby
+    if(routeBends.length && distance(routeBends[routeBends.length-1].coord, samples[i])<40){
+      if(turn>routeBends[routeBends.length-1].angle){
+        routeBends[routeBends.length-1]={coord:samples[i], angle:turn, radius:radius, sharpness:sharpness, along:alongs[i]};
+      }
+      continue;
+    }
+    routeBends.push({coord:samples[i], angle:turn, radius:radius, sharpness:sharpness, along:alongs[i]});
+  }
+  paintBends();
+  renderBendList();
+  return routeBends;
+}
+function paintBends(){
+  if(!ready||!map||!map.getSource('bends'))return;
+  var feats=routeBends.map(function(b,i){
+    return {type:'Feature',properties:{sharpness:b.sharpness,angle:Math.round(b.angle),radius:Math.round(b.radius),i:i},geometry:{type:'Point',coordinates:b.coord}};
+  });
+  map.getSource('bends').setData({type:'FeatureCollection',features:feats});
+}
+function renderBendList(){
+  var el=$('bendList'); if(!el)return;
+  if(!routeBends.length){el.hidden=true;el.textContent='';return}
+  el.hidden=false; el.textContent='';
+  var title=document.createElement('strong');
+  title.textContent='Upcoming bends on route (from geometry · estimate)';
+  el.appendChild(title);
+  routeBends.slice(0,8).forEach(function(b){
+    var row=document.createElement('div'); row.className='bend-item';
+    var left=document.createElement('span');
+    left.innerHTML=''; // use text
+    var tag=document.createElement('span'); tag.className='bend-tag '+b.sharpness; tag.textContent=b.sharpness;
+    var desc=document.createElement('span'); desc.textContent=' ~'+Math.round(b.angle)+'° turn · r≈'+Math.round(b.radius)+' m';
+    left.appendChild(tag); left.appendChild(desc);
+    var right=document.createElement('span'); right.textContent=fmtKm(b.along)+' along';
+    row.appendChild(left); row.appendChild(right);
+    el.appendChild(row);
+  });
+}
+function safeSpeedKmh(radius){
+  var a=3; // m/s² lateral
+  var v=Math.sqrt(Math.max(radius,8)*a); // m/s
+  var kmh=v*3.6;
+  return Math.min(90, Math.max(15, kmh));
+}
+function updateBendListFromPos(coord){
+  var el=$('bendList'); if(!el||!routeBends.length)return;
+  // rewrite with distance from current
+  el.hidden=false; el.textContent='';
+  var title=document.createElement('strong');
+  title.textContent='Bends ahead (geometry estimate)';
+  el.appendChild(title);
+  var upcoming=routeBends.map(function(b){
+    return {b:b, d:distance(coord,b.coord)};
+  }).filter(function(x){return x.d<5000}).sort(function(a,c){return a.d-c.d});
+  if(!upcoming.length){
+    var none=document.createElement('div'); none.textContent='No sharp bends detected nearby on this route geometry.';
+    el.appendChild(none); return;
+  }
+  upcoming.slice(0,6).forEach(function(x){
+    var row=document.createElement('div'); row.className='bend-item';
+    var left=document.createElement('span');
+    var tag=document.createElement('span'); tag.className='bend-tag '+x.b.sharpness; tag.textContent=x.b.sharpness;
+    var desc=document.createElement('span'); desc.textContent=' ~'+Math.round(x.b.angle)+'° · suggest ≤'+Math.round(safeSpeedKmh(x.b.radius))+' km/h';
+    left.appendChild(tag); left.appendChild(desc);
+    var right=document.createElement('span'); right.textContent=fmtNearDist(x.d);
+    row.appendChild(left); row.appendChild(right);
+    el.appendChild(row);
+  });
+}
+function checkBendSpeedWarning(pos){
+  var banner=$('speedBendBanner');
+  if(!routeBends.length||!pos){if(banner)banner.classList.remove('open');return}
+  var coord=[pos.coords.longitude,pos.coords.latitude];
+  var speed=Number.isFinite(pos.coords.speed)&&pos.coords.speed>=0?pos.coords.speed*3.6:null;
+  if(speed===null){if(banner)banner.classList.remove('open');return}
+  var hit=null;
+  for(var i=0;i<routeBends.length;i++){
+    var d=distance(coord, routeBends[i].coord);
+    if(d<=300 && (routeBends[i].sharpness==='sharp'||routeBends[i].sharpness==='moderate')){
+      var lim=safeSpeedKmh(routeBends[i].radius);
+      if(speed>lim+3){hit={bend:routeBends[i], d:d, lim:lim}; break}
+    }
+  }
+  if(!hit){if(banner)banner.classList.remove('open');return}
+  if(banner){
+    banner.classList.add('open');
+    banner.textContent='Slow down, sharp bend in '+fmtNearDist(hit.d)+' (suggest ≤'+Math.round(hit.lim)+' km/h · estimate)';
+  }
+  var key=Math.round(hit.bend.along)+':'+hit.bend.sharpness;
+  var now=Date.now();
+  if(key!==lastBendWarnKey || now-lastBendWarnAt>12000){
+    lastBendWarnKey=key; lastBendWarnAt=now;
+    if(navigating&&typeof navSpeak==='function'){
+      navSpeak('Slow down, sharp bend in '+Math.round(hit.d)+' metres');
+    }
+  }
+}
+
 /* Voice turn-by-turn navigation (browser speechSynthesis) */
 var navigating=false, navStepIndex=0, navRouteCoords=[], navStepAlong=[], navSpoken={}, navVoiceOn=true;
 var offRouteStreak=0, lastRerouteAt=0, lastCurveSpeakAt=0, wakeLock=null, navRemainDist=null, navRemainEta=null;
@@ -1061,6 +1255,7 @@ function applyOsrmRoute(data,opts){
   destination.steps=steps;
   buildStepAlong(steps,navRouteCoords);
   showSteps(steps);
+  analyseRouteBends(navRouteCoords);
   updateDestMeta();
   navRemainDist=r.distance;navRemainEta=r.duration;
   if(!opts.silentFit&&geom&&geom.coordinates&&geom.coordinates.length&&map&&!navigating){
