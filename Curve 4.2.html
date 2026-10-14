@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Curve Guide is a road safety development prototype designed to support driver awareness around road curves.">
+<meta name="theme-color" content="#101820">
+<title>Curve Guide | Intelligent Road Safety System</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#101820;--panel:#17232d;--panel2:#1d2c37;--line:#2c3d49;--text:#edf4f7;--muted:#9eb0ba;--lime:#b9f34a;--green:#20c477;--orange:#ffb347;--red:#ff625c}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+button{font:inherit;cursor:pointer}
+.app{width:min(100%,1100px);margin:0 auto;padding:14px;display:grid;gap:12px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 2px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.logo{width:44px;height:44px;border-radius:13px;background:var(--lime);display:grid;place-items:center;color:#101820;font-weight:950;font-size:20px;flex:none}
+h1{font-size:20px;line-height:1.1;margin:0;letter-spacing:-.4px}
+.subtitle{font-size:12px;color:var(--muted);margin-top:5px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:11px;color:var(--muted);white-space:nowrap}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 15px 11px}
+.panel-head h2{font-size:14px;margin:0}
+.small{font-size:11px;color:var(--muted)}
+.map-wrap{height:min(58vh,540px);min-height:310px;position:relative;background:#15232d}
+#map{position:absolute;inset:0}
+.map-status{position:absolute;z-index:2;left:12px;right:12px;top:12px;pointer-events:none;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.status-chip{background:#101820e8;border:1px solid #ffffff20;border-radius:11px;padding:8px 10px;font-size:11px;backdrop-filter:blur(8px);max-width:75%}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--orange);margin-right:6px}
+.map-controls{position:absolute;z-index:3;right:12px;bottom:14px;display:grid;gap:7px}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid #ffffff30;background:#101820ed;color:white;font-size:19px;display:grid;place-items:center;box-shadow:0 4px 14px #0003}
+.maplibregl-ctrl-bottom-left,.maplibregl-ctrl-bottom-right{z-index:2}
+.maplibregl-ctrl-group{background:#17232d!important;border:1px solid #ffffff24!important}
+.maplibregl-ctrl-group button{background-color:transparent!important}
+.maplibregl-ctrl button .maplibregl-ctrl-icon{filter:invert(1)}
+.car-marker{width:23px;height:34px;position:relative;filter:drop-shadow(0 2px 5px #0009)}
+.car-marker:before{content:"";position:absolute;left:4px;top:2px;width:15px;height:29px;background:var(--lime);border:2px solid #fff;border-radius:7px 7px 5px 5px;box-shadow:inset 0 -7px 0 #8bbd27}
+.car-marker:after{content:"";position:absolute;left:8px;top:7px;width:7px;height:9px;border-radius:3px;background:#223746}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.metric{padding:13px 12px;background:var(--panel);border:1px solid var(--line);border-radius:15px;min-width:0}
+.metric-label{font-size:11px;color:var(--muted);margin-bottom:8px}
+.metric-value{font-size:clamp(18px,4vw,25px);font-weight:750;letter-spacing:-.6px;overflow-wrap:anywhere}
+.metric-unit{font-size:11px;color:var(--muted);font-weight:500}
+.content{padding:14px 15px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.section-title{font-size:14px;font-weight:750}
+.status-box{margin-top:12px;padding:12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:13px;line-height:1.5}
+.status-box.good{border-color:#20c47755}
+.status-box.warn{border-color:#ffb34766}
+.status-box.danger{border-color:#ff625c77}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:11px;padding:10px 12px;font-size:12px;font-weight:650}
+.btn.primary{background:var(--lime);border-color:var(--lime);color:#111a20}
+.btn.active{border-color:var(--lime);color:var(--lime)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.notice{font-size:11px;line-height:1.55;color:var(--muted);padding:13px 14px}
+.notice strong{color:var(--text)}
+footer{text-align:center;color:#71838e;font-size:10px;padding:3px 0 8px}
+@media(min-width:760px){.app{padding:20px}.dashboard{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,1fr);gap:12px;align-items:start}.map-panel{grid-row:span 2}.map-wrap{height:600px}.side-stack{display:grid;gap:12px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between}.metric-label{margin:0}.metric-value{font-size:23px}}
+@media(max-width:390px){.app{padding:10px}.pill{font-size:10px}.map-wrap{min-height:290px}.btn{padding:9px 10px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden="true">CG</div>
+      <div>
+        <h1>Curve Guide</h1>
+        <div class="subtitle">Intelligent Road Safety System · Development prototype</div>
+      </div>
+    </div>
+    <div class="pill">PROTOTYPE · v4.2 3D</div>
+  </header>
+
+  <main class="dashboard">
+    <section class="panel map-panel" aria-label="Map">
+      <div class="panel-head">
+        <h2>Live road view</h2>
+        <span class="small" id="mapMode">3D perspective</span>
+      </div>
+      <div class="map-wrap">
+        <div id="map" aria-label="Interactive map"></div>
+        <div class="map-status">
+          <div class="status-chip"><span class="status-dot" id="statusDot"></span><span id="topStatus">Map loading…</span></div>
+          <div class="status-chip" id="gpsChip">GPS off</div>
+        </div>
+        <div class="map-controls">
+          <button class="icon-btn" id="zin" aria-label="Zoom in" title="Zoom in">+</button>
+          <button class="icon-btn" id="zout" aria-label="Zoom out" title="Zoom out">−</button>
+          <button class="icon-btn" id="tilt" aria-label="Toggle 3D tilt" title="Toggle 3D tilt">3D</button>
+          <button class="icon-btn" id="orient" aria-label="Change map orientation" title="Change orientation">↗</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="side-stack">
+      <section class="metrics" aria-label="Driving metrics">
+        <div class="metric"><div class="metric-label">Speed</div><div class="metric-value"><span id="speed">—</span> <span class="metric-unit" id="speedUnit">km/h</span></div></div>
+        <div class="metric"><div class="metric-label">Heading</div><div class="metric-value"><span id="heading">—</span><span class="metric-unit">°</span></div></div>
+        <div class="metric"><div class="metric-label">Next curve</div><div class="metric-value" id="curveDistance">— <span class="metric-unit">m</span></div></div>
+      </section>
+
+      <section class="panel">
+        <div class="content">
+          <div class="row">
+            <div class="section-title">Curve awareness</div>
+            <span class="small" id="analysisState">Not active</span>
+          </div>
+          <div class="status-box warn" id="warningBox" role="status" aria-live="polite">
+            Curve analysis is a development feature. Start GPS to test the prototype; do not rely on its warnings for driving decisions.
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="gps">Start GPS</button>
+            <button class="btn" id="stopGps" disabled>Stop GPS</button>
+            <button class="btn" id="follow">Follow: On</button>
+            <button class="btn" id="unit">Units: km/h</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="content">
+          <div class="row">
+            <div class="section-title">Route & map data</div>
+            <span class="small" id="routeState">No route yet</span>
+          </div>
+          <div class="small" style="line-height:1.6;margin-top:9px">The map uses community map data. Road geometry and curve estimates may be incomplete or inaccurate.</div>
+          <div class="actions">
+            <button class="btn" id="recenter">Recenter map</button>
+            <button class="btn" id="clearRoute">Clear route</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <section class="panel notice">
+    <strong>Safety notice:</strong> Curve Guide is an experimental road-awareness prototype, not a certified driver-assistance or navigation system. GPS accuracy, map data, device sensors, and curve estimates can be wrong or delayed. Never interact with this page while driving; set it up before a trip and have a passenger operate it. Always obey road signs, speed limits, and actual road conditions.
+  </section>
+  <footer>Curve Guide · Road safety development prototype · Map data © OpenStreetMap contributors</footer>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+(function(){
+'use strict';
+var map=null, carMarker=null, watchId=null, ready=false, follow=true, tilted=true, headingUp=true, useMph=false;
+var current=null, previous=null, route=[], lastCurveAt=0, lastHeading=null, curveEstimate=null, overpassBusy=false;
+var EMPTY={type:'FeatureCollection',features:[]};
+var $=function(id){return document.getElementById(id)};
+function setText(id,text){var el=$(id);if(el)el.textContent=text}
+function setStatus(text,kind){
+  setText('topStatus',text);
+  var dot=$('statusDot');
+  if(dot)dot.style.background=kind==='good'?'#20c477':kind==='danger'?'#ff625c':'#ffb347';
+}
+function setWarning(text,kind){
+  var box=$('warningBox');box.textContent=text;box.className='status-box '+(kind||'warn');
+}
+function fmt(n,d){return Number.isFinite(n)?n.toFixed(d||0):'—'}
+function bearing(a,b){
+  var r=Math.PI/180, p1=a[1]*r,p2=b[1]*r,dl=(b[0]-a[0])*r;
+  var y=Math.sin(dl)*Math.cos(p2),x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
+  return (Math.atan2(y,x)/r+360)%360;
+}
+function distance(a,b){
+  var r=Math.PI/180,lat1=a[1]*r,lat2=b[1]*r,dlat=(b[1]-a[1])*r,dlon=(b[0]-a[0])*r;
+  var h=Math.sin(dlat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dlon/2)**2;
+  return 6371000*2*Math.atan2(Math.sqrt(h),Math.sqrt(Math.max(0,1-h)));
+}
+function angleDiff(a,b){return ((a-b+540)%360)-180}
+function updateMetrics(pos){
+  var speed=Number.isFinite(pos.coords.speed)&&pos.coords.speed>=0?pos.coords.speed*3.6:null;
+  setText('speed',speed===null?'—':fmt(speed*(useMph?0.621371:1),0));
+  setText('speedUnit',useMph?'mph':'km/h');
+  var h=Number.isFinite(pos.coords.heading)&&pos.coords.heading>=0?pos.coords.heading:(lastHeading!==null?lastHeading:null);
+  setText('heading',h===null?'—':fmt(h,0));
+  setText('gpsChip','GPS active · '+(speed===null?'speed unavailable':fmt(speed,0)+' km/h'));
+}
+function updateRoute(){
+  if(!ready||!map.getSource('route'))return;
+  var features=[];
+  if(route.length>1)features.push({type:'Feature',properties:{},geometry:{type:'LineString',coordinates:route}});
+  map.getSource('route').setData({type:'FeatureCollection',features:features});
+  setText('routeState',route.length>1?route.length+' GPS points':'No route yet');
+}
+function updateCurveFeature(coord){
+  if(!ready||!map.getSource('curve'))return;
+  map.getSource('curve').setData(coord?{type:'FeatureCollection',features:[{type:'Feature',properties:{kind:'estimated-curve'},geometry:{type:'Point',coordinates:coord}}]}:EMPTY);
+}
+function applyCamera(){
+  if(!map||!current)return;
+  var center=[current.coords.longitude,current.coords.latitude];
+  var h=Number.isFinite(current.coords.heading)&&current.coords.heading>=0?current.coords.heading:(lastHeading||0);
+  map.easeTo({center:center,zoom:Math.max(map.getZoom(),16),pitch:tilted?55:0,bearing:headingUp?h:0,duration:450,essential:true});
+}
+function setFollow(on){follow=on;setText('follow','Follow: '+(follow?'On':'Off'));$('follow').classList.toggle('active',follow)}
+function initMap(){
+  if(!window.maplibregl){setStatus('Map library did not load', 'danger');setWarning('The map library could not load. Check your internet connection and reload.');return}
+  try{
+    map=new maplibregl.Map({
+      container:'map',
+      style:'https://tiles.openfreemap.org/styles/bright',
+      center:[3.3792,6.5244],
+      zoom:13,
+      pitch:55,
+      bearing:0,
+      antialias:true,
+      attributionControl:true
+    });
+    map.addControl(new maplibregl.NavigationControl({showCompass:true,showZoom:false,visualizePitch:true}),'bottom-left');
+    var el=document.createElement('div');el.className='car-marker';el.setAttribute('aria-label','Your approximate GPS position');
+    carMarker=new maplibregl.Marker({element:el,rotationAlignment:'map',pitchAlignment:'map'}).setLngLat([3.3792,6.5244]).addTo(map);
+    map.on('error',function(){setStatus('Some map data failed to load','warn')});
+    map.on('load',function(){
+      try{
+        map.addSource('route',{type:'geojson',data:EMPTY});
+        map.addLayer({id:'curve-guide-route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#20c477','line-width':6,'line-opacity':0.9}});
+        map.addSource('curve',{type:'geojson',data:EMPTY});
+        map.addLayer({id:'curve-guide-curve',type:'circle',source:'curve',paint:{'circle-radius':9,'circle-color':'#ff625c','circle-stroke-color':'#ffffff','circle-stroke-width':2}});
+        // Add 3D buildings only when the public vector style exposes the expected source and layer.
+        var style=map.getStyle(), sources=style&&style.sources?style.sources:{};
+        var vectorSource=Object.keys(sources).find(function(k){return sources[k]&&sources[k].type==='vector'&&sources[k]['url']});
+        var sourceId=(sources.openmaptiles?'openmaptiles':vectorSource);
+        if(sourceId){
+          var existing=map.getStyle().layers||[];
+          var labelLayer=existing.find(function(l){return l.type==='symbol'&&l.layout&&l.layout['text-field']});
+          try{
+            map.addLayer({
+              id:'curve-guide-3d-buildings',
+              source:sourceId,
+              'source-layer':'building',
+              type:'fill-extrusion',
+              minzoom:14,
+              filter:['all',['!=',['get','hide_3d'],'true']],
+              paint:{
+                'fill-extrusion-color':['interpolate',['linear'],['coalesce',['to-number',['get','render_height']],['to-number',['get','height']],3],0,'#b9c9d2',30,'#728b9b',100,'#526b7b'],
+                'fill-extrusion-height':['interpolate',['linear'],['zoom'],14,0,15,['coalesce',['to-number',['get','render_height']],['to-number',['get','height']],3]],
+                'fill-extrusion-base':['coalesce',['to-number',['get','render_min_height']],['to-number',['get','min_height']],0],
+                'fill-extrusion-opacity':0.82
+              }
+            },labelLayer?labelLayer.id:undefined);
+          }catch(e){/* The base map remains usable if 3D building data is not available. */}
+        }
+        ready=true;setStatus('Map ready · 3D view enabled','good');setText('mapMode','3D perspective');setFollow(true);
+        if(!sourceId)setText('mapMode','Tilted map');
+      }catch(e){setStatus('Map loaded with limited features','warn')}
+    });
+  }catch(e){setStatus('Could not initialize map','danger');setWarning('The map could not start. Check your connection and reload the page.')}
+}
+function maybeEstimateCurve(pos){
+  if(!previous||!Number.isFinite(pos.coords.latitude)||!Number.isFinite(pos.coords.longitude))return;
+  var a=[previous.coords.longitude,previous.coords.latitude],b=[pos.coords.longitude,pos.coords.latitude];
+  var d=distance(a,b);
+  if(d<5||d>100)return;
+  var h=Number.isFinite(pos.coords.heading)&&pos.coords.heading>=0?pos.coords.heading:bearing(a,b);
+  if(lastHeading!==null){
+    var turn=Math.abs(angleDiff(h,lastHeading));
+    if(turn>22&&d<75){
+      curveEstimate={coord:b,at:Date.now()};
+      updateCurveFeature(b);
+      var speed=Number.isFinite(pos.coords.speed)?pos.coords.speed*3.6:null;
+      setText('curveDistance','Nearby');
+      setWarning('A change in travel direction was detected. This is only a rough prototype estimate, not a verified road-curve warning.','warn');
+      setText('analysisState','Curve change detected');
+      lastCurveAt=Date.now();
+    }else if(Date.now()-lastCurveAt>12000){
+      setText('curveDistance','—');
+      updateCurveFeature(null);
+      setText('analysisState','Monitoring');
+      setWarning('GPS is active. No recent direction change was detected; this does not mean the road ahead is clear.','good');
+    }
+  }
+  lastHeading=h;
+}
+function onPosition(pos){
+  previous=current;current=pos;
+  var coord=[pos.coords.longitude,pos.coords.latitude];
+  if(!Number.isFinite(coord[0])||!Number.isFinite(coord[1]))return;
+  if(route.length===0||distance(route[route.length-1],coord)>3){route.push(coord);if(route.length>1500)route.shift();updateRoute()}
+  if(carMarker)carMarker.setLngLat(coord);
+  updateMetrics(pos);maybeEstimateCurve(pos);
+  if(follow&&map){
+    var h=Number.isFinite(pos.coords.heading)&&pos.coords.heading>=0?pos.coords.heading:(lastHeading||0);
+    map.easeTo({center:coord,zoom:Math.max(map.getZoom(),16),pitch:tilted?55:0,bearing:headingUp?h:0,duration:700,essential:true});
+  }
+  setStatus('GPS position updated','good');
+}
+function onGpsError(err){
+  var msg='GPS unavailable. Check location permission and device settings.';
+  if(err&&err.code===1)msg='Location permission was denied. Allow location access for this website to use GPS.';
+  else if(err&&err.code===3)msg='GPS request timed out. Try again where the sky is more visible.';
+  setStatus('GPS unavailable','danger');setText('gpsChip','GPS off');setWarning(msg,'warn');
+  setText('analysisState','Not active');
+}
+function startGps(){
+  if(!navigator.geolocation){setWarning('This browser does not support geolocation.','warn');return}
+  if(watchId!==null)return;
+  setStatus('Requesting GPS','warn');setWarning('Waiting for your device to provide a GPS position…','warn');
+  watchId=navigator.geolocation.watchPosition(onPosition,onGpsError,{enableHighAccuracy:true,maximumAge:1500,timeout:15000});
+  $('gps').disabled=true;$('stopGps').disabled=false;setText('analysisState','Waiting for GPS');
+}
+function stopGps(){
+  if(watchId!==null)navigator.geolocation.clearWatch(watchId);
+  watchId=null;$('gps').disabled=false;$('stopGps').disabled=true;
+  setText('gpsChip','GPS off');setText('analysisState','Not active');
+  setStatus('GPS stopped','warn');setWarning('GPS tracking is stopped. Curve Guide is not a certified safety system.','warn');
+}
+function clearRoute(){route=[];updateRoute();updateCurveFeature(null);setText('curveDistance','—');setText('analysisState',watchId===null?'Not active':'Monitoring')}
+$('gps').addEventListener('click',startGps);
+$('stopGps').addEventListener('click',stopGps);
+$('follow').addEventListener('click',function(){setFollow(!follow)});
+$('unit').addEventListener('click',function(){useMph=!useMph;setText('unit','Units: '+(useMph?'mph':'km/h'));if(current)updateMetrics(current)});
+$('zin').addEventListener('click',function(){if(map)map.zoomTo(Math.min(20,map.getZoom()+1),{duration:250})});
+$('zout').addEventListener('click',function(){if(map)map.zoomTo(Math.max(2,map.getZoom()-1),{duration:250})});
+$('tilt').addEventListener('click',function(){tilted=!tilted;setText('tilt',tilted?'3D':'2D');if(map)map.easeTo({pitch:tilted?55:0,duration:450});setText('mapMode',tilted?'3D perspective':'Flat view')});
+$('orient').addEventListener('click',function(){headingUp=!headingUp;setText('orient',headingUp?'↗':'N');if(map)map.easeTo({bearing:headingUp&&current&&Number.isFinite(current.coords.heading)?current.coords.heading:0,duration:400});});
+$('recenter').addEventListener('click',function(){if(current){setFollow(true);applyCamera()}else if(map)map.easeTo({center:[3.3792,6.5244],zoom:13,pitch:tilted?55:0,bearing:0,duration:500})});
+$('clearRoute').addEventListener('click',clearRoute);
+window.addEventListener('beforeunload',function(){if(watchId!==null)navigator.geolocation.clearWatch(watchId)});
+initMap();
+})();
+</script>
+</body>
+</html>
