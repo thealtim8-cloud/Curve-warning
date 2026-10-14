@@ -6,6 +6,7 @@
 <meta name="description" content="Curve Guide is a road safety development prototype designed to support driver awareness around road curves.">
 <meta name="theme-color" content="#101820">
 <title>Curve Guide | Intelligent Road Safety System</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
 <style>
 :root{color-scheme:dark;--bg:#101820;--panel:#17232d;--panel2:#1d2c37;--line:#2c3d49;--text:#edf4f7;--muted:#9eb0ba;--lime:#b9f34a;--green:#20c477;--orange:#ffb347;--red:#ff625c}
@@ -60,13 +61,19 @@ h1{font-size:20px;line-height:1.1;margin:0;letter-spacing:-.4px}
 footer{text-align:center;color:#71838e;font-size:10px;padding:3px 0 8px}
 @media(min-width:760px){.app{padding:20px}.dashboard{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,1fr);gap:12px;align-items:start}.map-panel{grid-row:span 2}.map-wrap{height:600px}.side-stack{display:grid;gap:12px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between}.metric-label{margin:0}.metric-value{font-size:23px}}
 @media(max-width:390px){.app{padding:10px}.pill{font-size:10px}.map-wrap{min-height:290px}.btn{padding:9px 10px}}
+.logo-img{width:48px;height:48px;border-radius:13px;object-fit:cover;flex:none;background:#1a1d20;display:block}
+.credit{display:grid;justify-items:center;gap:9px;padding:18px 12px 6px}
+.credit-label{font-size:10px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+.credit-card{background:#fff;border-radius:12px;padding:8px 16px;box-shadow:0 4px 14px #0004}
+.credit-card img{height:44px;width:auto;display:block}
+.credit-copy{font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
 <div class="app">
   <header>
     <div class="brand">
-      <div class="logo" aria-hidden="true">CG</div>
+      <img class="logo-img" src="assets/curveguide-logo.png" alt="Curve Guide logo">
       <div>
         <h1>Curve Guide</h1>
         <div class="subtitle">Intelligent Road Safety System · Development prototype</div>
@@ -140,6 +147,11 @@ footer{text-align:center;color:#71838e;font-size:10px;padding:3px 0 8px}
   <section class="panel notice">
     <strong>Safety notice:</strong> Curve Guide is an experimental road-awareness prototype, not a certified driver-assistance or navigation system. GPS accuracy, map data, device sensors, and curve estimates can be wrong or delayed. Never interact with this page while driving; set it up before a trip and have a passenger operate it. Always obey road signs, speed limits, and actual road conditions.
   </section>
+  <div class="credit">
+    <div class="credit-label">Developed by</div>
+    <div class="credit-card"><img src="assets/adeniyi-logo.png" alt="Adeniyi Investments &amp; Property Ltd."></div>
+    <div class="credit-copy">&copy; 2026 Adeniyi Investments &amp; Property Ltd. All rights reserved.</div>
+  </div>
   <footer>Curve Guide · Road safety development prototype · Map data © OpenStreetMap contributors</footer>
 </div>
 
