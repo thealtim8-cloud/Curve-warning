@@ -6,67 +6,79 @@
 <meta name="description" content="Curve Guide is a road safety development prototype designed to support driver awareness around road curves.">
 <meta name="theme-color" content="#101820">
 <title>Curve Guide | Intelligent Road Safety System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--bg:#101820;--panel:#17232d;--panel2:#1d2c37;--line:#2c3d49;--text:#edf4f7;--muted:#9eb0ba;--lime:#b9f34a;--green:#20c477;--orange:#ffb347;--red:#ff625c}
+:root{color-scheme:dark;--bg:#0d1114;--bg2:#13191d;--panel:#161d22;--panel2:#1c252b;--line:#263139;--line2:#33414b;--text:#eef3f5;--muted:#93a3ad;--silver:#c9d1d6;--lime:#20c477;--green:#20c477;--green2:#17a863;--orange:#ffb347;--red:#ff625c;--radius:18px;--shadow:0 1px 0 #ffffff08 inset,0 10px 30px -12px #000a}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);background:radial-gradient(900px 420px at 15% -10%,#20c47714,transparent 60%),radial-gradient(800px 400px at 100% 0,#c9d1d60d,transparent 60%),var(--bg);background-attachment:fixed}
 button{font:inherit;cursor:pointer}
-.app{width:min(100%,1100px);margin:0 auto;padding:14px;display:grid;gap:12px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 2px}
-.brand{display:flex;align-items:center;gap:11px;min-width:0}
-.logo{width:44px;height:44px;border-radius:13px;background:var(--lime);display:grid;place-items:center;color:#101820;font-weight:950;font-size:20px;flex:none}
-h1{font-size:20px;line-height:1.1;margin:0;letter-spacing:-.4px}
-.subtitle{font-size:12px;color:var(--muted);margin-top:5px}
-.pill{border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:11px;color:var(--muted);white-space:nowrap}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
-.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 15px 11px}
-.panel-head h2{font-size:14px;margin:0}
-.small{font-size:11px;color:var(--muted)}
+.app{width:min(100%,1160px);margin:0 auto;padding:16px;display:grid;gap:14px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 2px 4px}
+.brand{display:flex;align-items:center;gap:13px;min-width:0}
+.logo-img{width:52px;height:52px;border-radius:14px;object-fit:cover;flex:none;background:#1a1d20;display:block;border:1px solid var(--line2);box-shadow:0 6px 18px -6px #000c,0 0 0 4px #20c4770d}
+h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;color:#f4f7f8}
+.tagline{font-size:10.5px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--green);margin-top:5px}
+.subtitle{font-size:12px;color:var(--muted);margin-top:3px}
+.pill{border:1px solid #20c47740;background:#20c47712;border-radius:999px;padding:7px 11px;font-size:10.5px;font-weight:600;letter-spacing:.4px;color:#9be3bf;white-space:nowrap}
+.panel{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px 12px;border-bottom:1px solid var(--line)}
+.panel-head h2{font-size:14px;font-weight:700;margin:0;letter-spacing:-.1px}
+.small{font-size:11.5px;color:var(--muted)}
 .map-wrap{height:min(58vh,540px);min-height:310px;position:relative;background:#15232d}
 #map{position:absolute;inset:0}
 .map-status{position:absolute;z-index:2;left:12px;right:12px;top:12px;pointer-events:none;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
-.status-chip{background:#101820e8;border:1px solid #ffffff20;border-radius:11px;padding:8px 10px;font-size:11px;backdrop-filter:blur(8px);max-width:75%}
-.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--orange);margin-right:6px}
+.status-chip{background:#0d1114e6;border:1px solid #ffffff1c;border-radius:999px;padding:7px 12px;font-size:11px;font-weight:500;backdrop-filter:blur(10px);max-width:75%;box-shadow:0 4px 14px #0005}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--orange);margin-right:7px;box-shadow:0 0 0 3px #ffffff10}
 .map-controls{position:absolute;z-index:3;right:12px;bottom:14px;display:grid;gap:7px}
-.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid #ffffff30;background:#101820ed;color:white;font-size:19px;display:grid;place-items:center;box-shadow:0 4px 14px #0003}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid #ffffff26;background:#0d1114e8;color:#fff;font-size:17px;font-weight:600;display:grid;place-items:center;box-shadow:0 4px 14px #0005;backdrop-filter:blur(8px);transition:background .15s,border-color .15s,transform .1s}
+.icon-btn:hover{background:#1c252b;border-color:#20c47780}
+.icon-btn:active{transform:scale(.96)}
 .maplibregl-ctrl-bottom-left,.maplibregl-ctrl-bottom-right{z-index:2}
-.maplibregl-ctrl-group{background:#17232d!important;border:1px solid #ffffff24!important}
+.maplibregl-ctrl-group{background:#161d22!important;border:1px solid #ffffff24!important}
 .maplibregl-ctrl-group button{background-color:transparent!important}
 .maplibregl-ctrl button .maplibregl-ctrl-icon{filter:invert(1)}
 .car-marker{width:23px;height:34px;position:relative;filter:drop-shadow(0 2px 5px #0009)}
-.car-marker:before{content:"";position:absolute;left:4px;top:2px;width:15px;height:29px;background:var(--lime);border:2px solid #fff;border-radius:7px 7px 5px 5px;box-shadow:inset 0 -7px 0 #8bbd27}
-.car-marker:after{content:"";position:absolute;left:8px;top:7px;width:7px;height:9px;border-radius:3px;background:#223746}
-.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-.metric{padding:13px 12px;background:var(--panel);border:1px solid var(--line);border-radius:15px;min-width:0}
-.metric-label{font-size:11px;color:var(--muted);margin-bottom:8px}
-.metric-value{font-size:clamp(18px,4vw,25px);font-weight:750;letter-spacing:-.6px;overflow-wrap:anywhere}
-.metric-unit{font-size:11px;color:var(--muted);font-weight:500}
-.content{padding:14px 15px}
+.car-marker:before{content:"";position:absolute;left:4px;top:2px;width:15px;height:29px;background:var(--green);border:2px solid #fff;border-radius:7px 7px 5px 5px;box-shadow:inset 0 -7px 0 var(--green2)}
+.car-marker:after{content:"";position:absolute;left:8px;top:7px;width:7px;height:9px;border-radius:3px;background:#1c252b}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.metric{position:relative;padding:13px 13px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;min-width:0;box-shadow:var(--shadow);overflow:hidden}
+.metric:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--green),#20c47700)}
+.metric-label{font-size:10.5px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.metric-value{font-size:clamp(19px,4.4vw,26px);font-weight:750;letter-spacing:-.6px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.metric-unit{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0}
+.content{padding:16px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.section-title{font-size:14px;font-weight:750}
-.status-box{margin-top:12px;padding:12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:13px;line-height:1.5}
-.status-box.good{border-color:#20c47755}
-.status-box.warn{border-color:#ffb34766}
-.status-box.danger{border-color:#ff625c77}
-.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:11px;padding:10px 12px;font-size:12px;font-weight:650}
-.btn.primary{background:var(--lime);border-color:var(--lime);color:#111a20}
-.btn.active{border-color:var(--lime);color:var(--lime)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.notice{font-size:11px;line-height:1.55;color:var(--muted);padding:13px 14px}
-.notice strong{color:var(--text)}
-footer{text-align:center;color:#71838e;font-size:10px;padding:3px 0 8px}
-@media(min-width:760px){.app{padding:20px}.dashboard{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,1fr);gap:12px;align-items:start}.map-panel{grid-row:span 2}.map-wrap{height:600px}.side-stack{display:grid;gap:12px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between}.metric-label{margin:0}.metric-value{font-size:23px}}
-@media(max-width:390px){.app{padding:10px}.pill{font-size:10px}.map-wrap{min-height:290px}.btn{padding:9px 10px}}
-.logo-img{width:48px;height:48px;border-radius:13px;object-fit:cover;flex:none;background:#1a1d20;display:block}
-.credit{display:grid;justify-items:center;gap:9px;padding:18px 12px 6px}
-.credit-label{font-size:10px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
-.credit-card{background:#fff;border-radius:12px;padding:8px 16px;box-shadow:0 4px 14px #0004}
+.section-title{font-size:14px;font-weight:700;letter-spacing:-.1px}
+.status-box{margin-top:12px;padding:12px 14px;border-radius:12px;background:#0d1114a0;border:1px solid var(--line);border-left-width:3px;font-size:13px;line-height:1.55;color:#dbe3e7}
+.status-box.good{border-color:#20c47766;border-left-color:var(--green)}
+.status-box.warn{border-color:#ffb34755;border-left-color:var(--orange)}
+.status-box.danger{border-color:#ff625c66;border-left-color:var(--red)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btn{border:1px solid var(--line2);background:#222c33;color:var(--text);border-radius:11px;padding:10px 14px;font-size:12.5px;font-weight:600;transition:background .15s,border-color .15s,color .15s,box-shadow .15s,transform .1s}
+.btn:hover:not(:disabled){background:#2a363e;border-color:#4a5a65}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:focus-visible,.icon-btn:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766}
+.btn.primary{background:linear-gradient(180deg,#27d083,var(--green2));border-color:#20c477;color:#06150d;box-shadow:0 6px 16px -6px #20c477aa}
+.btn.primary:hover:not(:disabled){background:linear-gradient(180deg,#34dc8f,#1bb46b);border-color:#34dc8f}
+.btn.active{border-color:#20c477aa;color:#5fe0a3;background:#20c47714}
+.btn:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}
+.notice{font-size:11.5px;line-height:1.6;color:var(--muted);padding:14px 16px 14px 18px;position:relative;background:linear-gradient(180deg,#1f1a12,#18160f);border-color:#ffb34730}
+.notice:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--orange)}
+.notice strong{color:#ffcf8a}
+.site-footer{margin-top:6px;padding:20px 12px 10px;border-top:1px solid var(--line);display:grid;justify-items:center;gap:14px}
+.credit{display:grid;justify-items:center;gap:10px}
+.credit-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.credit-card{background:#fff;border-radius:12px;padding:8px 18px;box-shadow:0 8px 24px -8px #000c,0 0 0 1px #ffffff30}
 .credit-card img{height:44px;width:auto;display:block}
-.credit-copy{font-size:11px;color:var(--muted)}
+.credit-copy{text-align:center;font-size:11.5px;color:var(--silver)}
+footer{text-align:center;color:#6f7f89;font-size:10.5px;line-height:1.5;padding:0}
+@media(min-width:760px){.app{padding:24px;gap:16px}.dashboard{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr);gap:16px;align-items:start}.map-panel{grid-row:span 2}.map-wrap{height:600px}.side-stack{display:grid;gap:16px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}.metric-label{margin:0}.metric-value{font-size:23px}h1{font-size:24px}.logo-img{width:56px;height:56px}}
+@media(max-width:390px){.app{padding:12px}.pill{font-size:9.5px;padding:6px 9px}.map-wrap{min-height:290px}.btn{padding:9px 12px}.subtitle{display:none}.tagline{letter-spacing:.8px;font-size:9.5px;white-space:nowrap}.brand{gap:10px}.logo-img{width:46px;height:46px}}
 </style>
 </head>
 <body>
@@ -76,6 +88,7 @@ footer{text-align:center;color:#71838e;font-size:10px;padding:3px 0 8px}
       <img class="logo-img" src="assets/curveguide-logo.png" alt="Curve Guide logo">
       <div>
         <h1>Curve Guide</h1>
+        <div class="tagline">Safer turns. Smarter drives.</div>
         <div class="subtitle">Intelligent Road Safety System · Development prototype</div>
       </div>
     </div>
@@ -147,12 +160,14 @@ footer{text-align:center;color:#71838e;font-size:10px;padding:3px 0 8px}
   <section class="panel notice">
     <strong>Safety notice:</strong> Curve Guide is an experimental road-awareness prototype, not a certified driver-assistance or navigation system. GPS accuracy, map data, device sensors, and curve estimates can be wrong or delayed. Never interact with this page while driving; set it up before a trip and have a passenger operate it. Always obey road signs, speed limits, and actual road conditions.
   </section>
+  <div class="site-footer">
   <div class="credit">
     <div class="credit-label">Developed by</div>
     <div class="credit-card"><img src="assets/adeniyi-logo.png" alt="Adeniyi Investments &amp; Property Ltd."></div>
     <div class="credit-copy">&copy; 2026 Adeniyi Investments &amp; Property Ltd. All rights reserved.</div>
   </div>
   <footer>Curve Guide · Road safety development prototype · Map data © OpenStreetMap contributors</footer>
+  </div>
 </div>
 
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
