@@ -102,6 +102,36 @@ body.welcome-open{overflow:hidden}
 @media(max-width:420px){.welcome{padding:10px}.welcome-card{padding:18px 16px 14px;max-height:calc(100dvh - 20px)}.welcome-logo{width:220px}.welcome-card h2{font-size:20px}.welcome-intro{font-size:13px}.terms-box{max-height:150px}}
 .contact-line{font-size:11.5px;color:var(--muted);text-align:center}.contact{color:#5fe0a3;text-decoration:none;font-weight:600;white-space:nowrap}.contact:hover{text-decoration:underline}.contact:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766;border-radius:4px}.contact-line .sep{color:#4a5a65}
 .welcome-contact{margin-top:8px}
+
+:root{--s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px}
+.ico{width:15px;height:15px;flex:none;color:var(--green);vertical-align:-2px}
+.panel-head h2,.section-title{display:flex;align-items:center;gap:8px}
+.metric-label{display:flex;align-items:center;gap:7px}.metric-label .ico{width:14px;height:14px}
+.panel{transition:border-color .2s,box-shadow .2s}.panel:hover{border-color:var(--line2)}
+.hero{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);padding:var(--s3) var(--s4);border-radius:14px;border:1px solid #20c47733;background:linear-gradient(90deg,#20c47718,#20c47705 60%,transparent);font-size:12.5px;color:var(--silver)}
+.hero b{color:#fff;font-weight:700}.hero-items{display:flex;gap:var(--s4);flex-wrap:wrap}
+.hero-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.tips{position:relative}
+.tips-body{padding:var(--s4) var(--s4) var(--s3);min-height:118px;display:flex;flex-direction:column}
+.tip-quote{position:relative;margin:0;padding-left:var(--s4);border-left:2px solid var(--green);font-size:15.5px;line-height:1.5;font-weight:600;letter-spacing:-.2px;color:#f4f7f8;transition:opacity .45s ease,transform .45s ease;min-height:70px}
+.tip-quote.fade{opacity:0;transform:translateY(4px)}
+.tip-cat{display:block;margin-top:6px;font-size:10px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--green)}
+.tips-nav{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);margin-top:auto;padding-top:var(--s3)}
+.tip-dots{display:flex;gap:5px;flex-wrap:wrap}
+.tip-dot{width:6px;height:6px;padding:0;border-radius:99px;border:0;background:#33414b;transition:width .25s,background .25s}
+.tip-dot[aria-current="true"]{width:18px;background:var(--green)}
+.tip-arrows{display:flex;gap:6px}
+.tip-arrow{width:30px;height:30px;border-radius:9px;border:1px solid var(--line2);background:#1c252b;color:var(--text);display:grid;place-items:center;font-size:14px}
+.tip-arrow:hover{border-color:#20c47780}.tip-arrow:focus-visible,.tip-dot:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766}
+.welcome-quote{margin:-4px 0 14px;padding:9px 12px;border-radius:10px;background:#20c47710;border:1px solid #20c47730;text-align:center;font-size:12.5px;font-style:italic;color:#bfeed6;transition:opacity .45s;min-height:38px;display:flex;align-items:center;justify-content:center}
+.welcome-quote.fade{opacity:0}
+.notice{display:flex;gap:10px}.notice .ico{color:var(--orange);margin-top:2px}
+@media(max-width:600px){.hero-items{display:none}.hero{font-size:12px}}
+@media(max-width:420px){.welcome-quote{font-size:12px;margin-bottom:12px}}
+@media(max-width:759px){.metric-label{font-size:9.5px;letter-spacing:.5px;white-space:nowrap;gap:5px}.metric-label .ico{width:12px;height:12px}}
+@media(min-width:760px){.map-wrap{height:720px}.metrics{gap:10px}}
+.side-stack{display:grid;gap:14px}.dashboard{display:grid;gap:14px}.tip-quote{min-height:0}.tips-body{min-height:0}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body class="welcome-open">
@@ -110,6 +140,7 @@ body.welcome-open{overflow:hidden}
     <img class="welcome-logo" src="assets/curveguide-full.png" alt="Curve Guide — Safer turns. Smarter drives.">
     <h2 id="welcomeTitle">Welcome to Curve Guide</h2>
     <p class="welcome-intro" id="welcomeIntro">Curve Guide is a product of <strong>Adeniyi Investments &amp; Property Ltd.</strong>, built to help prevent road accidents on dangerous bends and curves. By giving drivers early awareness of sharp turns ahead, it supports safer, more confident driving on Nigerian roads. Curve Guide is currently a prototype: it is designed to supplement, never replace, careful and attentive driving.</p>
+    <p class="welcome-quote" id="welcomeQuote" aria-live="off">“Prevention is better than cure.”</p>
     <h3 class="terms-title">Terms &amp; Conditions</h3>
     <ol class="terms-box" tabindex="0" aria-label="Terms and Conditions">
       <li><strong>Experimental prototype.</strong> Curve Guide is under development and is provided "as is", without warranties of any kind.</li>
@@ -139,11 +170,12 @@ body.welcome-open{overflow:hidden}
     </div>
     <div class="pill">PROTOTYPE · v4.2 3D</div>
   </header>
+  <div class="hero" role="note"><div><b>Arrive alive.</b> Real-time curve awareness for safer journeys on Nigerian roads.</div><div class="hero-items"><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Safety first</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Satellite &amp; 3D</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>On-device GPS</span></div></div>
 
   <main class="dashboard">
     <section class="panel map-panel" aria-label="Map">
       <div class="panel-head">
-        <h2>Live road view</h2>
+        <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Live road view</h2>
         <span class="small" id="mapMode">3D perspective</span>
       </div>
       <div class="map-wrap">
@@ -164,15 +196,15 @@ body.welcome-open{overflow:hidden}
 
     <div class="side-stack">
       <section class="metrics" aria-label="Driving metrics">
-        <div class="metric"><div class="metric-label">Speed</div><div class="metric-value"><span id="speed">—</span> <span class="metric-unit" id="speedUnit">km/h</span></div></div>
-        <div class="metric"><div class="metric-label">Heading</div><div class="metric-value"><span id="heading">—</span><span class="metric-unit">°</span></div></div>
-        <div class="metric"><div class="metric-label">Next curve</div><div class="metric-value" id="curveDistance">— <span class="metric-unit">m</span></div></div>
+        <div class="metric"><div class="metric-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 14l4-4"/><path d="M3.3 17a9 9 0 1 1 17.4 0"/></svg>Speed</div><div class="metric-value"><span id="speed">—</span> <span class="metric-unit" id="speedUnit">km/h</span></div></div>
+        <div class="metric"><div class="metric-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Heading</div><div class="metric-value"><span id="heading">—</span><span class="metric-unit">°</span></div></div>
+        <div class="metric"><div class="metric-label"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20c0-6 4-6 7-8s7-2 7-8"/><circle cx="19" cy="4" r="1"/></svg>Next curve</div><div class="metric-value" id="curveDistance">— <span class="metric-unit">m</span></div></div>
       </section>
 
       <section class="panel">
         <div class="content">
           <div class="row">
-            <div class="section-title">Curve awareness</div>
+            <div class="section-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Curve awareness</div>
             <span class="small" id="analysisState">Not active</span>
           </div>
           <div class="status-box warn" id="warningBox" role="status" aria-live="polite">
@@ -190,7 +222,7 @@ body.welcome-open{overflow:hidden}
       <section class="panel">
         <div class="content">
           <div class="row">
-            <div class="section-title">Route & map data</div>
+            <div class="section-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h8"/></svg>Route &amp; map data</div>
             <span class="small" id="routeState">No route yet</span>
           </div>
           <div class="small" style="line-height:1.6;margin-top:9px">The map uses community map data. Road geometry and curve estimates may be incomplete or inaccurate.</div>
@@ -200,11 +232,18 @@ body.welcome-open{overflow:hidden}
           </div>
         </div>
       </section>
+      <section class="panel tips" aria-label="Road safety tips" aria-roledescription="carousel">
+        <div class="panel-head"><h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h4v4c0 3-2 5-4 6M14 7h4v4c0 3-2 5-4 6"/></svg>Road Safety Tips</h2><span class="small" id="tipCount">1 / 12</span></div>
+        <div class="tips-body">
+          <blockquote class="tip-quote" id="tipQuote" aria-live="polite">Prevention is better than cure.</blockquote>
+          <div class="tips-nav"><div class="tip-dots" id="tipDots"></div><div class="tip-arrows"><button class="tip-arrow" id="tipPrev" aria-label="Previous tip">&#8249;</button><button class="tip-arrow" id="tipNext" aria-label="Next tip">&#8250;</button></div></div>
+        </div>
+      </section>
     </div>
   </main>
 
   <section class="panel notice">
-    <strong>Safety notice:</strong> Curve Guide is an experimental road-awareness prototype, not a certified driver-assistance or navigation system. GPS accuracy, map data, device sensors, and curve estimates can be wrong or delayed. Never interact with this page while driving; set it up before a trip and have a passenger operate it. Always obey road signs, speed limits, and actual road conditions.
+    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.01"/></svg><div><strong>Safety notice:</strong> Curve Guide is an experimental road-awareness prototype, not a certified driver-assistance or navigation system. GPS accuracy, map data, device sensors, and curve estimates can be wrong or delayed. Never interact with this page while driving; set it up before a trip and have a passenger operate it. Always obey road signs, speed limits, and actual road conditions.</div>
   </section>
   <div class="site-footer">
   <div class="credit">
@@ -425,6 +464,23 @@ initMap();
   b.addEventListener('click',function(){if(!c.checked)return;w.hidden=true;document.body.classList.remove('welcome-open');var g=document.getElementById('gps');if(g)g.focus()});
   w.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var f=[].slice.call(w.querySelectorAll('input,button:not([disabled]),[tabindex="0"]'));if(!f.length)return;var a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}});
   card.focus();
+})();
+</script>
+<script>
+(function(){
+var T=["Prevention is better than cure.","Service your car regularly — a well-maintained vehicle is a safer vehicle.","Check your tyres and brakes before every long trip.","Slow down before the curve, not in it.","Speed thrills but kills.","Always wear your seatbelt.","Don't drink and drive.","Keep a safe distance from the vehicle ahead.","Phones down, eyes on the road.","Better late than never.","Rest when tired — fatigue kills.","Obey traffic signs; they are there to protect you."];
+var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches,FD=rm?0:450;
+var q=document.getElementById('tipQuote'),dots=document.getElementById('tipDots'),cnt=document.getElementById('tipCount'),i=0,timer=null;
+T.forEach(function(_,k){var b=document.createElement('button');b.className='tip-dot';b.setAttribute('aria-label','Show tip '+(k+1));b.addEventListener('click',function(){show(k);restart()});dots.appendChild(b)});
+function paint(){q.textContent=T[i];cnt.textContent=(i+1)+' / '+T.length;[].forEach.call(dots.children,function(d,k){d.setAttribute('aria-current',k===i?'true':'false')})}
+function show(k){i=(k+T.length)%T.length;q.classList.add('fade');setTimeout(function(){paint();q.classList.remove('fade')},FD)}
+function restart(){clearInterval(timer);if(!rm)timer=setInterval(function(){show(i+1)},7000)}
+document.getElementById('tipPrev').addEventListener('click',function(){show(i-1);restart()});
+document.getElementById('tipNext').addEventListener('click',function(){show(i+1);restart()});
+var card=q.parentNode.parentNode;card.addEventListener('mouseenter',function(){clearInterval(timer)});card.addEventListener('mouseleave',restart);
+paint();restart();
+var wq=document.getElementById('welcomeQuote'),w=document.getElementById('welcome'),j=0;
+if(!rm)var wt=setInterval(function(){if(w.hidden){clearInterval(wt);return}j=(j+1)%T.length;wq.classList.add('fade');setTimeout(function(){wq.textContent='“'+T[j]+'”';wq.classList.remove('fade')},FD)},4500);
 })();
 </script>
 </body>
