@@ -79,9 +79,50 @@ h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;
 footer{text-align:center;color:#6f7f89;font-size:10.5px;line-height:1.5;padding:0}
 @media(min-width:760px){.app{padding:24px;gap:16px}.dashboard{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr);gap:16px;align-items:start}.map-panel{grid-row:span 2}.map-wrap{height:600px}.side-stack{display:grid;gap:16px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}.metric-label{margin:0}.metric-value{font-size:23px}h1{font-size:24px}.logo-img{width:56px;height:56px}}
 @media(max-width:390px){.app{padding:12px}.pill{font-size:9.5px;padding:6px 9px}.map-wrap{min-height:290px}.btn{padding:9px 12px}.subtitle{display:none}.tagline{letter-spacing:.8px;font-size:9.5px;white-space:nowrap}.brand{gap:10px}.logo-img{width:46px;height:46px}}
+.welcome{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:16px;background:radial-gradient(700px 400px at 50% 0,#20c4771f,transparent 70%),#07090bdd;backdrop-filter:blur(8px)}
+.welcome[hidden]{display:none}
+body.welcome-open{overflow:hidden}
+.welcome-card{width:min(100%,560px);max-height:calc(100dvh - 32px);overflow:auto;background:linear-gradient(180deg,#1c1f22,#14181b);border:1px solid var(--line2);border-radius:22px;box-shadow:0 30px 80px -20px #000e,0 0 0 1px #ffffff08 inset;padding:22px 22px 18px;outline:none}
+.welcome-logo{display:block;width:min(100%,300px);height:auto;margin:0 auto 6px;border-radius:14px;-webkit-mask-image:radial-gradient(ellipse 80% 78% at 50% 50%,#000 72%,transparent 100%);mask-image:radial-gradient(ellipse 80% 78% at 50% 50%,#000 72%,transparent 100%)}
+.welcome-card h2{font-size:22px;font-weight:800;letter-spacing:-.4px;text-align:center;margin:8px 0 10px}
+.welcome-intro{font-size:13.5px;line-height:1.65;color:#cfd8dd;margin:0 0 16px;text-align:center}
+.welcome-intro strong{color:var(--text)}
+.terms-title{font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--green);margin:0 0 8px}
+.terms-box{max-height:170px;overflow:auto;background:#0d1114;border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 30px;margin:0;font-size:12px;line-height:1.6;color:var(--muted)}
+.terms-box li{margin-bottom:6px}.terms-box li:last-child{margin:0}
+.terms-box strong{color:#dbe3e7}
+.accept{display:flex;gap:10px;align-items:flex-start;margin:14px 0;font-size:13px;line-height:1.45;cursor:pointer;color:var(--text)}
+.accept input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--green);flex:none;cursor:pointer}
+.welcome .btn.primary{width:100%;padding:13px;font-size:14px;font-weight:700}
+.welcome-credit{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.welcome-credit span{font-size:9.5px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+.welcome-credit .credit-card{padding:5px 10px;border-radius:9px}
+.welcome-credit .credit-card img{height:28px}
+@media(max-width:420px){.welcome{padding:10px}.welcome-card{padding:18px 16px 14px;max-height:calc(100dvh - 20px)}.welcome-logo{width:220px}.welcome-card h2{font-size:20px}.welcome-intro{font-size:13px}.terms-box{max-height:150px}}
 </style>
 </head>
-<body>
+<body class="welcome-open">
+<div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="welcomeIntro">
+  <div class="welcome-card" tabindex="-1" id="welcomeCard">
+    <img class="welcome-logo" src="assets/curveguide-full.png" alt="Curve Guide — Safer turns. Smarter drives.">
+    <h2 id="welcomeTitle">Welcome to Curve Guide</h2>
+    <p class="welcome-intro" id="welcomeIntro">Curve Guide is a product of <strong>Adeniyi Investments &amp; Property Ltd.</strong>, built to help prevent road accidents on dangerous bends and curves. By giving drivers early awareness of sharp turns ahead, it supports safer, more confident driving on Nigerian roads. Curve Guide is currently a prototype: it is designed to supplement, never replace, careful and attentive driving.</p>
+    <h3 class="terms-title">Terms &amp; Conditions</h3>
+    <ol class="terms-box" tabindex="0" aria-label="Terms and Conditions">
+      <li><strong>Experimental prototype.</strong> Curve Guide is under development and is provided "as is", without warranties of any kind.</li>
+      <li><strong>Not a certified safety system.</strong> It is not an approved driver-assistance or navigation device, and its warnings may be missing, late, or wrong.</li>
+      <li><strong>You remain responsible.</strong> Always obey traffic laws, road signs, speed limits, and actual road conditions.</li>
+      <li><strong>Do not operate while driving.</strong> Set it up before your trip, or have a passenger operate it.</li>
+      <li><strong>Location privacy.</strong> Your location is processed only on your device, in your browser. Curve Guide does not store or send it anywhere.</li>
+      <li><strong>Map data.</strong> Maps come from OpenStreetMap contributors and may be incomplete or inaccurate.</li>
+      <li><strong>No liability.</strong> Adeniyi Investments &amp; Property Ltd. accepts no liability for any accident, injury, loss, or damage arising from use of Curve Guide. You use it at your own risk.</li>
+      <li><strong>Changes.</strong> These terms may be updated at any time; continued use means you accept the current terms.</li>
+    </ol>
+    <label class="accept"><input type="checkbox" id="acceptTerms"> I have read and accept the Terms &amp; Conditions</label>
+    <button class="btn primary" id="welcomeContinue" disabled>Continue</button>
+    <div class="welcome-credit"><span>Developed by</span><div class="credit-card"><img src="assets/adeniyi-logo.png" alt="Adeniyi Investments &amp; Property Ltd."></div></div>
+  </div>
+</div>
 <div class="app">
   <header>
     <div class="brand">
@@ -349,6 +390,16 @@ $('recenter').addEventListener('click',function(){if(current){setFollow(true);ap
 $('clearRoute').addEventListener('click',clearRoute);
 window.addEventListener('beforeunload',function(){if(watchId!==null)navigator.geolocation.clearWatch(watchId)});
 initMap();
+})();
+</script>
+<script>
+(function(){
+  var w=document.getElementById('welcome'),c=document.getElementById('acceptTerms'),b=document.getElementById('welcomeContinue'),card=document.getElementById('welcomeCard');
+  var last=null;
+  c.addEventListener('change',function(){b.disabled=!c.checked});
+  b.addEventListener('click',function(){if(!c.checked)return;w.hidden=true;document.body.classList.remove('welcome-open');var g=document.getElementById('gps');if(g)g.focus()});
+  w.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var f=[].slice.call(w.querySelectorAll('input,button:not([disabled]),[tabindex="0"]'));if(!f.length)return;var a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}});
+  card.focus();
 })();
 </script>
 </body>
