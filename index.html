@@ -134,6 +134,7 @@ body.welcome-open{overflow:hidden}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
 .welcome-video{display:block;width:100%;max-width:300px;aspect-ratio:544/352;height:auto;margin:0 auto 4px;border-radius:16px;object-fit:cover;background:#1a1c1f;border:1px solid var(--line2)}
 @media(max-width:420px){.welcome-video{max-width:260px;border-radius:14px}}
+#gpsChip.acc-good{border-color:#20c47799;color:#9be3bf}#gpsChip.acc-fair{border-color:#ffb34799;color:#ffd08a}#gpsChip.acc-poor{border-color:#ff625c99;color:#ffaaa6}
 </style>
 </head>
 <body class="welcome-open">
@@ -293,8 +294,11 @@ function updateMetrics(pos){
   setText('speedUnit',useMph?'mph':'km/h');
   var h=Number.isFinite(pos.coords.heading)&&pos.coords.heading>=0?pos.coords.heading:(lastHeading!==null?lastHeading:null);
   setText('heading',h===null?'—':fmt(h,0));
-  setText('gpsChip','GPS active · '+(speed===null?'speed unavailable':fmt(speed,0)+' km/h'));
+  var acc=pos.coords.accuracy,q=accQuality(acc),chip=$('gpsChip');
+  setText('gpsChip','GPS active · '+(Number.isFinite(acc)?'±'+fmt(acc,0)+' m':'accuracy unknown')+' · '+(speed===null?'speed unavailable':fmt(speed,0)+' km/h'));
+  if(chip){chip.classList.remove('acc-good','acc-fair','acc-poor');chip.classList.add('acc-'+q);chip.title='GPS accuracy: '+q}
 }
+function accQuality(acc){return !Number.isFinite(acc)?'poor':acc<=15?'good':acc<=25?'fair':'poor'}
 function updateRoute(){
   if(!ready||!map.getSource('route'))return;
   var features=[];
@@ -385,6 +389,13 @@ function initMap(){
   }catch(e){setStatus('Could not initialize map','danger');setWarning('The map could not start. Check your connection and reload the page.')}
 }
 function maybeEstimateCurve(pos){
+  var acc=pos.coords.accuracy;
+  if(!Number.isFinite(acc)||acc>25){
+    lastHeading=null;setText('curveDistance','—');updateCurveFeature(null);
+    setText('analysisState','Paused – weak GPS');
+    setWarning('Curve estimates are paused because GPS accuracy is '+(Number.isFinite(acc)?'±'+fmt(acc,0)+' m':'unknown')+' (needs ±25 m or better). Move to open sky; estimates resume automatically.','warn');
+    return;
+  }
   if(!previous||!Number.isFinite(pos.coords.latitude)||!Number.isFinite(pos.coords.longitude))return;
   var a=[previous.coords.longitude,previous.coords.latitude],b=[pos.coords.longitude,pos.coords.latitude];
   var d=distance(a,b);
@@ -396,9 +407,9 @@ function maybeEstimateCurve(pos){
       curveEstimate={coord:b,at:Date.now()};
       updateCurveFeature(b);
       var speed=Number.isFinite(pos.coords.speed)?pos.coords.speed*3.6:null;
-      setText('curveDistance','Nearby');
+      setText('curveDistance','Nearby (est.)');
       setWarning('A change in travel direction was detected. This is only a rough prototype estimate, not a verified road-curve warning.','warn');
-      setText('analysisState','Curve change detected');
+      setText('analysisState','Curve change detected (estimate)');
       lastCurveAt=Date.now();
     }else if(Date.now()-lastCurveAt>12000){
       setText('curveDistance','—');
@@ -413,7 +424,7 @@ function onPosition(pos){
   previous=current;current=pos;
   var coord=[pos.coords.longitude,pos.coords.latitude];
   if(!Number.isFinite(coord[0])||!Number.isFinite(coord[1]))return;
-  if(route.length===0||distance(route[route.length-1],coord)>3){route.push(coord);if(route.length>1500)route.shift();updateRoute()}
+  if(!(pos.coords.accuracy>50)&&(route.length===0||distance(route[route.length-1],coord)>3)){route.push(coord);if(route.length>1500)route.shift();updateRoute()}
   if(carMarker)carMarker.setLngLat(coord);
   updateMetrics(pos);maybeEstimateCurve(pos);
   if(follow&&map){
@@ -428,6 +439,9 @@ function onGpsError(err){
   else if(err&&err.code===3)msg='GPS request timed out. Try again where the sky is more visible.';
   setStatus('GPS unavailable','danger');setText('gpsChip','GPS off');setWarning(msg,'warn');
   setText('analysisState','Not active');
+  if(watchId!==null&&navigator.geolocation)navigator.geolocation.clearWatch(watchId);
+  watchId=null;$('gps').disabled=false;$('stopGps').disabled=true;
+  var chip=$('gpsChip');if(chip)chip.classList.remove('acc-good','acc-fair','acc-poor');
 }
 function startGps(){
   if(!navigator.geolocation){setWarning('This browser does not support geolocation.','warn');return}
@@ -439,7 +453,7 @@ function startGps(){
 function stopGps(){
   if(watchId!==null)navigator.geolocation.clearWatch(watchId);
   watchId=null;$('gps').disabled=false;$('stopGps').disabled=true;
-  setText('gpsChip','GPS off');setText('analysisState','Not active');
+  setText('gpsChip','GPS off');$('gpsChip').classList.remove('acc-good','acc-fair','acc-poor');setText('analysisState','Not active');
   setStatus('GPS stopped','warn');setWarning('GPS tracking is stopped. Curve Guide is not a certified safety system.','warn');
 }
 function clearRoute(){route=[];updateRoute();updateCurveFeature(null);setText('curveDistance','—');setText('analysisState',watchId===null?'Not active':'Monitoring')}
