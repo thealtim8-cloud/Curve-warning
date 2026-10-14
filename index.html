@@ -6,10 +6,14 @@
 <meta name="description" content="Curve Guide is a road safety development prototype designed to support driver awareness around road curves.">
 <meta name="theme-color" content="#101820">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Curve Guide">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="assets/icon-192.png">
-<title>Curve Guide 7.0.1 | Intelligent Road Safety System</title>
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="48x48" href="assets/favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
+<title>Curve Guide 7.0.2 | Intelligent Road Safety System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -265,7 +269,7 @@ body.navigating .dest-card{max-height:38%}
 .install-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid #20c47744;background:#20c47712;font-size:12px}
 .install-bar.show{display:flex}
 
-/* ===== 7.0.1 Map-first professional shell ===== */
+/* ===== 7.0.2 Map-first professional shell ===== */
 :root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--radius-sm:12px;--radius-md:16px;--radius-lg:22px;--shadow-float:0 8px 28px -10px #000c,0 0 0 1px #ffffff0f;--shadow-soft:0 4px 16px -8px #000a;--topbar-h:56px}
 html,body{height:100%;overflow:hidden}
 body{padding:0}
@@ -346,6 +350,28 @@ body{padding:0}
   .welcome{backdrop-filter:none}
   .status-chip,.icon-btn,.dest-search,.dest-card,.nav-banner-main{backdrop-filter:none!important}
 }
+
+/* Focus mode */
+body.focus-mode .topbar,
+body.focus-mode .map-search,
+body.focus-mode .map-controls,
+body.focus-mode .gps-pill,
+body.focus-mode .emerg-fab,
+body.focus-mode .dest-card,
+body.focus-mode .offline-banner,
+body.focus-mode .niyi-panel,
+body.focus-mode .menu-sheet,
+body.focus-mode .menu-backdrop,
+body.focus-mode .niyi-fab,
+body.focus-mode .emerg-sheet{display:none!important}
+body.focus-mode .hud{top:12px;left:12px}
+body.focus-mode .nav-banner{top:12px;left:12px;right:12px}
+.focus-exit{display:none;position:absolute;z-index:9;right:12px;top:12px;border:0;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:750;background:#12181cf2;color:#eef3f5;box-shadow:var(--shadow-float)}
+body.focus-mode .focus-exit{display:inline-flex;align-items:center;gap:6px}
+.focus-btn.active{border-color:#20c477aa;color:#5fe0a3;background:#20c47714}
+.map-focus-btn{position:absolute;z-index:7;right:12px;bottom:148px;width:44px;height:44px;border:0;border-radius:14px;background:#12181cf2;color:#cfd8dd;font-size:11px;font-weight:800;box-shadow:var(--shadow-float)}
+.map-focus-btn.active{color:#5fe0a3}
+body.focus-mode .map-focus-btn{display:none}
 </style>
 </head>
 <body class="welcome-open">
@@ -380,7 +406,7 @@ body{padding:0}
       <div>
         <h1>Curve Guide</h1>
         <div class="tagline">Safer turns. Smarter drives.</div>
-        <div class="subtitle">Prototype v7.0.1</div>
+        <div class="subtitle">Prototype v7.0.2</div>
       </div>
     </div>
     <div class="topbar-actions">
@@ -404,6 +430,8 @@ body{padding:0}
           <div class="hud-chip warn" id="hudCurve"><div class="label">Curve / bend</div><div class="value" id="curveDistance">—</div></div>
         </div>
         <button type="button" class="gps-pill" id="gps">Start GPS</button>
+        <button type="button" class="map-focus-btn" id="focusMapBtn" title="Focus mode" aria-pressed="false">Focus</button>
+        <button type="button" class="focus-exit" id="focusExit" title="Exit focus mode">Exit focus</button>
         <div id="map" aria-label="Interactive map"></div>
         <div class="map-status">
           <div class="status-chip"><span class="status-dot" id="statusDot"></span><span id="topStatus">Map loading…</span></div>
@@ -470,6 +498,7 @@ body{padding:0}
         <div class="row"><span class="small" id="analysisState">Not active</span><span class="small" id="routeState">No route yet</span></div>
         <div class="status-box warn" id="warningBox" role="status" aria-live="polite">Prototype — start GPS before a trip. Do not rely on warnings alone.</div>
         <div class="actions">
+          <button class="btn focus-btn" id="focusToggle" aria-pressed="false">Focus mode</button>
           <button class="btn" id="stopGps" disabled>Stop GPS</button>
           <button class="btn" id="follow">Follow: On</button>
           <button class="btn" id="unit">Units: km/h</button>
@@ -507,7 +536,7 @@ body{padding:0}
       <div class="menu-sec" id="menuApp">
         <h3>App</h3>
         <div class="install-bar show" id="installBar" style="display:flex"><span id="installText">Install Curve Guide for quicker access.</span><button type="button" class="btn primary" id="installBtn">Install</button></div>
-        <p class="small" style="margin-top:10px">Curve Guide 7.0.1 · Prototype · Arrive alive.</p>
+        <p class="small" style="margin-top:10px">Curve Guide 7.0.2 · Prototype · Arrive alive.</p>
         <details class="more-info"><summary>More info &amp; safety</summary>
           <p class="small" style="margin-top:8px">Experimental road-awareness prototype, not a certified driver-assistance or navigation system. GPS, maps, routes, and curve estimates can be wrong or delayed. Do not operate while driving. Always obey road signs and conditions. Search: Nominatim · Routing: OSRM demo · Map data © OpenStreetMap.</p>
         </details>
@@ -835,7 +864,8 @@ window.__cgApi={
     onPosition({coords:{longitude:lon,latitude:lat,accuracy:o.accuracy!=null?o.accuracy:10,speed:o.speed!=null?o.speed:12,heading:o.heading!=null?o.heading:0},timestamp:Date.now()});
   },
   goFavourite:goFavourite, reportHazardAt:reportHazardAt, loadFavs:loadFavs,
-  setNightMode:setNightMode, getNightMode:function(){return nightMode}
+  setNightMode:setNightMode, getNightMode:function(){return nightMode},
+  setFocusMode:setFocusMode, toggleFocusMode:toggleFocusMode, getFocusMode:function(){return focusMode}
 };
 
 /* Destination search + OSRM routing (prototype) */
@@ -992,6 +1022,47 @@ function showSteps(steps){
 }
 
 
+
+
+/* Focus mode */
+var focusMode=false;
+(function restoreFocus(){
+  var s=loadSettings();
+  if(s.focusMode===true)focusMode=true;
+})();
+function syncFocusUi(){
+  document.body.classList.toggle('focus-mode', focusMode);
+  var a=$('focusToggle'), b=$('focusMapBtn'), x=$('focusExit');
+  [a,b].forEach(function(el){
+    if(!el)return;
+    el.classList.toggle('active', focusMode);
+    el.setAttribute('aria-pressed', focusMode?'true':'false');
+    if(el.id==='focusToggle')el.textContent=focusMode?'Focus mode: On':'Focus mode';
+  });
+  if(x)x.hidden=!focusMode;
+  if(focusMode&&typeof window.__cgCloseMenu==='function')window.__cgCloseMenu();
+  // close Niyi if open
+  var panel=document.getElementById('niyiPanel');
+  if(focusMode&&panel&&panel.classList.contains('open')){
+    panel.classList.remove('open'); panel.hidden=true;
+    var fab=document.getElementById('niyiFab'); if(fab)fab.setAttribute('aria-expanded','false');
+    var hb=document.getElementById('niyiHeaderBtn'); if(hb)hb.setAttribute('aria-expanded','false');
+  }
+}
+function setFocusMode(on){
+  focusMode=!!on;
+  saveSettings({focusMode:focusMode});
+  syncFocusUi();
+  setStatus(focusMode?'Focus mode on':'Focus mode off', focusMode?'good':'warn');
+}
+function toggleFocusMode(){setFocusMode(!focusMode)}
+function bindFocusUi(){
+  var a=$('focusToggle'), b=$('focusMapBtn'), x=$('focusExit');
+  if(a)a.addEventListener('click', toggleFocusMode);
+  if(b)b.addEventListener('click', toggleFocusMode);
+  if(x)x.addEventListener('click', function(){setFocusMode(false)});
+  syncFocusUi();
+}
 
 /* Night map mode */
 var nightMode=false, STYLE_DAY='https://tiles.openfreemap.org/styles/liberty', STYLE_NIGHT='https://tiles.openfreemap.org/styles/dark';
@@ -1778,7 +1849,7 @@ var tips=[
   "Obey traffic signs; they are there to protect you.",
   'Phones down, eyes on the road.'
 ];
-var chips=['How does it work?','Set destination','Take me home','Navigation','Contact us','Emergency','Start GPS'];
+var chips=['How does it work?','Set destination','Take me home','Focus mode','Navigation','Contact us','Emergency'];
 
 function api(){return window.__cgApi||null}
 
@@ -1901,6 +1972,11 @@ function doPageAction(t){
   if(/\b(unmute voice|unmute navigation|voice on)\b/.test(t)){
     A.setNavVoice(true);return confirm('Navigation voice unmuted.');
   }
+  if(/\bfocus mode\b|^focus$|exit focus/.test(t)){
+    if(/exit|off|disable|leave/.test(t)){A.setFocusMode(false);return confirm('Focus mode off.');}
+    if(/on|enable|enter/.test(t)||/^focus$/.test(t)||/^focus mode$/.test(t)){A.setFocusMode(true);return confirm('Focus mode on — map, speed, and bend alert only. Say “exit focus” to leave.');}
+    A.toggleFocusMode();return confirm(A.getFocusMode()?'Focus mode on.':'Focus mode off.');
+  }
   if(/\b(night mode|dark map|night map)\b/.test(t)||/^night$/i.test(t)){
     A.setNightMode(true);return confirm('Night map mode on (saved).');
   }
@@ -2003,7 +2079,7 @@ function pickPlace(it){
 }
 function answer(q){
   var t=String(q||'').toLowerCase().trim();
-  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 7.0.1.";
+  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 7.0.2.";
   var explained=explainButton(t);
   if(explained)return explained;
   if(/voice|speak|mute|unmute|speech|talk|announce|mic|microphone/.test(t))
@@ -2013,7 +2089,7 @@ function answer(q){
   if(/destin|search|route|how do i (set|find)|directions?/.test(t)&&!extractPlace(q))
     return 'Say “go to …” or “take me to …”, or type in Search destination on the map. Then Route and Start navigation.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
-    return 'Curve Guide 7.0.1 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
+    return 'Curve Guide 7.0.2 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
   if(/disclaim|liabilit|certified|safe to use|replace|prototype/.test(t))
     return 'Curve Guide is an experimental prototype, not a certified safety or navigation system. Warnings and routes can be wrong. Always obey the road.';
   if(/gps|accur|±|plus.?minus|poor|fair|green|yellow|red chip/.test(t))
@@ -2030,7 +2106,7 @@ function answer(q){
     return tip+' (Ask for another safety tip anytime.)';
   }
   if(/hello|hi\b|hey|good (morning|afternoon|evening)/.test(t))
-    return "Hi! I'm Niyi for Curve Guide 7.0.1 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
+    return "Hi! I'm Niyi for Curve Guide 7.0.2 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
   return "I'm still learning — I match simple keywords and a few page actions. Try: go to …, start GPS, satellite, Contact us, or Navigation.";
 }
 function refreshDriveNote(){

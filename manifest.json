@@ -1,7 +1,7 @@
 {
   "name": "Curve Guide",
   "short_name": "Curve Guide",
-  "description": "Curve Guide \u2014 installable road safety prototype.",
+  "description": "Curve Guide — installable road safety prototype.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -18,7 +18,13 @@
       "src": "assets/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
