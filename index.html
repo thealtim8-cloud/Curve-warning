@@ -209,6 +209,29 @@ body.welcome-open{overflow:hidden}
   .dest-card{left:10px;right:52px;bottom:10px;padding:10px}
   .dest-search{font-size:13px;padding:10px 12px 10px 36px}
 }
+
+/* Voice navigation */
+.nav-banner{position:absolute;z-index:7;left:10px;right:10px;top:10px;display:none;flex-direction:column;gap:6px;pointer-events:none}
+.nav-banner.open{display:flex}
+.nav-banner-main{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:12px 12px;border-radius:16px;background:linear-gradient(180deg,#122018f5,#0d1114f2);border:1px solid #20c47755;box-shadow:0 16px 40px -14px #000e;backdrop-filter:blur(12px)}
+.nav-arrow{width:52px;height:52px;border-radius:14px;background:#20c47722;border:1px solid #20c47755;color:#9be3bf;display:grid;place-items:center;font-size:28px;font-weight:800;flex:none}
+.nav-instr{min-width:0;flex:1}
+.nav-dist{font-size:20px;font-weight:800;letter-spacing:-.4px;color:#fff;line-height:1.1}
+.nav-text{font-size:13px;line-height:1.35;color:#d5e7dd;margin-top:3px;font-weight:600}
+.nav-mute{width:40px;height:40px;border-radius:12px;border:1px solid var(--line2);background:#222c33;color:var(--text);flex:none;font-size:16px;padding:0}
+.nav-mute[aria-pressed="true"]{border-color:#ffb34766;color:#ffd08a}
+.nav-banner-sub{pointer-events:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;padding:7px 10px;border-radius:11px;background:#0d1114e8;border:1px solid #ffffff14;font-size:11px;color:#cfd8dd}
+.nav-remain{font-weight:700;color:#9be3bf}
+.nav-safety{color:#ffd08a;font-weight:600}
+body.navigating .map-search{top:128px}
+body.navigating .map-status{opacity:.0;pointer-events:none}
+body.navigating .dest-card{max-height:38%}
+@media(max-width:390px){
+  .nav-arrow{width:46px;height:46px;font-size:24px}
+  .nav-dist{font-size:18px}
+  .nav-text{font-size:12.5px}
+  body.navigating .map-search{top:120px}
+}
 </style>
 </head>
 <body class="welcome-open">
@@ -281,18 +304,34 @@ body.welcome-open{overflow:hidden}
           </div>
           <div class="dest-results" id="destResults" role="listbox" hidden></div>
         </div>
+        <div class="nav-banner" id="navBanner" role="status" aria-live="polite" hidden>
+          <div class="nav-banner-main">
+            <div class="nav-arrow" id="navArrow" aria-hidden="true">⬆</div>
+            <div class="nav-instr">
+              <div class="nav-dist" id="navDist">—</div>
+              <div class="nav-text" id="navText">—</div>
+            </div>
+            <button type="button" class="nav-mute" id="navMuteBtn" aria-pressed="false" title="Mute voice">🔊</button>
+          </div>
+          <div class="nav-banner-sub">
+            <span class="nav-remain" id="navRemain">—</span>
+            <span class="nav-safety">Prototype guidance. Always obey road signs and drive carefully.</span>
+          </div>
+        </div>
         <div class="dest-card" id="destCard" hidden>
           <p class="dest-name" id="destName"></p>
           <p class="dest-meta" id="destMeta"></p>
           <div class="dest-actions">
             <button type="button" class="btn primary" id="destRoute">Route</button>
+            <button type="button" class="btn primary" id="destNavStart">Start navigation</button>
+            <button type="button" class="btn" id="destNavStop" hidden>Stop navigation</button>
             <button type="button" class="btn" id="destClear">Clear</button>
           </div>
           <details class="dest-steps" id="destSteps" hidden>
             <summary id="destStepsSummary">Turn-by-turn (text)</summary>
             <ol id="destStepsList"></ol>
           </details>
-          <p class="dest-note">Routing by OpenStreetMap/OSRM demo — free test service, may be slow or unavailable. Not turn-by-turn voice navigation.</p>
+          <p class="dest-note">Routing by OpenStreetMap/OSRM demo — free test service, may be slow or unavailable. Voice uses your browser speechSynthesis (prototype guidance, not a certified navigation system).</p>
         </div>
       </div>
     </section>
@@ -554,6 +593,7 @@ function maybeEstimateCurve(pos){
       setWarning('A change in travel direction was detected. This is only a rough prototype estimate, not a verified road-curve warning.','warn');
       setText('analysisState','Curve change detected (estimate)');
       lastCurveAt=Date.now();
+      if(typeof onCurveEstimateForNav==='function')onCurveEstimateForNav();
     }else if(Date.now()-lastCurveAt>12000){
       setText('curveDistance','—');
       updateCurveFeature(null);
@@ -574,8 +614,9 @@ function onPosition(pos){
     var h=Number.isFinite(pos.coords.heading)&&pos.coords.heading>=0?pos.coords.heading:(lastHeading||0);
     map.easeTo({center:coord,zoom:Math.max(map.getZoom(),16),pitch:tilted?55:0,bearing:headingUp?h:0,duration:700,essential:true});
   }
-  setStatus('GPS position updated','good');
+  setStatus(navigating?'Navigating':'GPS position updated','good');
   if(destination)updateDestMeta();
+  if(navigating)onNavPosition(pos);
 }
 function onGpsError(err){
   var msg='GPS unavailable. Check location permission and device settings.';
@@ -595,6 +636,7 @@ function startGps(){
   $('gps').disabled=true;$('stopGps').disabled=false;setText('analysisState','Waiting for GPS');
 }
 function stopGps(){
+  if(navigating)stopNavigation();
   if(watchId!==null)navigator.geolocation.clearWatch(watchId);
   watchId=null;$('gps').disabled=false;$('stopGps').disabled=true;
   setText('gpsChip','GPS off');$('gpsChip').classList.remove('acc-good','acc-fair','acc-poor');setText('analysisState','Not active');
@@ -617,6 +659,24 @@ window.__cgIsDriving=function(){
   if(watchId===null||!current)return false;
   var s=current.coords.speed;
   return Number.isFinite(s)&&s>=0&&(s*3.6)>10;
+};
+window.__cgApi={
+  startGps:startGps,stopGps:stopGps,setSatellite:setSatellite,getSatellite:function(){return satellite},
+  setUnitsMph:function(on){useMph=!!on;setText('unit','Units: '+(useMph?'mph':'km/h'));setText('speedUnit',useMph?'mph':'km/h');saveSettings({useMph:useMph});if(current)updateMetrics(current)},
+  getUseMph:function(){return useMph},
+  setTilt3d:function(on){tilted=!!on;setText('tilt',tilted?'3D':'2D');if(map)map.easeTo({pitch:tilted?55:0,duration:450});setText('mapMode',tilted?'3D perspective':'Flat view')},
+  getTilt3d:function(){return tilted},
+  clearGpsTrail:clearRoute,clearDestination:clearDestination,
+  setDestination:setDestination,routeToDestination:routeToDestination,
+  startNavigation:startNavigation,stopNavigation:stopNavigation,
+  isNavigating:function(){return navigating},
+  setNavVoice:setNavVoice,getNavVoice:function(){return navVoiceOn},
+  searchNominatim:searchNominatim,showResults:showResults,
+  getDestination:function(){return destination},
+  injectPos:function(lon,lat,o){
+    o=o||{};
+    onPosition({coords:{longitude:lon,latitude:lat,accuracy:o.accuracy!=null?o.accuracy:10,speed:o.speed!=null?o.speed:12,heading:o.heading!=null?o.heading:0},timestamp:Date.now()});
+  }
 };
 
 /* Destination search + OSRM routing (prototype) */
@@ -719,22 +779,27 @@ function clearDirectionsLayer(){
 }
 function setDestination(place){
   if(!place||!place.coord)return;
-  destination={name:place.name,subtitle:place.subtitle||'',coord:place.coord,routeDist:null,routeEta:null,steps:null};
+  if(typeof stopNavigation==='function'&&navigating)stopNavigation();
+  destination={name:place.name,subtitle:place.subtitle||'',coord:place.coord,routeDist:null,routeEta:null,steps:null,routeGeom:null};
+  navRouteCoords=[];navStepAlong=[];
   ensureDestMarker(place.coord);
   clearDirectionsLayer();
   var card=$('destCard');if(card)card.hidden=false;
   setText('destName',destination.name);
   updateDestMeta();
+  syncNavButtons();
   if(map)map.flyTo({center:place.coord,zoom:Math.max(map.getZoom(),14),pitch:tilted?55:0,duration:1200,essential:true});
   setStatus('Destination set','good');
 }
 function clearDestination(){
-  destination=null;
+  if(typeof stopNavigation==='function')stopNavigation();
+  destination=null;navRouteCoords=[];navStepAlong=[];
   if(destMarker){destMarker.remove();destMarker=null}
   clearDirectionsLayer();
   var card=$('destCard');if(card)card.hidden=true;
   hideResults();
   var inp=$('destSearch');if(inp)inp.value='';
+  syncNavButtons();
   setStatus(ready?'Map ready':'Map loading…',ready?'good':'warn');
 }
 function maneuverText(step){
@@ -762,43 +827,381 @@ function showSteps(steps){
   if(sum)sum.textContent='Turn-by-turn ('+slim.length+' steps)';
   box.hidden=!slim.length;
 }
+/* Voice turn-by-turn navigation (browser speechSynthesis) */
+var navigating=false, navStepIndex=0, navRouteCoords=[], navStepAlong=[], navSpoken={}, navVoiceOn=true;
+var offRouteStreak=0, lastRerouteAt=0, lastCurveSpeakAt=0, wakeLock=null, navRemainDist=null, navRemainEta=null;
+var savedVoice=loadSettings();
+if(savedVoice.voiceMuted===true)navVoiceOn=false;
+
+function fmtNearDist(m){
+  if(!Number.isFinite(m))return '—';
+  if(useMph){
+    var ft=m*3.28084;
+    if(ft<528)return Math.round(ft)+' ft';
+    return fmtKm(m);
+  }
+  if(m<1000)return Math.round(m)+' m';
+  return fmtKm(m);
+}
+function unlockSpeech(){
+  if(!window.speechSynthesis)return;
+  try{
+    var u=new SpeechSynthesisUtterance(' ');
+    u.volume=0;u.rate=1;
+    speechSynthesis.speak(u);
+    speechSynthesis.cancel();
+  }catch(e){}
+}
+function pickVoice(){
+  if(!window.speechSynthesis)return null;
+  var vs=speechSynthesis.getVoices()||[];
+  var prefs=['en-NG','en-GB','en-AU','en-US','en'];
+  for(var i=0;i<prefs.length;i++){
+    for(var j=0;j<vs.length;j++){
+      if(vs[j].lang&&vs[j].lang.toLowerCase().indexOf(prefs[i].toLowerCase())===0)return vs[j];
+    }
+  }
+  for(var k=0;k<vs.length;k++){if(/^en/i.test(vs[k].lang||''))return vs[k]}
+  return null;
+}
+function navSpeak(text){
+  if(!navigating||!navVoiceOn||!window.speechSynthesis||!text)return;
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang='en-GB';u.rate=1;u.pitch=1;
+    var v=pickVoice();if(v)u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function updateMuteUi(){
+  var b=$('navMuteBtn'),d=$('destMute');
+  var label=navVoiceOn?'Mute voice':'Unmute voice';
+  var icon=navVoiceOn?'🔊':'🔇';
+  if(b){b.textContent=icon;b.setAttribute('aria-pressed',navVoiceOn?'false':'true');b.title=label}
+}
+function setNavVoice(on){
+  navVoiceOn=!!on;
+  saveSettings({voiceMuted:!navVoiceOn});
+  updateMuteUi();
+  if(!navVoiceOn&&window.speechSynthesis)try{speechSynthesis.cancel()}catch(e){}
+}
+function requestWakeLock(){
+  releaseWakeLock();
+  if(navigator.wakeLock&&navigator.wakeLock.request){
+    navigator.wakeLock.request('screen').then(function(lock){
+      wakeLock=lock;
+      lock.addEventListener('release',function(){wakeLock=null});
+    }).catch(function(){});
+  }
+}
+function releaseWakeLock(){
+  if(wakeLock){try{wakeLock.release()}catch(e){}wakeLock=null}
+}
+function projectPointToSegment(p,a,b){
+  var R=6371000,toR=Math.PI/180;
+  var ax=a[0]*toR,ay=a[1]*toR,bx=b[0]*toR,by=b[1]*toR,px=p[0]*toR,py=p[1]*toR;
+  var cos=Math.cos((ay+by)/2);
+  var axm=ax*cos,aym=ay,bxm=bx*cos,bym=by,pxm=px*cos,pym=py;
+  var dx=bxm-axm,dy=bym-aym,len2=dx*dx+dy*dy;
+  var t=len2===0?0:((pxm-axm)*dx+(pym-aym)*dy)/len2;
+  t=Math.max(0,Math.min(1,t));
+  var sx=ax+(bx-ax)*t,sy=ay+(by-ay)*t;
+  var snapped=[sx/toR,sy/toR];
+  return {t:t,snapped:snapped,dist:distance(p,snapped)};
+}
+function snapToRoute(coord){
+  if(!navRouteCoords||navRouteCoords.length<2)return null;
+  var best={dist:Infinity,along:0,snapped:coord,seg:0};
+  var along=0;
+  for(var i=0;i<navRouteCoords.length-1;i++){
+    var a=navRouteCoords[i],b=navRouteCoords[i+1];
+    var segLen=distance(a,b);
+    var pr=projectPointToSegment(coord,a,b);
+    if(pr.dist<best.dist){
+      best={dist:pr.dist,along:along+segLen*pr.t,snapped:pr.snapped,seg:i};
+    }
+    along+=segLen;
+  }
+  return best;
+}
+function buildStepAlong(steps,coords){
+  navStepAlong=[];
+  if(!steps||!coords||!coords.length)return;
+  for(var i=0;i<steps.length;i++){
+    var loc=steps[i].maneuver&&steps[i].maneuver.location;
+    if(!loc){navStepAlong[i]=i===0?0:(navStepAlong[i-1]||0);continue}
+    var snap=snapToRoute([loc[0],loc[1]]);
+    navStepAlong[i]=snap?snap.along:0;
+  }
+}
+function arrowForStep(step){
+  if(!step||!step.maneuver)return '⬆';
+  var t=step.maneuver.type||'',m=step.maneuver.modifier||'';
+  if(t==='arrive')return '⬤';
+  if(t==='roundabout'||t==='rotary'||t==='exit roundabout'||t==='exit rotary')return '↻';
+  if(m.indexOf('uturn')>=0||m==='uturn')return '↩';
+  if(m==='sharp left'||m==='left')return '⬅';
+  if(m==='sharp right'||m==='right')return '⮕';
+  if(m==='slight left')return '↖';
+  if(m==='slight right')return '↗';
+  if(m==='straight'||t==='new name'||t==='continue'||t==='notification')return '⬆';
+  if(m.indexOf('left')>=0)return '⬅';
+  if(m.indexOf('right')>=0)return '⮕';
+  return '⬆';
+}
+function voicePhrase(step,phase){
+  if(!step)return '';
+  var m=step.maneuver||{};
+  var type=m.type||'';
+  var mod=(m.modifier||'').replace(/_/g,' ');
+  var road=step.name||step.ref||'the road';
+  var destName=destination&&destination.name?destination.name:'your destination';
+  if(type==='arrive'){
+    return phase==='now'||phase==='near'?'You have arrived at '+destName:'Continue to '+destName;
+  }
+  if(type==='roundabout'||type==='rotary'||type==='exit roundabout'||type==='exit rotary'){
+    var exit=m.exit?ordinal(m.exit):'the';
+    var phrase='At the roundabout, take the '+exit+' exit onto '+road;
+    if(phase==='now')return phrase.replace('At the roundabout, take','Take')+' now';
+    return phrase;
+  }
+  var action='Continue';
+  if(mod)action=mod.charAt(0).toUpperCase()+mod.slice(1);
+  else if(type&&type!=='depart')action=type.replace(/_/g,' ');
+  if(phase==='now')return action+' now onto '+road;
+  return 'In a moment, '+action.toLowerCase()+' onto '+road;
+}
+function ordinal(n){
+  n=parseInt(n,10);if(!Number.isFinite(n))return '';
+  var s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);
+}
+function instructionText(step){
+  if(!step)return 'Follow the route';
+  var m=step.maneuver||{};
+  var type=m.type||'';
+  var mod=(m.modifier||'').replace(/_/g,' ');
+  var road=step.name||step.ref||'the road';
+  if(type==='arrive')return 'Arrive at '+(destination&&destination.name?destination.name:'destination');
+  if(type==='depart')return 'Head onto '+road;
+  if(type==='roundabout'||type==='rotary'){
+    var exit=m.exit?ordinal(m.exit)+' exit':'exit';
+    return 'Roundabout, '+exit+' onto '+road;
+  }
+  if(mod)return mod.charAt(0).toUpperCase()+mod.slice(1)+' onto '+road;
+  return maneuverText(step);
+}
+function maybeAnnounce(stepIndex,distM,speedMs){
+  if(!navigating||!destination||!destination.steps)return;
+  var step=destination.steps[stepIndex];if(!step)return;
+  var type=(step.maneuver&&step.maneuver.type)||'';
+  var phase=null;
+  var timeS=(Number.isFinite(speedMs)&&speedMs>1)?(distM/speedMs):null;
+  if(type==='arrive'){
+    if(distM<=40)phase='now';
+    else if(distM<=150)phase='near';
+  }else{
+    if(distM<=28)phase='now';
+    else if(distM<=150)phase='near';
+    else if(distM<=500||(timeS!==null&&timeS<=30&&distM<=900))phase='far';
+  }
+  if(!phase)return;
+  var key=stepIndex+':'+phase;
+  if(navSpoken[key])return;
+  // mark lower phases too so we don't spam if we jumped ahead
+  if(phase==='now'){navSpoken[stepIndex+':far']=true;navSpoken[stepIndex+':near']=true}
+  if(phase==='near')navSpoken[stepIndex+':far']=true;
+  navSpoken[key]=true;
+  navSpeak(voicePhrase(step,phase));
+}
+function updateNavBanner(distToManeuver,step){
+  var banner=$('navBanner');if(!banner)return;
+  banner.hidden=false;banner.classList.add('open');
+  setText('navDist',fmtNearDist(distToManeuver));
+  setText('navText',instructionText(step));
+  var arrow=$('navArrow');if(arrow)arrow.textContent=arrowForStep(step);
+  var rem='';
+  if(Number.isFinite(navRemainDist))rem='Remaining '+fmtKm(navRemainDist);
+  if(Number.isFinite(navRemainEta))rem+=(rem?' · ':'')+'ETA '+fmtEta(navRemainEta);
+  setText('navRemain',rem||'Navigating');
+}
+function hideNavBanner(){
+  var banner=$('navBanner');
+  if(banner){banner.hidden=true;banner.classList.remove('open')}
+}
+function syncNavButtons(){
+  var start=$('destNavStart'),stop=$('destNavStop');
+  if(start){start.hidden=navigating;start.disabled=!destination||!destination.steps||!destination.steps.length}
+  if(stop)stop.hidden=!navigating;
+}
+function applyOsrmRoute(data,opts){
+  opts=opts||{};
+  if(!data||data.code!=='Ok'||!data.routes||!data.routes[0])throw new Error('noroute');
+  var r=data.routes[0];
+  var geom=r.geometry;
+  if(ready&&map.getSource('directions')){
+    map.getSource('directions').setData({type:'FeatureCollection',features:[{type:'Feature',properties:{},geometry:geom}]});
+  }
+  destination.routeDist=r.distance;destination.routeEta=r.duration;
+  destination.routeGeom=geom;
+  navRouteCoords=(geom&&geom.coordinates)||[];
+  var steps=[];
+  (r.legs||[]).forEach(function(leg){(leg.steps||[]).forEach(function(s){steps.push(s)})});
+  destination.steps=steps;
+  buildStepAlong(steps,navRouteCoords);
+  showSteps(steps);
+  updateDestMeta();
+  navRemainDist=r.distance;navRemainEta=r.duration;
+  if(!opts.silentFit&&geom&&geom.coordinates&&geom.coordinates.length&&map&&!navigating){
+    var bounds=new maplibregl.LngLatBounds(geom.coordinates[0],geom.coordinates[0]);
+    geom.coordinates.forEach(function(c){bounds.extend(c)});
+    map.fitBounds(bounds,{padding:{top:90,bottom:160,left:40,right:70},duration:900,pitch:tilted?45:0});
+  }
+  setStatus((opts.reroute?'Rerouted':'Route ready')+' · '+fmtKm(r.distance),'good');
+  syncNavButtons();
+  return r;
+}
+function fetchOsrmRoute(from,opts){
+  opts=opts||{};
+  var url='https://router.project-osrm.org/route/v1/driving/'+from[0]+','+from[1]+';'+destination.coord[0]+','+destination.coord[1]+'?overview=full&geometries=geojson&steps=true';
+  return fetch(url,{headers:{'Accept':'application/json'}}).then(function(res){
+    if(!res.ok)throw new Error('http');
+    return res.json();
+  }).then(function(data){return applyOsrmRoute(data,opts)});
+}
+function rerouteFromHere(){
+  if(!destination||!current)return;
+  var now=Date.now();
+  if(now-lastRerouteAt<20000)return;
+  lastRerouteAt=now;
+  setStatus('Rerouting…','warn');
+  navSpeak('Rerouting');
+  var from=[current.coords.longitude,current.coords.latitude];
+  fetchOsrmRoute(from,{reroute:true,silentFit:true}).then(function(){
+    navStepIndex=0;navSpoken={};offRouteStreak=0;
+  }).catch(function(){
+    setWarning('Rerouting failed. Continuing with the previous route if possible.','warn');
+    navSpeak('Rerouting failed');
+  });
+}
+function onNavPosition(pos){
+  if(!navigating||!destination||!destination.steps||!destination.steps.length)return;
+  var coord=[pos.coords.longitude,pos.coords.latitude];
+  var acc=pos.coords.accuracy;
+  var speedMs=Number.isFinite(pos.coords.speed)&&pos.coords.speed>=0?pos.coords.speed:null;
+  var snap=snapToRoute(coord);
+  if(snap&&Number.isFinite(acc)&&acc<=25){
+    if(snap.dist>50){
+      offRouteStreak++;
+      if(offRouteStreak>=3)rerouteFromHere();
+    }else offRouteStreak=0;
+  }
+  // advance steps
+  var along=snap?snap.along:0;
+  while(navStepIndex<destination.steps.length-1){
+    var manAlong=navStepAlong[navStepIndex];
+    var manLoc=destination.steps[navStepIndex].maneuver&&destination.steps[navStepIndex].maneuver.location;
+    var dMan=manLoc?distance(coord,[manLoc[0],manLoc[1]]):Infinity;
+    var passed=Number.isFinite(manAlong)?(along>manAlong+8):false;
+    if(dMan<=25||passed){
+      var k=navStepIndex+':now';
+      if(!navSpoken[k]){navSpoken[navStepIndex+':far']=true;navSpoken[navStepIndex+':near']=true;navSpoken[k]=true;navSpeak(voicePhrase(destination.steps[navStepIndex],'now'))}
+      navStepIndex++;
+    }else break;
+  }
+  var step=destination.steps[navStepIndex]||destination.steps[destination.steps.length-1];
+  var mLoc=step.maneuver&&step.maneuver.location;
+  var distTo=mLoc?distance(coord,[mLoc[0],mLoc[1]]):0;
+  if(snap&&Number.isFinite(navStepAlong[navStepIndex])){
+    distTo=Math.max(0,navStepAlong[navStepIndex]-along);
+    // prefer smaller of along-track and straight if near
+    if(mLoc)distTo=Math.min(distTo,distance(coord,[mLoc[0],mLoc[1]]));
+  }
+  // remaining route approx
+  if(destination.routeDist!=null&&snap){
+    var totalAlong=0;
+    for(var i=0;i<navRouteCoords.length-1;i++)totalAlong+=distance(navRouteCoords[i],navRouteCoords[i+1]);
+    navRemainDist=Math.max(0,totalAlong-along);
+    if(destination.routeEta!=null&&totalAlong>0)navRemainEta=destination.routeEta*(navRemainDist/totalAlong);
+  }
+  updateNavBanner(distTo,step);
+  maybeAnnounce(navStepIndex,distTo,speedMs);
+  // arrival
+  if(step&&step.maneuver&&step.maneuver.type==='arrive'&&distTo<=25){
+    var ak=navStepIndex+':arrived';
+    if(!navSpoken[ak]){
+      navSpoken[ak]=true;
+      navSpeak('You have arrived at '+(destination.name||'your destination'));
+      setStatus('Arrived','good');
+    }
+  }
+}
+function startNavigation(){
+  if(!destination){setWarning('Pick a destination first.','warn');return}
+  unlockSpeech();
+  setNavVoice(true); // voice on by default when navigation starts
+  function begin(){
+    if(!destination.steps||!destination.steps.length){
+      setWarning('Getting a route before navigation…','warn');
+      fetchOsrmRoute(originLonLat(),{}).then(function(){begin()}).catch(function(){
+        setWarning('Could not start navigation — route failed.','warn');
+      });
+      return;
+    }
+    if(watchId===null)startGps();
+    navigating=true;
+    document.body.classList.add('navigating');
+    navStepIndex=0;navSpoken={};offRouteStreak=0;
+    if(destination.routeGeom&&destination.routeGeom.coordinates)navRouteCoords=destination.routeGeom.coordinates;
+    buildStepAlong(destination.steps,navRouteCoords);
+    setFollow(true);headingUp=true;setText('orient','↗');
+    requestWakeLock();
+    syncNavButtons();
+    updateMuteUi();
+    var step=destination.steps[0];
+    updateNavBanner(destination.steps[0]&&destination.steps[0].distance||0, step);
+    setStatus('Navigation started','good');
+    setWarning('Prototype guidance. Always obey road signs and drive carefully. Curve warnings remain estimates only.','warn');
+    navSpeak('Starting navigation to '+(destination.name||'your destination'));
+    if(current)onNavPosition(current);
+  }
+  begin();
+}
+function stopNavigation(){
+  navigating=false;
+  document.body.classList.remove('navigating');
+  hideNavBanner();
+  releaseWakeLock();
+  if(window.speechSynthesis)try{speechSynthesis.cancel()}catch(e){}
+  syncNavButtons();
+  setStatus(destination&&destination.routeDist!=null?('Route ready · '+fmtKm(destination.routeDist)):(ready?'Map ready':'Map loading…'),'good');
+}
+function onCurveEstimateForNav(){
+  if(!navigating)return;
+  var now=Date.now();
+  if(now-lastCurveSpeakAt<15000)return;
+  lastCurveSpeakAt=now;
+  navSpeak('Caution, curve ahead');
+  setWarning('Caution, curve ahead (prototype estimate — not a verified road-curve warning). Always obey road signs.','warn');
+}
+
 function routeToDestination(){
-  if(!destination){setWarning('Search and pick a destination first.','warn');return}
+  if(!destination){setWarning('Search and pick a destination first.','warn');return Promise.reject(new Error('nodest'))}
   var from=originLonLat();
   var usingGps=!!(current&&Number.isFinite(current.coords.longitude));
   if(!usingGps){
     setWarning('GPS is off — routing from the map centre. Start GPS for a route from your position.','warn');
   }
-  var url='https://router.project-osrm.org/route/v1/driving/'+from[0]+','+from[1]+';'+destination.coord[0]+','+destination.coord[1]+'?overview=full&geometries=geojson&steps=true';
   setStatus('Getting route…','warn');
-  $('destRoute').disabled=true;
-  fetch(url,{headers:{'Accept':'application/json'}}).then(function(res){
-    if(!res.ok)throw new Error('http');
-    return res.json();
-  }).then(function(data){
-    $('destRoute').disabled=false;
-    if(!data||data.code!=='Ok'||!data.routes||!data.routes[0])throw new Error('noroute');
-    var r=data.routes[0];
-    var geom=r.geometry;
-    if(ready&&map.getSource('directions')){
-      map.getSource('directions').setData({type:'FeatureCollection',features:[{type:'Feature',properties:{},geometry:geom}]});
-    }
-    destination.routeDist=r.distance;destination.routeEta=r.duration;
-    var steps=[];
-    (r.legs||[]).forEach(function(leg){(leg.steps||[]).forEach(function(s){steps.push(s)})});
-    destination.steps=steps;
-    showSteps(steps);
-    updateDestMeta();
-    if(geom&&geom.coordinates&&geom.coordinates.length&&map){
-      var bounds=new maplibregl.LngLatBounds(geom.coordinates[0],geom.coordinates[0]);
-      geom.coordinates.forEach(function(c){bounds.extend(c)});
-      map.fitBounds(bounds,{padding:{top:90,bottom:160,left:40,right:70},duration:900,pitch:tilted?45:0});
-    }
-    setStatus('Route ready · '+fmtKm(r.distance),'good');
+  if($('destRoute'))$('destRoute').disabled=true;
+  return fetchOsrmRoute(from,{}).then(function(r){
+    if($('destRoute'))$('destRoute').disabled=false;
+    return r;
   }).catch(function(err){
-    $('destRoute').disabled=false;
+    if($('destRoute'))$('destRoute').disabled=false;
     setStatus('Route failed','warn');
     setWarning(!navigator.onLine?'You appear offline — cannot fetch a route.':(err&&err.message==='noroute'?'No driving route found between those points.':'Could not reach the free OSRM demo. Try again later.'),'warn');
+    throw err;
   });
 }
 function bindDestinationUi(){
@@ -816,9 +1219,14 @@ function bindDestinationUi(){
     var wrap=$('mapSearchWrap');
     if(wrap&&!wrap.contains(e.target))hideResults();
   });
-  var rb=$('destRoute'),cb=$('destClear');
-  if(rb)rb.addEventListener('click',routeToDestination);
+  var rb=$('destRoute'),cb=$('destClear'),ns=$('destNavStart'),np=$('destNavStop'),mb=$('navMuteBtn');
+  if(rb)rb.addEventListener('click',function(){routeToDestination()});
   if(cb)cb.addEventListener('click',clearDestination);
+  if(ns)ns.addEventListener('click',startNavigation);
+  if(np)np.addEventListener('click',stopNavigation);
+  if(mb)mb.addEventListener('click',function(){setNavVoice(!navVoiceOn)});
+  updateMuteUi();
+  syncNavButtons();
 }
 function bindMapDestinationGestures(){
   if(!map)return;
@@ -902,7 +1310,7 @@ var tips=[
   "Obey traffic signs; they are there to protect you.",
   'Phones down, eyes on the road.'
 ];
-var chips=['How does it work?','Set destination','Safety tip','GPS accuracy','Contact'];
+var chips=['How does it work?','Set destination','Navigation','Safety tip','GPS accuracy','Contact'];
 
 function escText(s){return String(s==null?'':s)}
 function addMsg(text,who){
@@ -936,8 +1344,12 @@ function speak(text){
 function answer(q){
   var t=String(q||'').toLowerCase().trim();
   if(!t)return "Ask me how Curve Guide works, about destinations, GPS accuracy, units, the map, safety tips, or contact details.";
-  if(/destin|search|route|navigat|how do i (set|find)|go to|directions?/.test(t))
-    return 'Type a place in Search destination on the map (at least 3 letters). Pick a result, then tap Route. You can also long-press or right-click the map to drop a pin. Routing uses the free OpenStreetMap/OSRM demo — it can be slow and is not voice turn-by-turn navigation.';
+  if(/voice|speak|mute|unmute|speech|talk|announce/.test(t))
+    return 'After you set a route, tap Start navigation. Curve Guide speaks turn-by-turn with your browser\'s free speechSynthesis (English). Tap the speaker on the nav banner to mute or unmute — that choice is saved on this device. This is prototype guidance, not a certified navigation system.';
+  if(/navigat|start nav|turn.?by.?turn|guidance/.test(t))
+    return 'Search a destination, tap Route, then Start navigation. You will see the next turn banner and hear voice prompts. GPS must be on; the map follows you. Say "stop navigation" or tap Stop. Always obey road signs — this is a free prototype using OSRM + browser speech.';
+  if(/destin|search|route|how do i (set|find)|go to|directions?/.test(t))
+    return 'Type a place in Search destination on the map (at least 3 letters). Pick a result, then tap Route, then Start navigation for voice guidance. You can also long-press or right-click the map to drop a pin.';
   if(/contact|phone|email|call|whatsapp|reach/.test(t))
     return 'You can reach Adeniyi Investments & Property Ltd. at +234 805 352 9802 or info@adeniyiltd.com.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
