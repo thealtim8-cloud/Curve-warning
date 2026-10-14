@@ -132,12 +132,14 @@ body.welcome-open{overflow:hidden}
 @media(min-width:760px){.map-wrap{height:720px}.metrics{gap:10px}}
 .side-stack{display:grid;gap:14px}.dashboard{display:grid;gap:14px}.tip-quote{min-height:0}.tips-body{min-height:0}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+.welcome-video{display:block;width:100%;max-width:300px;aspect-ratio:544/352;height:auto;margin:0 auto 4px;border-radius:16px;object-fit:cover;background:#1a1c1f;border:1px solid var(--line2)}
+@media(max-width:420px){.welcome-video{max-width:260px;border-radius:14px}}
 </style>
 </head>
 <body class="welcome-open">
 <div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="welcomeIntro">
   <div class="welcome-card" tabindex="-1" id="welcomeCard">
-    <img class="welcome-logo" src="assets/curveguide-full.png" alt="Curve Guide — Safer turns. Smarter drives.">
+    <video class="welcome-video" id="welcomeVideo" autoplay muted loop playsinline preload="auto" poster="assets/welcome-poster.jpg" aria-label="Curve Guide — Safer turns. Smarter drives." disablepictureinpicture><source src="assets/welcome.mp4" type="video/mp4"></video>
     <h2 id="welcomeTitle">Welcome to Curve Guide</h2>
     <p class="welcome-intro" id="welcomeIntro">Curve Guide is a product of <strong>Adeniyi Investments &amp; Property Ltd.</strong>, built to help prevent road accidents on dangerous bends and curves. By giving drivers early awareness of sharp turns ahead, it supports safer, more confident driving on Nigerian roads. Curve Guide is currently a prototype: it is designed to supplement, never replace, careful and attentive driving.</p>
     <p class="welcome-quote" id="welcomeQuote" aria-live="off">“Prevention is better than cure.”</p>
@@ -461,7 +463,7 @@ initMap();
   var w=document.getElementById('welcome'),c=document.getElementById('acceptTerms'),b=document.getElementById('welcomeContinue'),card=document.getElementById('welcomeCard');
   var last=null;
   c.addEventListener('change',function(){b.disabled=!c.checked});
-  b.addEventListener('click',function(){if(!c.checked)return;w.hidden=true;document.body.classList.remove('welcome-open');var g=document.getElementById('gps');if(g)g.focus()});
+  b.addEventListener('click',function(){if(!c.checked)return;w.hidden=true;var wv=document.getElementById('welcomeVideo');if(wv)wv.pause();document.body.classList.remove('welcome-open');var g=document.getElementById('gps');if(g)g.focus()});
   w.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var f=[].slice.call(w.querySelectorAll('input,button:not([disabled]),[tabindex="0"]'));if(!f.length)return;var a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}});
   card.focus();
 })();
@@ -483,5 +485,6 @@ var wq=document.getElementById('welcomeQuote'),w=document.getElementById('welcom
 if(!rm)var wt=setInterval(function(){if(w.hidden){clearInterval(wt);return}j=(j+1)%T.length;wq.classList.add('fade');setTimeout(function(){wq.textContent='“'+T[j]+'”';wq.classList.remove('fade')},FD)},4500);
 })();
 </script>
+<script>(function(){var v=document.getElementById('welcomeVideo');if(v&&window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){v.removeAttribute('autoplay');v.pause()}})();</script>
 </body>
 </html>
