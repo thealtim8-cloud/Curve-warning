@@ -34,8 +34,9 @@ h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;
 .map-status{position:absolute;z-index:2;left:12px;right:12px;top:12px;pointer-events:none;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
 .status-chip{background:#0d1114e6;border:1px solid #ffffff1c;border-radius:999px;padding:7px 12px;font-size:11px;font-weight:500;backdrop-filter:blur(10px);max-width:75%;box-shadow:0 4px 14px #0005}
 .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--orange);margin-right:7px;box-shadow:0 0 0 3px #ffffff10}
-.map-controls{position:absolute;z-index:3;right:12px;bottom:14px;display:grid;gap:7px}
+.map-controls{position:absolute;z-index:3;right:12px;bottom:62px;display:grid;gap:7px}
 .icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid #ffffff26;background:#0d1114e8;color:#fff;font-size:17px;font-weight:600;display:grid;place-items:center;box-shadow:0 4px 14px #0005;backdrop-filter:blur(8px);transition:background .15s,border-color .15s,transform .1s}
+.icon-btn.map-type{font-size:11.5px;letter-spacing:.2px}
 .icon-btn:hover{background:#1c252b;border-color:#20c47780}
 .icon-btn:active{transform:scale(.96)}
 .maplibregl-ctrl-bottom-left,.maplibregl-ctrl-bottom-right{z-index:2}
@@ -156,6 +157,7 @@ body.welcome-open{overflow:hidden}
           <button class="icon-btn" id="zout" aria-label="Zoom out" title="Zoom out">−</button>
           <button class="icon-btn" id="tilt" aria-label="Toggle 3D tilt" title="Toggle 3D tilt">3D</button>
           <button class="icon-btn" id="orient" aria-label="Change map orientation" title="Change orientation">↗</button>
+          <button class="icon-btn map-type" id="mapType" aria-label="Toggle satellite view" aria-pressed="false" title="Switch to satellite view">Sat</button>
         </div>
       </div>
     </section>
@@ -270,12 +272,29 @@ function applyCamera(){
   map.easeTo({center:center,zoom:Math.max(map.getZoom(),16),pitch:tilted?55:0,bearing:headingUp?h:0,duration:450,essential:true});
 }
 function setFollow(on){follow=on;setText('follow','Follow: '+(follow?'On':'Off'));$('follow').classList.toggle('active',follow)}
+var satellite=false,satHidden=[];
+function setupSatellite(){
+  try{
+    map.addSource('esri-imagery',{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'Imagery © Esri, Maxar, Earthstar Geographics'});
+    var ls=map.getStyle().layers||[];
+    var before=ls.find(function(l){return (l.type==='line'&&l['source-layer']==='transportation')||l.type==='symbol'});
+    map.addLayer({id:'curve-guide-satellite',type:'raster',source:'esri-imagery',layout:{visibility:'none'},paint:{'raster-fade-duration':200}},before?before.id:undefined);
+    satHidden=ls.filter(function(l){return l.type==='fill'||l.type==='background'}).map(function(l){return l.id});
+  }catch(e){}
+}
+function setSatellite(on){
+  if(!map||!map.getLayer('curve-guide-satellite'))return;
+  satellite=on;
+  map.setLayoutProperty('curve-guide-satellite','visibility',on?'visible':'none');
+  satHidden.forEach(function(id){if(map.getLayer(id))map.setLayoutProperty(id,'visibility',on?'none':'visible')});
+  var b=$('mapType');if(b){b.textContent=on?'Map':'Sat';b.setAttribute('aria-pressed',on?'true':'false');b.title=on?'Switch to map view':'Switch to satellite view'}
+}
 function initMap(){
   if(!window.maplibregl){setStatus('Map library did not load', 'danger');setWarning('The map library could not load. Check your internet connection and reload.');return}
   try{
     map=new maplibregl.Map({
       container:'map',
-      style:'https://tiles.openfreemap.org/styles/bright',
+      style:'https://tiles.openfreemap.org/styles/liberty',
       center:[3.3792,6.5244],
       zoom:13,
       pitch:55,
@@ -317,6 +336,7 @@ function initMap(){
             },labelLayer?labelLayer.id:undefined);
           }catch(e){/* The base map remains usable if 3D building data is not available. */}
         }
+        setupSatellite();
         ready=true;setStatus('Map ready · 3D view enabled','good');setText('mapMode','3D perspective');setFollow(true);
         if(!sourceId)setText('mapMode','Tilted map');
       }catch(e){setStatus('Map loaded with limited features','warn')}
@@ -391,6 +411,7 @@ $('zout').addEventListener('click',function(){if(map)map.zoomTo(Math.max(2,map.g
 $('tilt').addEventListener('click',function(){tilted=!tilted;setText('tilt',tilted?'3D':'2D');if(map)map.easeTo({pitch:tilted?55:0,duration:450});setText('mapMode',tilted?'3D perspective':'Flat view')});
 $('orient').addEventListener('click',function(){headingUp=!headingUp;setText('orient',headingUp?'↗':'N');if(map)map.easeTo({bearing:headingUp&&current&&Number.isFinite(current.coords.heading)?current.coords.heading:0,duration:400});});
 $('recenter').addEventListener('click',function(){if(current){setFollow(true);applyCamera()}else if(map)map.easeTo({center:[3.3792,6.5244],zoom:13,pitch:tilted?55:0,bearing:0,duration:500})});
+$('mapType').addEventListener('click',function(){setSatellite(!satellite)});
 $('clearRoute').addEventListener('click',clearRoute);
 window.addEventListener('beforeunload',function(){if(watchId!==null)navigator.geolocation.clearWatch(watchId)});
 initMap();
