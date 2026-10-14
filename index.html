@@ -170,6 +170,45 @@ body.welcome-open{overflow:hidden}
   .niyi-fab{width:50px;height:50px;font-size:12px;right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom))}
   .niyi-panel{width:calc(100vw - 16px);right:8px;left:8px;bottom:max(10px,env(safe-area-inset-bottom));height:min(70dvh,520px);border-radius:16px}
 }
+
+/* Header Ask Niyi */
+.header-actions{display:flex;align-items:center;gap:8px;flex:none}
+.niyi-header-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border-radius:999px;border:1px solid #20c47766;background:#20c47718;color:#9be3bf;font-size:12.5px;font-weight:700;white-space:nowrap}
+.niyi-header-btn:hover{border-color:#20c477;background:#20c47728;color:#fff}
+.niyi-header-btn svg{width:16px;height:16px;flex:none}
+@keyframes niyiPulse{0%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 #20c47766}70%{box-shadow:0 10px 28px -8px #000c,0 0 0 14px #20c47700}100%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 #20c47700}}
+.niyi-fab.niyi-pulse{animation:niyiPulse 1.2s ease-out 2}
+@media(max-width:420px){.pill{display:none}.niyi-header-btn{padding:8px 11px;font-size:12px}.header-actions{gap:0}}
+/* Destination search */
+.map-search{position:absolute;z-index:5;left:12px;right:12px;top:52px;pointer-events:none}
+.map-search>*{pointer-events:auto}
+.dest-search{width:100%;border:1px solid #ffffff26;background:#0d1114f0;color:var(--text);border-radius:12px;padding:11px 14px 11px 38px;font:inherit;font-size:13.5px;font-weight:500;box-shadow:0 8px 24px -10px #000c;backdrop-filter:blur(10px)}
+.dest-search:focus{outline:none;border-color:#20c47799;box-shadow:0 0 0 3px #20c47733,0 8px 24px -10px #000c}
+.dest-search-wrap{position:relative}
+.dest-search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
+.dest-results{margin-top:6px;background:#0d1114f5;border:1px solid var(--line2);border-radius:12px;overflow:hidden;box-shadow:0 14px 36px -12px #000d;max-height:220px;overflow-y:auto}
+.dest-results[hidden]{display:none}
+.dest-result{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--text);padding:10px 12px;font:inherit;font-size:12.5px;line-height:1.4;cursor:pointer}
+.dest-result:last-child{border-bottom:0}
+.dest-result:hover,.dest-result:focus{background:#20c47718;outline:none}
+.dest-result small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.dest-card{position:absolute;z-index:5;left:12px;right:58px;bottom:12px;background:#0d1114f2;border:1px solid var(--line2);border-radius:14px;padding:12px 12px 10px;box-shadow:0 14px 36px -12px #000d;backdrop-filter:blur(10px);max-height:46%;overflow:auto}
+.dest-card[hidden]{display:none}
+.dest-name{font-size:13.5px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;line-height:1.35}
+.dest-meta{font-size:11.5px;color:var(--muted);margin:0 0 10px;line-height:1.45}
+.dest-actions{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px}
+.dest-actions .btn{padding:8px 12px;font-size:12px}
+.dest-note{margin:0;font-size:10.5px;line-height:1.45;color:#6f7f89}
+.dest-steps{margin:8px 0;border:1px solid var(--line);border-radius:10px;background:#13191d;overflow:hidden}
+.dest-steps summary{cursor:pointer;padding:8px 10px;font-size:11.5px;font-weight:600;color:#9be3bf;list-style:none}
+.dest-steps summary::-webkit-details-marker{display:none}
+.dest-steps ol{margin:0;padding:0 12px 10px 28px;font-size:11.5px;line-height:1.45;color:#cfd8dd}
+.dest-steps li{margin:5px 0}
+@media(max-width:390px){
+  .map-search{top:48px;left:10px;right:10px}
+  .dest-card{left:10px;right:52px;bottom:10px;padding:10px}
+  .dest-search{font-size:13px;padding:10px 12px 10px 36px}
+}
 </style>
 </head>
 <body class="welcome-open">
@@ -206,7 +245,13 @@ body.welcome-open{overflow:hidden}
         <div class="subtitle">Intelligent Road Safety System · Development prototype</div>
       </div>
     </div>
-    <div class="pill">PROTOTYPE · v5.0 3D</div>
+    <div class="header-actions">
+      <button type="button" class="niyi-header-btn" id="niyiHeaderBtn" aria-controls="niyiPanel" title="Ask Niyi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+        Ask Niyi
+      </button>
+      <div class="pill">PROTOTYPE · v5.0 3D</div>
+    </div>
   </header>
   <div class="hero" role="note"><div><b>Arrive alive.</b> Real-time curve awareness for safer journeys on Nigerian roads.</div><div class="hero-items"><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Safety first</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Satellite &amp; 3D</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>On-device GPS</span></div></div>
 
@@ -228,6 +273,26 @@ body.welcome-open{overflow:hidden}
           <button class="icon-btn" id="tilt" aria-label="Toggle 3D tilt" title="Toggle 3D tilt">3D</button>
           <button class="icon-btn" id="orient" aria-label="Change map orientation" title="Change orientation">↗</button>
           <button class="icon-btn map-type" id="mapType" aria-label="Toggle satellite view" aria-pressed="false" title="Switch to satellite view">Sat</button>
+        </div>
+        <div class="map-search" id="mapSearchWrap">
+          <div class="dest-search-wrap">
+            <svg class="dest-search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input class="dest-search" id="destSearch" type="search" placeholder="Search destination" autocomplete="off" aria-label="Search destination" aria-autocomplete="list" aria-controls="destResults">
+          </div>
+          <div class="dest-results" id="destResults" role="listbox" hidden></div>
+        </div>
+        <div class="dest-card" id="destCard" hidden>
+          <p class="dest-name" id="destName"></p>
+          <p class="dest-meta" id="destMeta"></p>
+          <div class="dest-actions">
+            <button type="button" class="btn primary" id="destRoute">Route</button>
+            <button type="button" class="btn" id="destClear">Clear</button>
+          </div>
+          <details class="dest-steps" id="destSteps" hidden>
+            <summary id="destStepsSummary">Turn-by-turn (text)</summary>
+            <ol id="destStepsList"></ol>
+          </details>
+          <p class="dest-note">Routing by OpenStreetMap/OSRM demo — free test service, may be slow or unavailable. Not turn-by-turn voice navigation.</p>
         </div>
       </div>
     </section>
@@ -263,7 +328,7 @@ body.welcome-open{overflow:hidden}
             <div class="section-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h8"/></svg>Route &amp; map data</div>
             <span class="small" id="routeState">No route yet</span>
           </div>
-          <div class="small" style="line-height:1.6;margin-top:9px">The map uses community map data. Road geometry and curve estimates may be incomplete or inaccurate.</div>
+          <div class="small" style="line-height:1.6;margin-top:9px">The map uses community map data. Destination search uses Nominatim; driving routes use the public OSRM demo. Road geometry, routes, and curve estimates may be incomplete or inaccurate.</div>
           <div class="actions">
             <button class="btn" id="recenter">Recenter map</button>
             <button class="btn" id="clearRoute">Clear route</button>
@@ -290,7 +355,7 @@ body.welcome-open{overflow:hidden}
     <div class="credit-copy">&copy; 2026 Curve Guide — Automotive Division of <a href="https://adeniyiltd.com/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Adeniyi Investments &amp; Property Ltd.</a> All rights reserved.</div>
     <div class="contact-line">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
   </div>
-  <footer>Curve Guide · Road safety development prototype · Map data © OpenStreetMap contributors</footer>
+  <footer>Curve Guide · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
   </div>
 </div>
 
@@ -433,6 +498,8 @@ function initMap(){
         map.addLayer({id:'curve-guide-route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#20c477','line-width':6,'line-opacity':0.9}});
         map.addSource('curve',{type:'geojson',data:EMPTY});
         map.addLayer({id:'curve-guide-curve',type:'circle',source:'curve',paint:{'circle-radius':9,'circle-color':'#ff625c','circle-stroke-color':'#ffffff','circle-stroke-width':2}});
+        map.addSource('directions',{type:'geojson',data:EMPTY});
+        map.addLayer({id:'curve-guide-directions',type:'line',source:'directions',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#4ea1ff','line-width':5,'line-opacity':0.92}});
         // Add 3D buildings only when the public vector style exposes the expected source and layer.
         var style=map.getStyle(), sources=style&&style.sources?style.sources:{};
         var vectorSource=Object.keys(sources).find(function(k){return sources[k]&&sources[k].type==='vector'&&sources[k]['url']});
@@ -458,7 +525,7 @@ function initMap(){
           }catch(e){/* The base map remains usable if 3D building data is not available. */}
         }
         setupSatellite();
-        ready=true;setStatus('Map ready · 3D view enabled','good');setText('mapMode','3D perspective');setFollow(true);
+        ready=true;setStatus('Map ready · 3D view enabled','good');setText('mapMode','3D perspective');setFollow(true);bindMapDestinationGestures();
         if(!sourceId)setText('mapMode','Tilted map');
       }catch(e){setStatus('Map loaded with limited features','warn')}
     });
@@ -508,6 +575,7 @@ function onPosition(pos){
     map.easeTo({center:coord,zoom:Math.max(map.getZoom(),16),pitch:tilted?55:0,bearing:headingUp?h:0,duration:700,essential:true});
   }
   setStatus('GPS position updated','good');
+  if(destination)updateDestMeta();
 }
 function onGpsError(err){
   var msg='GPS unavailable. Check location permission and device settings.';
@@ -550,6 +618,228 @@ window.__cgIsDriving=function(){
   var s=current.coords.speed;
   return Number.isFinite(s)&&s>=0&&(s*3.6)>10;
 };
+
+/* Destination search + OSRM routing (prototype) */
+var destMarker=null, destination=null, searchTimer=null, searchSeq=0, pressTimer=null;
+function fmtKm(m){
+  if(!Number.isFinite(m))return '—';
+  if(useMph){var mi=m/1609.344;return (mi<10?mi.toFixed(1):Math.round(mi))+' mi'}
+  var km=m/1000;return (km<10?km.toFixed(1):Math.round(km))+' km';
+}
+function fmtEta(sec){
+  if(!Number.isFinite(sec))return '—';
+  var m=Math.max(1,Math.round(sec/60));
+  if(m<60)return m+' min';
+  var h=Math.floor(m/60),rm=m%60;return h+' h '+(rm?rm+' min':'');
+}
+function originLonLat(){
+  if(current&&Number.isFinite(current.coords.longitude)&&Number.isFinite(current.coords.latitude))
+    return [current.coords.longitude,current.coords.latitude];
+  if(map){var c=map.getCenter();return [c.lng,c.lat]}
+  return [3.3792,6.5244];
+}
+function updateDestMeta(){
+  if(!destination)return;
+  var parts=[];
+  if(current){
+    var d=distance([current.coords.longitude,current.coords.latitude],destination.coord);
+    parts.push('Straight-line: '+fmtKm(d));
+  }else{
+    parts.push('Start GPS to see distance from you');
+  }
+  if(destination.routeDist!=null)parts.push('Route: '+fmtKm(destination.routeDist)+' · ETA '+fmtEta(destination.routeEta));
+  setText('destMeta',parts.join(' · '));
+}
+function hideResults(){var r=$('destResults');if(r){r.hidden=true;r.textContent=''}}
+function showResults(items){
+  var box=$('destResults');if(!box)return;
+  box.textContent='';
+  if(!items.length){
+    var empty=document.createElement('div');empty.className='dest-result';empty.style.cursor='default';
+    empty.textContent='No places found. Try a clearer name.';
+    box.appendChild(empty);box.hidden=false;return;
+  }
+  items.forEach(function(it){
+    var b=document.createElement('button');b.type='button';b.className='dest-result';b.setAttribute('role','option');
+    var title=document.createElement('span');title.textContent=it.name;
+    var sub=document.createElement('small');sub.textContent=it.subtitle||'';
+    b.appendChild(title);if(it.subtitle)b.appendChild(sub);
+    b.addEventListener('click',function(){setDestination(it);hideResults();var inp=$('destSearch');if(inp)inp.value=it.name});
+    box.appendChild(b);
+  });
+  box.hidden=false;
+}
+function searchNominatim(q){
+  var seq=++searchSeq;
+  var base='https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=0&limit=5&accept-language=en&q=';
+  function parse(list){
+    return (list||[]).map(function(r){
+      var name=r.namedetails&&r.namedetails.name?r.namedetails.name:(r.display_name||'').split(',')[0];
+      return {name:name||r.display_name, subtitle:r.display_name, coord:[parseFloat(r.lon),parseFloat(r.lat)]};
+    }).filter(function(x){return Number.isFinite(x.coord[0])&&Number.isFinite(x.coord[1])});
+  }
+  function fetchUrl(url,isFallback){
+    return fetch(url,{headers:{'Accept':'application/json'}}).then(function(res){
+      if(res.status===429)throw new Error('rate');
+      if(!res.ok)throw new Error('http');
+      return res.json();
+    }).then(function(data){
+      if(seq!==searchSeq)return;
+      var items=parse(data);
+      if(!items.length&&!isFallback){
+        return fetchUrl(base+encodeURIComponent(q),true);
+      }
+      showResults(items);
+    });
+  }
+  var ngUrl=base+encodeURIComponent(q)+'&countrycodes=ng';
+  fetchUrl(ngUrl,false).catch(function(err){
+    if(seq!==searchSeq)return;
+    var box=$('destResults');if(!box)return;
+    box.textContent='';
+    var d=document.createElement('div');d.className='dest-result';d.style.cursor='default';
+    d.textContent=err&&err.message==='rate'?'Search is busy (rate limit). Wait a moment and try again.':(!navigator.onLine?'You appear offline. Check your connection.':'Could not search right now. Try again shortly.');
+    box.appendChild(d);box.hidden=false;
+  });
+}
+function ensureDestMarker(coord){
+  if(!map)return;
+  if(!destMarker){
+    var el=document.createElement('div');
+    el.style.cssText='width:18px;height:18px;border-radius:50% 50% 50% 0;background:#ff625c;border:2px solid #fff;transform:rotate(-45deg);box-shadow:0 4px 12px #000a';
+    el.setAttribute('aria-label','Destination');
+    destMarker=new maplibregl.Marker({element:el,anchor:'center'}).setLngLat(coord).addTo(map);
+  }else destMarker.setLngLat(coord);
+}
+function clearDirectionsLayer(){
+  if(ready&&map&&map.getSource('directions'))map.getSource('directions').setData(EMPTY);
+  var steps=$('destSteps'),list=$('destStepsList');
+  if(steps){steps.hidden=true;steps.open=false}
+  if(list)list.textContent='';
+}
+function setDestination(place){
+  if(!place||!place.coord)return;
+  destination={name:place.name,subtitle:place.subtitle||'',coord:place.coord,routeDist:null,routeEta:null,steps:null};
+  ensureDestMarker(place.coord);
+  clearDirectionsLayer();
+  var card=$('destCard');if(card)card.hidden=false;
+  setText('destName',destination.name);
+  updateDestMeta();
+  if(map)map.flyTo({center:place.coord,zoom:Math.max(map.getZoom(),14),pitch:tilted?55:0,duration:1200,essential:true});
+  setStatus('Destination set','good');
+}
+function clearDestination(){
+  destination=null;
+  if(destMarker){destMarker.remove();destMarker=null}
+  clearDirectionsLayer();
+  var card=$('destCard');if(card)card.hidden=true;
+  hideResults();
+  var inp=$('destSearch');if(inp)inp.value='';
+  setStatus(ready?'Map ready':'Map loading…',ready?'good':'warn');
+}
+function maneuverText(step){
+  var m=step.maneuver||{};
+  var type=(m.type||'').replace(/_/g,' ');
+  var mod=(m.modifier||'').replace(/_/g,' ');
+  var road=step.name||step.ref||'the road';
+  if(type==='depart')return 'Start on '+road;
+  if(type==='arrive')return 'Arrive at destination';
+  if(type==='roundabout'||type==='rotary')return 'Enter roundabout toward '+road;
+  if(mod)return mod.charAt(0).toUpperCase()+mod.slice(1)+' onto '+road;
+  if(type)return type.charAt(0).toUpperCase()+type.slice(1)+' onto '+road;
+  return 'Continue on '+road;
+}
+function showSteps(steps){
+  var box=$('destSteps'),list=$('destStepsList'),sum=$('destStepsSummary');
+  if(!box||!list)return;
+  list.textContent='';
+  var slim=(steps||[]).slice(0,40);
+  slim.forEach(function(s){
+    var li=document.createElement('li');
+    li.textContent=maneuverText(s)+(Number.isFinite(s.distance)?' ('+fmtKm(s.distance)+')':'');
+    list.appendChild(li);
+  });
+  if(sum)sum.textContent='Turn-by-turn ('+slim.length+' steps)';
+  box.hidden=!slim.length;
+}
+function routeToDestination(){
+  if(!destination){setWarning('Search and pick a destination first.','warn');return}
+  var from=originLonLat();
+  var usingGps=!!(current&&Number.isFinite(current.coords.longitude));
+  if(!usingGps){
+    setWarning('GPS is off — routing from the map centre. Start GPS for a route from your position.','warn');
+  }
+  var url='https://router.project-osrm.org/route/v1/driving/'+from[0]+','+from[1]+';'+destination.coord[0]+','+destination.coord[1]+'?overview=full&geometries=geojson&steps=true';
+  setStatus('Getting route…','warn');
+  $('destRoute').disabled=true;
+  fetch(url,{headers:{'Accept':'application/json'}}).then(function(res){
+    if(!res.ok)throw new Error('http');
+    return res.json();
+  }).then(function(data){
+    $('destRoute').disabled=false;
+    if(!data||data.code!=='Ok'||!data.routes||!data.routes[0])throw new Error('noroute');
+    var r=data.routes[0];
+    var geom=r.geometry;
+    if(ready&&map.getSource('directions')){
+      map.getSource('directions').setData({type:'FeatureCollection',features:[{type:'Feature',properties:{},geometry:geom}]});
+    }
+    destination.routeDist=r.distance;destination.routeEta=r.duration;
+    var steps=[];
+    (r.legs||[]).forEach(function(leg){(leg.steps||[]).forEach(function(s){steps.push(s)})});
+    destination.steps=steps;
+    showSteps(steps);
+    updateDestMeta();
+    if(geom&&geom.coordinates&&geom.coordinates.length&&map){
+      var bounds=new maplibregl.LngLatBounds(geom.coordinates[0],geom.coordinates[0]);
+      geom.coordinates.forEach(function(c){bounds.extend(c)});
+      map.fitBounds(bounds,{padding:{top:90,bottom:160,left:40,right:70},duration:900,pitch:tilted?45:0});
+    }
+    setStatus('Route ready · '+fmtKm(r.distance),'good');
+  }).catch(function(err){
+    $('destRoute').disabled=false;
+    setStatus('Route failed','warn');
+    setWarning(!navigator.onLine?'You appear offline — cannot fetch a route.':(err&&err.message==='noroute'?'No driving route found between those points.':'Could not reach the free OSRM demo. Try again later.'),'warn');
+  });
+}
+function bindDestinationUi(){
+  var inp=$('destSearch'),results=$('destResults');
+  if(inp){
+    inp.addEventListener('input',function(){
+      var q=inp.value.trim();
+      clearTimeout(searchTimer);
+      if(q.length<3){hideResults();return}
+      searchTimer=setTimeout(function(){searchNominatim(q)},500);
+    });
+    inp.addEventListener('keydown',function(e){if(e.key==='Escape')hideResults()});
+  }
+  document.addEventListener('click',function(e){
+    var wrap=$('mapSearchWrap');
+    if(wrap&&!wrap.contains(e.target))hideResults();
+  });
+  var rb=$('destRoute'),cb=$('destClear');
+  if(rb)rb.addEventListener('click',routeToDestination);
+  if(cb)cb.addEventListener('click',clearDestination);
+}
+function bindMapDestinationGestures(){
+  if(!map)return;
+  map.on('contextmenu',function(e){
+    e.preventDefault();
+    setDestination({name:'Dropped pin',subtitle:'Long-press / right-click on map',coord:[e.lngLat.lng,e.lngLat.lat]});
+  });
+  map.on('touchstart',function(e){
+    if(!e.points||e.points.length!==1)return;
+    clearTimeout(pressTimer);
+    var p=e.lngLat;
+    pressTimer=setTimeout(function(){
+      setDestination({name:'Dropped pin',subtitle:'Long-press on map',coord:[p.lng,p.lat]});
+    },650);
+  });
+  map.on('touchend',function(){clearTimeout(pressTimer)});
+  map.on('touchmove',function(){clearTimeout(pressTimer)});
+  map.on('touchcancel',function(){clearTimeout(pressTimer)});
+}
+bindDestinationUi();
+
 setText('unit','Units: '+(useMph?'mph':'km/h'));
 setText('speedUnit',useMph?'mph':'km/h');
 initMap();
@@ -560,7 +850,7 @@ initMap();
   var w=document.getElementById('welcome'),c=document.getElementById('acceptTerms'),b=document.getElementById('welcomeContinue'),card=document.getElementById('welcomeCard');
   var last=null;
   c.addEventListener('change',function(){b.disabled=!c.checked});
-  b.addEventListener('click',function(){if(!c.checked)return;w.hidden=true;var wv=document.getElementById('welcomeVideo');if(wv)wv.pause();document.body.classList.remove('welcome-open');var g=document.getElementById('gps');if(g)g.focus()});
+  b.addEventListener('click',function(){if(!c.checked)return;w.hidden=true;var wv=document.getElementById('welcomeVideo');if(wv)wv.pause();document.body.classList.remove('welcome-open');var g=document.getElementById('gps');if(g)g.focus();if(typeof window.__cgPulseNiyi==='function')window.__cgPulseNiyi()});
   w.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var f=[].slice.call(w.querySelectorAll('input,button:not([disabled]),[tabindex="0"]'));if(!f.length)return;var a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}});
   card.focus();
 })();
@@ -588,6 +878,7 @@ if(!rm)var wt=setInterval(function(){if(w.hidden){clearInterval(wt);return}j=(j+
 (function(){
 'use strict';
 var fab=document.getElementById('niyiFab');
+var headerBtn=document.getElementById('niyiHeaderBtn');
 var panel=document.getElementById('niyiPanel');
 var msgs=document.getElementById('niyiMsgs');
 var chipsEl=document.getElementById('niyiChips');
@@ -611,7 +902,7 @@ var tips=[
   "Obey traffic signs; they are there to protect you.",
   'Phones down, eyes on the road.'
 ];
-var chips=['How does it work?','Safety tip','GPS accuracy','Contact'];
+var chips=['How does it work?','Set destination','Safety tip','GPS accuracy','Contact'];
 
 function escText(s){return String(s==null?'':s)}
 function addMsg(text,who){
@@ -644,7 +935,9 @@ function speak(text){
 }
 function answer(q){
   var t=String(q||'').toLowerCase().trim();
-  if(!t)return "Ask me how Curve Guide works, about GPS accuracy, units, the map, safety tips, or contact details.";
+  if(!t)return "Ask me how Curve Guide works, about destinations, GPS accuracy, units, the map, safety tips, or contact details.";
+  if(/destin|search|route|navigat|how do i (set|find)|go to|directions?/.test(t))
+    return 'Type a place in Search destination on the map (at least 3 letters). Pick a result, then tap Route. You can also long-press or right-click the map to drop a pin. Routing uses the free OpenStreetMap/OSRM demo — it can be slow and is not voice turn-by-turn navigation.';
   if(/contact|phone|email|call|whatsapp|reach/.test(t))
     return 'You can reach Adeniyi Investments & Property Ltd. at +234 805 352 9802 or info@adeniyiltd.com.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
@@ -679,6 +972,7 @@ function openPanel(){
   panel.hidden=false;
   panel.classList.add('open');
   fab.setAttribute('aria-expanded','true');
+  if(headerBtn)headerBtn.setAttribute('aria-expanded','true');
   if(!greeted){
     greeted=true;
     addMsg("Hi, I'm Niyi! Ask me how Curve Guide works or for a driving safety tip.",'bot');
@@ -691,6 +985,7 @@ function closePanel(){
   panel.classList.remove('open');
   panel.hidden=true;
   fab.setAttribute('aria-expanded','false');
+  if(headerBtn)headerBtn.setAttribute('aria-expanded','false');
   if(window.speechSynthesis)try{window.speechSynthesis.cancel()}catch(e){}
   fab.focus();
 }
@@ -709,6 +1004,19 @@ function ask(text){
   renderChips();
 }
 fab.addEventListener('click',openPanel);
+if(headerBtn)headerBtn.addEventListener('click',openPanel);
+window.__cgOpenNiyi=openPanel;
+function maybePulseNiyi(){
+  try{
+    if(sessionStorage.getItem('curveGuide.niyiPulse'))return;
+    sessionStorage.setItem('curveGuide.niyiPulse','1');
+  }catch(e){}
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  fab.classList.add('niyi-pulse');
+  setTimeout(function(){fab.classList.remove('niyi-pulse')},2600);
+}
+window.__cgPulseNiyi=maybePulseNiyi;
+
 closeBtn.addEventListener('click',closePanel);
 form.addEventListener('submit',function(e){
   e.preventDefault();
