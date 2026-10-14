@@ -1686,7 +1686,7 @@ var tips=[
   "Obey traffic signs; they are there to protect you.",
   'Phones down, eyes on the road.'
 ];
-var chips=['How does it work?','Set destination','Navigation','Contact us','Safety tip','Start GPS'];
+var chips=['How does it work?','Set destination','Take me home','Navigation','Contact us','Emergency','Start GPS'];
 
 function api(){return window.__cgApi||null}
 
@@ -1804,6 +1804,39 @@ function doPageAction(t){
   }
   if(/\b(unmute voice|unmute navigation|voice on)\b/.test(t)){
     A.setNavVoice(true);return confirm('Navigation voice unmuted.');
+  }
+  if(/\b(night mode|dark map|night map)\b/.test(t)||/^night$/i.test(t)){
+    A.setNightMode(true);return confirm('Night map mode on (saved).');
+  }
+  if(/\b(day mode|day map|light map)\b/.test(t)||/^day$/i.test(t)){
+    A.setNightMode(false);return confirm('Day map mode on (saved).');
+  }
+  if(/\btake me home\b|^home$|go home/.test(t)){
+    A.goFavourite('home').then(function(){confirm('Routing to Home.')}).catch(function(){confirm('No Home saved yet. Set a destination, then tap Save Home.')});
+    return 'Working on Home…';
+  }
+  if(/\btake me to school\b|go to school/.test(t)){
+    A.goFavourite('school').then(function(){confirm('Routing to School.')}).catch(function(){confirm('No School favourite saved yet.')});
+    return 'Working on School…';
+  }
+  if(/\btake me to work\b|go to work/.test(t)){
+    A.goFavourite('work').then(function(){confirm('Routing to Work.')}).catch(function(){confirm('No Work favourite saved yet.')});
+    return 'Working on Work…';
+  }
+  if(/\b(emergency|sos|call 112)\b/.test(t)){
+    if(typeof window.__cgOpenEmergency==='function')window.__cgOpenEmergency();
+    return confirm('Opened emergency options. Confirm before calling 112.');
+  }
+  if(/\b(report|danger spot|pothole|hazard)\b/.test(t)){
+    var coord=null;
+    // use report via API with GPS if any — prompt type
+    return confirm('Use Report danger spot on the destination card. Spots are saved on this phone only — sharing with other drivers coming later.');
+  }
+  if(/\b(offline|install|pwa|home screen)\b/.test(t)){
+    return 'Curve Guide can cache its shell for offline use (map tiles still need network). On supported browsers tap Install; on iPhone use Share → Add to Home Screen.';
+  }
+  if(/\bbend|sharp bend|speed warning\b/.test(t)){
+    return 'When a route is set, Curve Guide estimates bends from the route shape and marks them. If you are going too fast for a nearby bend, you may see and hear a slow-down warning — it is an estimate only.';
   }
   return null;
 }
@@ -2090,6 +2123,48 @@ setInterval(refreshDriveNote,1500);
       bar.classList.add('show');
     }
   }catch(e){}
+})();
+</script>
+
+<script>
+(function(){
+  var fab=document.getElementById('emergFab');
+  var sheet=document.getElementById('emergSheet');
+  var callBtn=document.getElementById('emergCall');
+  var waBtn=document.getElementById('emergWhatsApp');
+  var closeBtn=document.getElementById('emergClose');
+  function open(){ if(sheet){sheet.hidden=false; sheet.classList.add('open')} }
+  function close(){ if(sheet){sheet.classList.remove('open'); sheet.hidden=true} }
+  if(fab)fab.addEventListener('click', open);
+  if(closeBtn)closeBtn.addEventListener('click', close);
+  if(callBtn)callBtn.addEventListener('click', function(){
+    if(window.confirm('Call 112 now? (Nigeria emergency number)')){
+      window.location.href='tel:112';
+    }
+  });
+  if(waBtn)waBtn.addEventListener('click', function(){
+    var api=window.__cgApi;
+    var lat=null, lon=null;
+    // read from last GPS via inject-less: use geolocation once if needed
+    function share(la, lo){
+      var maps=Number.isFinite(la)&&Number.isFinite(lo)
+        ? ('https://maps.google.com/?q='+la+','+lo)
+        : '';
+      var msg=maps
+        ? ('Emergency — my location from Curve Guide: '+maps)
+        : 'Emergency — I need help. (Curve Guide did not have a GPS fix yet.)';
+      var url='https://wa.me/?text='+encodeURIComponent(msg);
+      window.open(url, '_blank', 'noopener');
+    }
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        function(p){ share(p.coords.latitude, p.coords.longitude) },
+        function(){ share(null,null) },
+        {enableHighAccuracy:true, timeout:8000, maximumAge:10000}
+      );
+    }else share(null,null);
+  });
+  window.__cgOpenEmergency=open;
 })();
 </script>
 </body>
