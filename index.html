@@ -621,7 +621,7 @@ function initMap(){
           }catch(e){/* The base map remains usable if 3D building data is not available. */}
         }
         setupSatellite();
-        ready=true;setStatus('Map ready · 3D view enabled','good');setText('mapMode','3D perspective');setFollow(true);bindMapDestinationGestures();
+        ready=true;setStatus('Map ready · 3D view enabled','good');setText('mapMode','3D perspective');setFollow(true);bindMapDestinationGestures();paintHazards();
         if(!sourceId)setText('mapMode','Tilted map');
       }catch(e){setStatus('Map loaded with limited features','warn')}
     });
@@ -737,7 +737,8 @@ window.__cgApi={
   injectPos:function(lon,lat,o){
     o=o||{};
     onPosition({coords:{longitude:lon,latitude:lat,accuracy:o.accuracy!=null?o.accuracy:10,speed:o.speed!=null?o.speed:12,heading:o.heading!=null?o.heading:0},timestamp:Date.now()});
-  }
+  },
+  goFavourite:goFavourite, reportHazardAt:reportHazardAt, loadFavs:loadFavs
 };
 
 /* Destination search + OSRM routing (prototype) */
@@ -891,6 +892,100 @@ function showSteps(steps){
   });
   if(sum)sum.textContent='Turn-by-turn ('+slim.length+' steps)';
   box.hidden=!slim.length;
+}
+
+
+/* Device-only danger spots */
+var HAZARD_KEY='curveGuide.hazards';
+function loadHazards(){
+  try{var raw=localStorage.getItem(HAZARD_KEY);var a=raw?JSON.parse(raw):[];return Array.isArray(a)?a:[]}catch(e){return []}
+}
+function saveHazards(list){
+  try{localStorage.setItem(HAZARD_KEY,JSON.stringify(list.slice(-100)))}catch(e){}
+}
+function paintHazards(){
+  if(!ready||!map||!map.getSource('hazards'))return;
+  var feats=loadHazards().map(function(h,i){
+    return {type:'Feature',properties:{type:h.type||'hazard',note:h.note||'',i:i},geometry:{type:'Point',coordinates:h.coord}};
+  });
+  map.getSource('hazards').setData({type:'FeatureCollection',features:feats});
+}
+function reportHazardAt(coord,type){
+  if(!coord){setWarning('Need a GPS fix or map pin to report a danger spot.','warn');return}
+  var list=loadHazards();
+  list.push({coord:coord,type:type||'danger',note:'',at:Date.now()});
+  saveHazards(list);paintHazards();
+  setWarning('Danger spot saved on this phone only — sharing with other drivers coming later.','warn');
+  setStatus('Danger spot saved (this device)','good');
+}
+function bindHazardUi(){
+  var btn=$('reportHazard');
+  if(!btn)return;
+  btn.addEventListener('click',function(){
+    var types=['pothole','crash','bad bend','other'];
+    var type=window.prompt('Danger type: pothole / crash / bad bend / other','pothole');
+    if(type===null)return;
+    type=(type||'danger').toLowerCase().trim();
+    if(types.indexOf(type)<0 && type!=='other')type='danger';
+    var coord=null;
+    if(current)coord=[current.coords.longitude,current.coords.latitude];
+    else if(destination&&destination.coord)coord=destination.coord;
+    else if(map){var c=map.getCenter();coord=[c.lng,c.lat]}
+    reportHazardAt(coord,type);
+  });
+  // paint when map ready — also call now if ready
+  if(ready)paintHazards();
+}
+
+
+/* Favourite places (device-only) */
+var FAV_KEY='curveGuide.favourites';
+function loadFavs(){
+  try{var raw=localStorage.getItem(FAV_KEY);var o=raw?JSON.parse(raw):{};return o&&typeof o==='object'?o:{}}catch(e){return {}}
+}
+function saveFavs(o){try{localStorage.setItem(FAV_KEY,JSON.stringify(o))}catch(e){}}
+function renderFavRow(){
+  var row=$('favRow'); if(!row)return;
+  row.textContent='';
+  var favs=loadFavs();
+  ['home','school','work'].forEach(function(key){
+    var b=document.createElement('button'); b.type='button'; b.className='btn';
+    var label=key.charAt(0).toUpperCase()+key.slice(1);
+    if(favs[key]){b.textContent='Go '+label; b.title=favs[key].name||label}
+    else {b.textContent='Save '+label}
+    b.addEventListener('click',function(){
+      if(favs[key]){ goFavourite(key); return }
+      if(!destination||!destination.coord){setWarning('Set a destination first, then save it as '+label+'.','warn');return}
+      favs=loadFavs();
+      favs[key]={name:destination.name,coord:destination.coord};
+      saveFavs(favs); renderFavRow();
+      setStatus(label+' saved on this phone','good');
+    });
+    row.appendChild(b);
+  });
+  var custom=document.createElement('button'); custom.type='button'; custom.className='btn'; custom.textContent='Save custom';
+  custom.addEventListener('click',function(){
+    if(!destination||!destination.coord){setWarning('Set a destination first.','warn');return}
+    var name=window.prompt('Name this favourite', destination.name||'Favourite');
+    if(!name)return;
+    favs=loadFavs();
+    if(!favs.custom)favs.custom=[];
+    favs.custom.push({name:name,coord:destination.coord});
+    if(favs.custom.length>8)favs.custom=favs.custom.slice(-8);
+    saveFavs(favs); renderFavRow();
+  });
+  row.appendChild(custom);
+  (favs.custom||[]).forEach(function(c,i){
+    var b=document.createElement('button'); b.type='button'; b.className='btn'; b.textContent=c.name;
+    b.addEventListener('click',function(){ setDestination({name:c.name,coord:c.coord}); routeToDestination(); });
+    row.appendChild(b);
+  });
+}
+function goFavourite(key){
+  var favs=loadFavs(); var f=favs[key];
+  if(!f||!f.coord){setWarning('No '+key+' saved yet.','warn');return Promise.reject()}
+  setDestination({name:f.name||key, coord:f.coord});
+  return routeToDestination();
 }
 
 /* Route bend analysis + speed-on-bend warnings */
@@ -1433,6 +1528,8 @@ function bindDestinationUi(){
   if(mb)mb.addEventListener('click',function(){setNavVoice(!navVoiceOn)});
   updateMuteUi();
   syncNavButtons();
+  bindHazardUi();
+  renderFavRow();
 }
 function bindMapDestinationGestures(){
   if(!map)return;
