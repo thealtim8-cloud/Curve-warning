@@ -424,9 +424,11 @@ body.navigating .dest-card{max-height:38%}
   <div class="niyi-msgs" id="niyiMsgs" aria-live="polite"></div>
   <div class="niyi-chips" id="niyiChips"></div>
   <form class="niyi-input-row" id="niyiForm" autocomplete="off">
+    <button type="button" class="niyi-mic" id="niyiMic" title="Voice input" aria-label="Voice input" aria-pressed="false" hidden>🎤</button>
     <input class="niyi-input" id="niyiInput" type="text" maxlength="240" placeholder="Ask about Curve Guide…" aria-label="Message to Niyi">
     <button class="niyi-send" id="niyiSend" type="submit">Send</button>
   </form>
+  <p class="niyi-mic-note" id="niyiMicNote" hidden>Mic turns speech into text for Niyi's keyword helper — not a smart AI. Nothing is uploaded by Curve Guide.</p>
 </div>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
@@ -1319,7 +1321,9 @@ var tips=[
   "Obey traffic signs; they are there to protect you.",
   'Phones down, eyes on the road.'
 ];
-var chips=['How does it work?','Set destination','Navigation','Safety tip','GPS accuracy','Contact us'];
+var chips=['How does it work?','Set destination','Navigation','Contact us','Safety tip','Start GPS'];
+
+function api(){return window.__cgApi||null}
 
 function escText(s){return String(s==null?'':s)}
 function addMsg(text,who){
@@ -1369,7 +1373,6 @@ function contactActions(){
     {label:'WhatsApp',href:'https://wa.me/2348053529802?text=Hello%2C%20I%27m%20contacting%20you%20from%20Curve%20Guide',external:true}
   ];
 }
-
 function renderChips(){
   chipsEl.textContent='';
   chips.forEach(function(label){
@@ -1390,37 +1393,151 @@ function speak(text){
     window.speechSynthesis.speak(u);
   }catch(e){}
 }
+function extractPlace(q){
+  var m=String(q||'').match(/^(?:take me to|go to|directions to|navigate to|find|search for|search)\s+(.+)$/i);
+  return m?m[1].replace(/[?.!]+$/,'').trim():null;
+}
+function confirm(msg){addBotRich(msg);speak(msg);return msg}
+function doPageAction(t){
+  var A=api();
+  if(!A)return null;
+  if(/^(start gps|turn on gps|enable gps)$/i.test(t)||/\bstart gps\b/.test(t)){
+    A.startGps();return confirm('Started GPS. Allow location if your browser asks.');
+  }
+  if(/^(stop gps|turn off gps|disable gps)$/i.test(t)||/\bstop gps\b/.test(t)){
+    A.stopGps();return confirm('Stopped GPS.');
+  }
+  if(/\b(satellite|sat view|aerial)\b/.test(t)&&!/street|map view/.test(t)){
+    A.setSatellite(true);return confirm('Switched to satellite view.');
+  }
+  if(/\b(street map|map view|standard map)\b/.test(t)||(/^(street|map)$/i.test(t))){
+    A.setSatellite(false);return confirm('Switched to street map.');
+  }
+  if(/\b(3d on|enable 3d|tilt on)\b/.test(t)||(/^3d$/i.test(t)&&!/off/.test(t))){
+    A.setTilt3d(true);return confirm('3D tilt is on.');
+  }
+  if(/\b(3d off|disable 3d|2d|flat)\b/.test(t)){
+    A.setTilt3d(false);return confirm('Switched to 2D (flat) view.');
+  }
+  if(/\b(switch to mph|use mph|miles)\b/.test(t)){
+    A.setUnitsMph(true);return confirm('Units set to mph (saved on this device).');
+  }
+  if(/\b(switch to km\/?h|use km\/?h|kilometr|metric)\b/.test(t)){
+    A.setUnitsMph(false);return confirm('Units set to km/h (saved on this device).');
+  }
+  if(/\bclear (route|destination|directions)\b/.test(t)){
+    A.clearDestination();A.clearGpsTrail();return confirm('Cleared destination and the GPS trail.');
+  }
+  if(/\b(start navigation|begin navigation|start nav)\b/.test(t)){
+    A.startNavigation();return confirm('Starting navigation (prototype voice guidance).');
+  }
+  if(/\b(stop navigation|end navigation|stop nav)\b/.test(t)){
+    A.stopNavigation();return confirm('Stopped navigation.');
+  }
+  if(/\b(mute voice|mute navigation|mute nav)\b/.test(t)){
+    A.setNavVoice(false);return confirm('Navigation voice muted (saved on this device).');
+  }
+  if(/\b(unmute voice|unmute navigation|voice on)\b/.test(t)){
+    A.setNavVoice(true);return confirm('Navigation voice unmuted.');
+  }
+  return null;
+}
+function explainButton(t){
+  var m=t.match(/what does\s+(.+?)(?:\s+do)?\??$/i)||t.match(/explain\s+(.+)$/i);
+  if(!m)return null;
+  var x=m[1].toLowerCase().replace(/[?.!]/g,'').trim();
+  var map={
+    'start gps':'Start GPS watches your phone location so Curve Guide can estimate curves and navigate.',
+    'stop gps':'Stop GPS ends location tracking on this page.',
+    'follow':'Follow keeps the map centred on your GPS position while you move.',
+    'units':'Units switches speed between km/h and mph. Your choice is saved on this device.',
+    'sat':'Sat / Map toggles satellite imagery versus the street map.',
+    'satellite':'Sat / Map toggles satellite imagery versus the street map.',
+    '3d':'3D tilts the map for a perspective view; 2D flattens it.',
+    '2d':'3D tilts the map for a perspective view; 2D flattens it.',
+    'route':'Route asks the free OSRM demo for a driving path to your destination.',
+    'start navigation':'Start navigation begins prototype voice turn-by-turn guidance along the OSRM route.',
+    'stop navigation':'Stop navigation ends voice guidance and hides the next-turn banner.',
+    'clear':'Clear removes the destination pin and driving route.',
+    'clear route':'Clear route removes the green GPS trail you have driven.',
+    'recenter':'Recenter map jumps the camera back to your GPS position (or Lagos if GPS is off).',
+    'ask niyi':'Ask Niyi opens this helper. I match keywords and can tap a few page controls — I am not a smart AI.',
+    'niyi':'Ask Niyi opens this helper. I match keywords and can tap a few page controls — I am not a smart AI.'
+  };
+  for(var k in map){if(x.indexOf(k)>=0)return map[k]}
+  return 'I am not sure about “'+m[1]+'”. Try asking about Start GPS, Units, Sat, 3D, Route, or Start navigation.';
+}
+function searchPlaceInChat(place){
+  var A=api();
+  if(!A){addMsg('Map tools are not ready yet.','bot');return}
+  addMsg('Searching for “'+place+'”…','bot');
+  var base='https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=0&limit=5&accept-language=en&q=';
+  function parse(list){
+    return (list||[]).map(function(r){
+      var name=(r.display_name||'').split(',')[0];
+      return {name:name||r.display_name, subtitle:r.display_name, coord:[parseFloat(r.lon),parseFloat(r.lat)]};
+    }).filter(function(x){return Number.isFinite(x.coord[0])&&Number.isFinite(x.coord[1])});
+  }
+  function show(items){
+    if(!items.length){addMsg('No places found for “'+place+'”. Try a clearer name.','bot');return}
+    var actions=items.map(function(it){
+      return {label:it.name, onClick:function(){pickPlace(it)}};
+    });
+    addBotRich('Pick a place (top Nominatim results):', actions);
+  }
+  fetch(base+encodeURIComponent(place)+'&countrycodes=ng',{headers:{'Accept':'application/json'}})
+    .then(function(r){if(!r.ok)throw new Error('http');return r.json()})
+    .then(function(data){
+      var items=parse(data);
+      if(items.length)return show(items);
+      return fetch(base+encodeURIComponent(place),{headers:{'Accept':'application/json'}})
+        .then(function(r2){return r2.json()}).then(function(d2){show(parse(d2))});
+    })
+    .catch(function(){addMsg('Search failed. Check your connection and try again.','bot')});
+}
+function pickPlace(it){
+  var A=api();if(!A)return;
+  A.setDestination(it);
+  addMsg('Set destination: '+it.name+'. Getting a route…','bot');
+  A.routeToDestination().then(function(){
+    addBotRich('Route ready. You can start prototype voice navigation.',[
+      {label:'Start navigation', onClick:function(){A.startNavigation();confirm('Starting navigation.')}}
+    ]);
+  }).catch(function(){
+    addMsg('Could not get a route. You can still try Route on the map card.','bot');
+  });
+}
 function answer(q){
   var t=String(q||'').toLowerCase().trim();
-  if(!t)return "Ask me how Curve Guide works, about destinations, GPS accuracy, units, the map, safety tips, or contact details.";
-  if(/voice|speak|mute|unmute|speech|talk|announce/.test(t))
-    return 'After you set a route, tap Start navigation. Curve Guide speaks turn-by-turn with your browser\'s free speechSynthesis (English). Tap the speaker on the nav banner to mute or unmute — that choice is saved on this device. This is prototype guidance, not a certified navigation system.';
+  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 6.0.";
+  var explained=explainButton(t);
+  if(explained)return explained;
+  if(/voice|speak|mute|unmute|speech|talk|announce|mic|microphone/.test(t))
+    return 'Voice navigation uses your browser speechSynthesis after Start navigation. Mute is on the green nav banner. The mic here turns speech into text for my keyword brain — nothing is uploaded by Curve Guide. Not a smart AI.';
   if(/navigat|start nav|turn.?by.?turn|guidance/.test(t))
-    return 'Search a destination, tap Route, then Start navigation. You will see the next turn banner and hear voice prompts. GPS must be on; the map follows you. Say "stop navigation" or tap Stop. Always obey road signs — this is a free prototype using OSRM + browser speech.';
-  if(/destin|search|route|how do i (set|find)|go to|directions?/.test(t))
-    return 'Type a place in Search destination on the map (at least 3 letters). Pick a result, then tap Route, then Start navigation for voice guidance. You can also long-press or right-click the map to drop a pin.';
-  if(/contact|phone|email|call|whatsapp|reach|contact us/.test(t))
-    return 'You can reach Adeniyi Investments & Property Ltd. at +234 805 352 9802 or info@adeniyiltd.com. Ask Contact us for Call, Email, and WhatsApp buttons.';
+    return 'Search or say “go to …”, pick a place, then Start navigation for the next-turn banner and spoken prompts. GPS must be on. Prototype guidance only — always obey the road.';
+  if(/destin|search|route|how do i (set|find)|directions?/.test(t)&&!extractPlace(q))
+    return 'Say “go to …” or “take me to …”, or type in Search destination on the map. Then Route and Start navigation.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
-    return 'Curve Guide is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
+    return 'Curve Guide 6.0 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
   if(/disclaim|liabilit|certified|safe to use|replace|prototype/.test(t))
-    return 'Curve Guide is an experimental prototype, not a certified safety or navigation system. Warnings can be missing, late, or wrong. Always obey the road and drive carefully.';
+    return 'Curve Guide is an experimental prototype, not a certified safety or navigation system. Warnings and routes can be wrong. Always obey the road.';
   if(/gps|accur|±|plus.?minus|poor|fair|green|yellow|red chip/.test(t))
-    return 'The GPS chip shows your accuracy in metres (for example ±12 m). Green is good (about ±15 m or better), yellow is fair (up to about ±25 m), and red is poor. If accuracy is worse than ±25 m, Curve Guide pauses curve estimates until GPS improves.';
+    return 'The GPS chip shows accuracy in metres. Green ≈ ±15 m or better, yellow up to ±25 m, red is poor. Worse than ±25 m pauses curve estimates.';
   if(/unit|km\/?h|mph|miles|kilometr/.test(t))
-    return 'Tap Units to switch between km/h and mph. Your choice is saved on this device in the browser, so it comes back next time on the same phone. Clearing site data resets it.';
+    return 'Say “switch to mph” or “switch to km/h”, or tap Units. Preference is saved on this device.';
   if(/satellit|3d|2d|map type|aerial|street/.test(t))
-    return 'Use the map buttons on the right of the map: Map/Sat switches street and satellite view, and 3D/2D tilts the view. These help you look at the road, but they do not change how curve estimates work.';
-  if(/how (does|do)|work|estimat|curve|heading|detect|what is curve guide|explain/.test(t))
-    return 'Curve Guide uses your phone GPS. As you move, it watches heading changes. A turn of more than about 22° is treated as a rough curve estimate. This is a prototype aid only — it is not verified road-curve data and must never replace careful driving.';
-  if(/tip|advice|safe|prevent|brake|tyre|tire|seatbelt|distance|headlight|fatigue|phone/.test(t)){
+    return 'Say “satellite”, “street map”, “3D on”, or “3D off” — or use the map buttons. Views do not change curve estimates.';
+  if(/how (does|do)|work|estimat|curve|heading|detect|what is curve guide/.test(t))
+    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Version 6.0 also adds free search, OSRM routing, and browser voice navigation — still a prototype aid only.';
+  if(/tip|advice|safe|prevent|brake|tyre|tire|seatbelt|distance|headlight|fatigue/.test(t)){
     var tip=tips[tipI%tips.length];
     tipI++;
     return tip+' (Ask for another safety tip anytime.)';
   }
   if(/hello|hi\b|hey|good (morning|afternoon|evening)/.test(t))
-    return "Hi! I'm Niyi, a simple keyword helper for Curve Guide. Try a chip below, or ask about GPS, units, or safety.";
-  return "I'm still learning — I only match simple keywords. Try: How does it work?, Safety tip, GPS accuracy, or Contact.";
+    return "Hi! I'm Niyi for Curve Guide 6.0 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
+  return "I'm still learning — I match simple keywords and a few page actions. Try: go to …, start GPS, satellite, Contact us, or Navigation.";
 }
 function refreshDriveNote(){
   var driving=typeof window.__cgIsDriving==='function'&&window.__cgIsDriving();
@@ -1428,6 +1545,7 @@ function refreshDriveNote(){
   input.disabled=!!driving;
   document.getElementById('niyiSend').disabled=!!driving;
   if(driving)input.blur();
+  // mic stays available while driving
 }
 function openPanel(){
   panel.hidden=false;
@@ -1436,7 +1554,7 @@ function openPanel(){
   if(headerBtn)headerBtn.setAttribute('aria-expanded','true');
   if(!greeted){
     greeted=true;
-    addMsg("Hi, I'm Niyi! Ask me how Curve Guide works or for a driving safety tip.",'bot');
+    addMsg("Hi, I'm Niyi! Ask how Curve Guide works, say “go to …”, or tap Contact us.",'bot');
     renderChips();
   }
   refreshDriveNote();
@@ -1448,18 +1566,22 @@ function closePanel(){
   fab.setAttribute('aria-expanded','false');
   if(headerBtn)headerBtn.setAttribute('aria-expanded','false');
   if(window.speechSynthesis)try{window.speechSynthesis.cancel()}catch(e){}
+  stopMic();
   fab.focus();
 }
 function ask(text){
   var q=String(text||'').trim();
   if(!q)return;
   refreshDriveNote();
-  if(typeof window.__cgIsDriving==='function'&&window.__cgIsDriving()){
+  var driving=typeof window.__cgIsDriving==='function'&&window.__cgIsDriving();
+  // allow voice-originated asks even when driving; typed asks blocked
+  if(driving&&!ask._fromVoice){
     refreshDriveNote();
     return;
   }
+  ask._fromVoice=false;
   addMsg(q,'user');
-  var t=q.toLowerCase();
+  var t=q.toLowerCase().trim();
   if(/contact|phone|email|call|whatsapp|reach|help me contact|contact us/.test(t)){
     var msg='You can reach Adeniyi Investments & Property Ltd. Tap a button below.';
     addBotRich(msg, contactActions());
@@ -1467,11 +1589,63 @@ function ask(text){
     renderChips();
     return;
   }
+  var place=extractPlace(q);
+  if(place&&place.length>=2){
+    searchPlaceInChat(place);
+    renderChips();
+    return;
+  }
+  var acted=doPageAction(t);
+  if(acted){renderChips();return}
   var a=answer(q);
   addMsg(a,'bot');
   speak(a);
   renderChips();
 }
+var micBtn=document.getElementById('niyiMic');
+var micNote=document.getElementById('niyiMicNote');
+var recog=null, listening=false;
+function stopMic(){
+  listening=false;
+  if(micBtn){micBtn.setAttribute('aria-pressed','false');micBtn.title='Voice input'}
+  try{if(recog)recog.stop()}catch(e){}
+}
+function setupMic(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR||!micBtn){
+    if(micBtn)micBtn.hidden=true;
+    if(micNote){micNote.hidden=false;micNote.textContent='Voice input is not supported in this browser. You can still type (or use chips). Speech-to-text is not a smart AI.';}
+    return;
+  }
+  micBtn.hidden=false;
+  if(micNote)micNote.hidden=false;
+  recog=new SR();
+  recog.lang='en-NG';
+  recog.interimResults=false;
+  recog.maxAlternatives=1;
+  recog.onstart=function(){listening=true;micBtn.setAttribute('aria-pressed','true');micBtn.title='Listening… tap to stop'};
+  recog.onend=function(){listening=false;micBtn.setAttribute('aria-pressed','false');micBtn.title='Voice input'};
+  recog.onerror=function(){stopMic();addMsg('Could not hear clearly. Try again or type.','bot')};
+  recog.onresult=function(ev){
+    var said=(ev.results&&ev.results[0]&&ev.results[0][0]&&ev.results[0][0].transcript)||'';
+    said=String(said).trim();
+    if(!said)return;
+    input.value='';
+    ask._fromVoice=true;
+    ask(said);
+  };
+  micBtn.addEventListener('click',function(){
+    if(listening){stopMic();return}
+    try{
+      recog.lang='en-NG';
+      recog.start();
+    }catch(e1){
+      try{recog.lang='en-US';recog.start()}catch(e2){addMsg('Microphone could not start. Check permission.','bot')}
+    }
+  });
+}
+setupMic();
+
 fab.addEventListener('click',openPanel);
 if(headerBtn)headerBtn.addEventListener('click',openPanel);
 window.__cgOpenNiyi=openPanel;
