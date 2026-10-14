@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
-<title>Curve Guide 6.0 | Intelligent Road Safety System</title>
+<title>Curve Guide 7.0 | Intelligent Road Safety System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -298,7 +298,7 @@ body.navigating .dest-card{max-height:38%}
       <div>
         <h1>Curve Guide</h1>
         <div class="tagline">Safer turns. Smarter drives.</div>
-        <div class="subtitle">Intelligent Road Safety System · Development prototype v6.0</div>
+        <div class="subtitle">Intelligent Road Safety System · Development prototype v7.0</div>
       </div>
     </div>
     <div class="header-actions">
@@ -307,7 +307,7 @@ body.navigating .dest-card{max-height:38%}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
         Ask Niyi
       </button>
-      <div class="pill">PROTOTYPE · v6.0 3D</div>
+      <div class="pill">PROTOTYPE · v7.0 3D</div>
     </div>
   </header>
   <div class="install-bar" id="installBar"><span id="installText">Install Curve Guide on your phone for quicker access.</span><button type="button" class="btn primary" id="installBtn">Install</button></div>
@@ -435,7 +435,7 @@ body.navigating .dest-card{max-height:38%}
     <div class="credit-copy">&copy; 2026 Curve Guide — Automotive Division of <a href="https://adeniyiltd.com/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Adeniyi Investments &amp; Property Ltd.</a> All rights reserved.</div>
     <div class="contact-line">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
   </div>
-  <footer>Curve Guide 6.0 · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
+  <footer>Curve Guide 7.0 · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
   </div>
 </div>
 
@@ -1911,7 +1911,7 @@ function pickPlace(it){
 }
 function answer(q){
   var t=String(q||'').toLowerCase().trim();
-  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 6.0.";
+  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 7.0.";
   var explained=explainButton(t);
   if(explained)return explained;
   if(/voice|speak|mute|unmute|speech|talk|announce|mic|microphone/.test(t))
@@ -1921,7 +1921,7 @@ function answer(q){
   if(/destin|search|route|how do i (set|find)|directions?/.test(t)&&!extractPlace(q))
     return 'Say “go to …” or “take me to …”, or type in Search destination on the map. Then Route and Start navigation.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
-    return 'Curve Guide 6.0 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
+    return 'Curve Guide 7.0 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
   if(/disclaim|liabilit|certified|safe to use|replace|prototype/.test(t))
     return 'Curve Guide is an experimental prototype, not a certified safety or navigation system. Warnings and routes can be wrong. Always obey the road.';
   if(/gps|accur|±|plus.?minus|poor|fair|green|yellow|red chip/.test(t))
@@ -1938,7 +1938,7 @@ function answer(q){
     return tip+' (Ask for another safety tip anytime.)';
   }
   if(/hello|hi\b|hey|good (morning|afternoon|evening)/.test(t))
-    return "Hi! I'm Niyi for Curve Guide 6.0 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
+    return "Hi! I'm Niyi for Curve Guide 7.0 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
   return "I'm still learning — I match simple keywords and a few page actions. Try: go to …, start GPS, satellite, Contact us, or Navigation.";
 }
 function refreshDriveNote(){
