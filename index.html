@@ -264,6 +264,26 @@ body.welcome-open{overflow:hidden}
 (function(){
 'use strict';
 var map=null, carMarker=null, watchId=null, ready=false, follow=true, tilted=true, headingUp=true, useMph=false;
+var SETTINGS_KEY='curveGuide.settings';
+function loadSettings(){
+  try{
+    var raw=localStorage.getItem(SETTINGS_KEY);
+    if(!raw)return {};
+    var o=JSON.parse(raw);
+    return o&&typeof o==='object'?o:{};
+  }catch(e){return {}}
+}
+function saveSettings(partial){
+  try{
+    var cur=loadSettings();
+    for(var k in partial)if(Object.prototype.hasOwnProperty.call(partial,k))cur[k]=partial[k];
+    localStorage.setItem(SETTINGS_KEY,JSON.stringify(cur));
+  }catch(e){}
+}
+(function restoreUnits(){
+  var s=loadSettings();
+  if(s.useMph===true)useMph=true;
+})();
 var current=null, previous=null, route=[], lastCurveAt=0, lastHeading=null, curveEstimate=null, overpassBusy=false;
 var EMPTY={type:'FeatureCollection',features:[]};
 var $=function(id){return document.getElementById(id)};
@@ -460,7 +480,7 @@ function clearRoute(){route=[];updateRoute();updateCurveFeature(null);setText('c
 $('gps').addEventListener('click',startGps);
 $('stopGps').addEventListener('click',stopGps);
 $('follow').addEventListener('click',function(){setFollow(!follow)});
-$('unit').addEventListener('click',function(){useMph=!useMph;setText('unit','Units: '+(useMph?'mph':'km/h'));if(current)updateMetrics(current)});
+$('unit').addEventListener('click',function(){useMph=!useMph;setText('unit','Units: '+(useMph?'mph':'km/h'));setText('speedUnit',useMph?'mph':'km/h');saveSettings({useMph:useMph});if(current)updateMetrics(current)});
 $('zin').addEventListener('click',function(){if(map)map.zoomTo(Math.min(20,map.getZoom()+1),{duration:250})});
 $('zout').addEventListener('click',function(){if(map)map.zoomTo(Math.max(2,map.getZoom()-1),{duration:250})});
 $('tilt').addEventListener('click',function(){tilted=!tilted;setText('tilt',tilted?'3D':'2D');if(map)map.easeTo({pitch:tilted?55:0,duration:450});setText('mapMode',tilted?'3D perspective':'Flat view')});
@@ -469,6 +489,8 @@ $('recenter').addEventListener('click',function(){if(current){setFollow(true);ap
 $('mapType').addEventListener('click',function(){setSatellite(!satellite)});
 $('clearRoute').addEventListener('click',clearRoute);
 window.addEventListener('beforeunload',function(){if(watchId!==null)navigator.geolocation.clearWatch(watchId)});
+setText('unit','Units: '+(useMph?'mph':'km/h'));
+setText('speedUnit',useMph?'mph':'km/h');
 initMap();
 })();
 </script>
