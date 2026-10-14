@@ -74,8 +74,8 @@ h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;
 .site-footer{margin-top:6px;padding:20px 12px 10px;border-top:1px solid var(--line);display:grid;justify-items:center;gap:14px}
 .credit{display:grid;justify-items:center;gap:10px}
 .credit-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-.credit-card{background:none;border:0;box-shadow:none;padding:0}
-.credit-card img{height:56px;width:auto;display:block}
+.credit-card{background:#fff;border-radius:12px;padding:8px 18px;box-shadow:0 8px 24px -8px #000c,0 0 0 1px #ffffff30}
+.credit-card img{height:48px;width:auto;display:block}
 .credit-copy{text-align:center;font-size:11.5px;color:var(--silver)}
 footer{text-align:center;color:#6f7f89;font-size:10.5px;line-height:1.5;padding:0}
 @media(min-width:760px){.app{padding:24px;gap:16px}.dashboard{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr);gap:16px;align-items:start}.map-panel{grid-row:span 2}.map-wrap{height:600px}.side-stack{display:grid;gap:16px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}.metric-label{margin:0}.metric-value{font-size:23px}h1{font-size:24px}.logo-img{width:56px;height:56px}}
@@ -97,8 +97,8 @@ body.welcome-open{overflow:hidden}
 .welcome .btn.primary{width:100%;padding:13px;font-size:14px;font-weight:700}
 .welcome-credit{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
 .welcome-credit span{font-size:9.5px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
-.welcome-credit .credit-card{padding:0}
-.welcome-credit .credit-card img{height:34px}
+.welcome-credit .credit-card{padding:5px 10px;border-radius:9px}
+.welcome-credit .credit-card img{height:30px}
 @media(max-width:420px){.welcome{padding:10px}.welcome-card{padding:18px 16px 14px;max-height:calc(100dvh - 20px)}.welcome-logo{width:220px}.welcome-card h2{font-size:20px}.welcome-intro{font-size:13px}.terms-box{max-height:150px}}
 .contact-line{font-size:11.5px;color:var(--muted);text-align:center}.contact{color:#5fe0a3;text-decoration:none;font-weight:600;white-space:nowrap}.contact:hover{text-decoration:underline}.contact:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766;border-radius:4px}.contact-line .sep{color:#4a5a65}
 .welcome-contact{margin-top:8px}
@@ -141,7 +141,7 @@ body.welcome-open{overflow:hidden}
   <div class="welcome-card" tabindex="-1" id="welcomeCard">
     <video class="welcome-video" id="welcomeVideo" autoplay muted loop playsinline preload="auto" poster="assets/welcome-poster.jpg" aria-label="Curve Guide — Safer turns. Smarter drives." disablepictureinpicture><source src="assets/welcome.mp4" type="video/mp4"></video>
     <h2 id="welcomeTitle">Welcome to Curve Guide</h2>
-    <p class="welcome-intro" id="welcomeIntro">Curve Guide is a product of <strong>Adeniyi Investments &amp; Property Ltd.</strong>, built to help prevent road accidents on dangerous bends and curves. By giving drivers early awareness of sharp turns ahead, it supports safer, more confident driving on Nigerian roads. Curve Guide is currently a prototype: it is designed to supplement, never replace, careful and attentive driving.</p>
+    <p class="welcome-intro" id="welcomeIntro">Curve Guide is a product of the Automotive Division of <strong>Adeniyi Investments &amp; Property Ltd.</strong>, built to help prevent road accidents on dangerous bends and curves. By giving drivers early awareness of sharp turns ahead, it supports safer, more confident driving on Nigerian roads. Curve Guide is currently a prototype: it is designed to supplement, never replace, careful and attentive driving.</p>
     <p class="welcome-quote" id="welcomeQuote" aria-live="off">“Prevention is better than cure.”</p>
     <h3 class="terms-title">Terms &amp; Conditions</h3>
     <ol class="terms-box" tabindex="0" aria-label="Terms and Conditions">
@@ -156,7 +156,7 @@ body.welcome-open{overflow:hidden}
     </ol>
     <label class="accept"><input type="checkbox" id="acceptTerms"> I have read and accept the Terms &amp; Conditions</label>
     <button class="btn primary" id="welcomeContinue" disabled>Continue</button>
-    <div class="welcome-credit"><span>Developed by</span><div class="credit-card"><img src="assets/adeniyi-logo-light.png" alt="Adeniyi Investments &amp; Property Ltd."></div></div>
+    <div class="welcome-credit"><span>An Automotive Division of</span><div class="credit-card"><img src="assets/adeniyi-logo.png" alt="Adeniyi Investments &amp; Property Ltd."></div></div>
     <div class="contact-line welcome-contact">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
   </div>
 </div>
@@ -249,9 +249,9 @@ body.welcome-open{overflow:hidden}
   </section>
   <div class="site-footer">
   <div class="credit">
-    <div class="credit-label">Developed by</div>
-    <div class="credit-card"><img src="assets/adeniyi-logo-light.png" alt="Adeniyi Investments &amp; Property Ltd."></div>
-    <div class="credit-copy">&copy; 2026 Adeniyi Investments &amp; Property Ltd. All rights reserved.</div>
+    <div class="credit-label">An Automotive Division of</div>
+    <div class="credit-card"><img src="assets/adeniyi-logo.png" alt="Adeniyi Investments &amp; Property Ltd."></div>
+    <div class="credit-copy">&copy; 2026 Curve Guide — Automotive Division of Adeniyi Investments &amp; Property Ltd. All rights reserved.</div>
     <div class="contact-line">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
   </div>
   <footer>Curve Guide · Road safety development prototype · Map data © OpenStreetMap contributors</footer>
