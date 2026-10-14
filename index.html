@@ -564,9 +564,10 @@ function setSatellite(on){
 function initMap(){
   if(!window.maplibregl){setStatus('Map library did not load', 'danger');setWarning('The map library could not load. Check your internet connection and reload.');return}
   try{
+    initNightMode();
     map=new maplibregl.Map({
       container:'map',
-      style:'https://tiles.openfreemap.org/styles/liberty',
+      style:nightMode?STYLE_NIGHT:STYLE_DAY,
       center:[3.3792,6.5244],
       zoom:13,
       pitch:55,
@@ -738,7 +739,8 @@ window.__cgApi={
     o=o||{};
     onPosition({coords:{longitude:lon,latitude:lat,accuracy:o.accuracy!=null?o.accuracy:10,speed:o.speed!=null?o.speed:12,heading:o.heading!=null?o.heading:0},timestamp:Date.now()});
   },
-  goFavourite:goFavourite, reportHazardAt:reportHazardAt, loadFavs:loadFavs
+  goFavourite:goFavourite, reportHazardAt:reportHazardAt, loadFavs:loadFavs,
+  setNightMode:setNightMode, getNightMode:function(){return nightMode}
 };
 
 /* Destination search + OSRM routing (prototype) */
@@ -894,6 +896,73 @@ function showSteps(steps){
   box.hidden=!slim.length;
 }
 
+
+
+/* Night map mode */
+var nightMode=false, STYLE_DAY='https://tiles.openfreemap.org/styles/liberty', STYLE_NIGHT='https://tiles.openfreemap.org/styles/dark';
+function isNightHour(){var h=new Date().getHours(); return h>=19||h<6}
+function restoreMapOverlays(){
+  try{
+    if(!map.getSource('route')){
+      map.addSource('route',{type:'geojson',data:EMPTY});
+      map.addLayer({id:'curve-guide-route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#20c477','line-width':6,'line-opacity':0.9}});
+    }
+    if(!map.getSource('curve')){
+      map.addSource('curve',{type:'geojson',data:EMPTY});
+      map.addLayer({id:'curve-guide-curve',type:'circle',source:'curve',paint:{'circle-radius':9,'circle-color':'#ff625c','circle-stroke-color':'#ffffff','circle-stroke-width':2}});
+    }
+    if(!map.getSource('directions')){
+      map.addSource('directions',{type:'geojson',data:EMPTY});
+      map.addLayer({id:'curve-guide-directions',type:'line',source:'directions',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#4ea1ff','line-width':5,'line-opacity':0.92}});
+    }
+    if(!map.getSource('bends')){
+      map.addSource('bends',{type:'geojson',data:EMPTY});
+      map.addLayer({id:'curve-guide-bends',type:'circle',source:'bends',paint:{'circle-radius':['match',['get','sharpness'],'sharp',9,'moderate',7,6],'circle-color':['match',['get','sharpness'],'sharp','#ff625c','moderate','#ffb347','#ffd08a'],'circle-stroke-color':'#ffffff','circle-stroke-width':1.5,'circle-opacity':0.95}});
+    }
+    if(!map.getSource('hazards')){
+      map.addSource('hazards',{type:'geojson',data:EMPTY});
+      map.addLayer({id:'curve-guide-hazards',type:'circle',source:'hazards',paint:{'circle-radius':8,'circle-color':'#c084fc','circle-stroke-color':'#fff','circle-stroke-width':2}});
+    }
+    setupSatellite();
+    updateRoute(); updateCurveFeature(curveEstimate&&curveEstimate.coord?curveEstimate.coord:null);
+    if(destination&&destination.routeGeom&&map.getSource('directions')){
+      map.getSource('directions').setData({type:'FeatureCollection',features:[{type:'Feature',properties:{},geometry:destination.routeGeom}]});
+    }
+    paintBends(); paintHazards();
+  }catch(e){}
+}
+function setNightMode(on, persist){
+  nightMode=!!on;
+  var b=$('nightToggle');
+  if(b){b.classList.toggle('active',nightMode); b.setAttribute('aria-pressed',nightMode?'true':'false'); b.textContent=nightMode?'Day':'Night'}
+  if(persist!==false)saveSettings({nightMode:nightMode, nightManual:true});
+  if(!map)return;
+  var style=nightMode?STYLE_NIGHT:STYLE_DAY;
+  var center=map.getCenter(), zoom=map.getZoom(), pitch=map.getPitch(), bearing=map.getBearing();
+  map.setStyle(style);
+  map.once('style.load', function(){
+    map.jumpTo({center:center, zoom:zoom, pitch:pitch, bearing:bearing});
+    restoreMapOverlays();
+    setSatellite(satellite);
+  });
+}
+function initNightMode(){
+  var s=loadSettings();
+  var manual=s.nightManual===true;
+  var on=manual?(s.nightMode===true):isNightHour();
+  // Don't setStyle on first load if day and liberty already — only switch if night
+  nightMode=on;
+  var b=$('nightToggle');
+  if(b){
+    b.classList.toggle('active',nightMode);
+    b.setAttribute('aria-pressed',nightMode?'true':'false');
+    b.textContent=nightMode?'Day':'Night';
+    b.addEventListener('click',function(){setNightMode(!nightMode,true)});
+  }
+  if(nightMode && map){
+    // apply after map constructed — called from initMap load
+  }
+}
 
 /* Device-only danger spots */
 var HAZARD_KEY='curveGuide.hazards';
