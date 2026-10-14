@@ -135,6 +135,41 @@ body.welcome-open{overflow:hidden}
 .welcome-video{display:block;width:100%;max-width:300px;aspect-ratio:544/352;height:auto;margin:0 auto 4px;border-radius:16px;object-fit:cover;background:#1a1c1f;border:1px solid var(--line2)}
 @media(max-width:420px){.welcome-video{max-width:260px;border-radius:14px}}
 #gpsChip.acc-good{border-color:#20c47799;color:#9be3bf}#gpsChip.acc-fair{border-color:#ffb34799;color:#ffd08a}#gpsChip.acc-poor{border-color:#ff625c99;color:#ffaaa6}
+
+/* Niyi helper */
+.niyi-fab{position:fixed;z-index:40;right:max(14px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;border:1px solid #20c47766;background:linear-gradient(180deg,#1c252b,#13191d);color:#9be3bf;font-weight:800;font-size:13px;letter-spacing:-.2px;box-shadow:0 10px 28px -8px #000c,0 0 0 4px #20c47714;display:grid;place-items:center;padding:0}
+.niyi-fab:hover{border-color:#20c477;color:#fff;background:linear-gradient(180deg,#243038,#1a2228)}
+.niyi-fab:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766,0 10px 28px -8px #000c}
+.niyi-fab[aria-expanded="true"]{display:none}
+.niyi-panel{position:fixed;z-index:45;right:max(12px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:min(360px,calc(100vw - 24px));height:min(520px,calc(100dvh - 32px));display:none;flex-direction:column;background:linear-gradient(180deg,#1c252b,#14191d);border:1px solid var(--line2);border-radius:18px;box-shadow:0 24px 60px -16px #000e,0 0 0 1px #ffffff08 inset;overflow:hidden}
+.niyi-panel.open{display:flex}
+.niyi-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 12px 10px;border-bottom:1px solid var(--line);background:#0d1114a8}
+.niyi-head-title{min-width:0}
+.niyi-head-title strong{display:block;font-size:13.5px;font-weight:750;letter-spacing:-.2px}
+.niyi-head-title span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+.niyi-head-actions{display:flex;gap:6px;flex:none}
+.niyi-icon{width:34px;height:34px;border-radius:10px;border:1px solid var(--line2);background:#222c33;color:var(--text);display:grid;place-items:center;font-size:14px;padding:0}
+.niyi-icon:hover{border-color:#20c47780}
+.niyi-icon[aria-pressed="true"]{border-color:#20c477aa;color:#5fe0a3;background:#20c47714}
+.niyi-icon[hidden]{display:none}
+.niyi-drive{display:none;margin:0;padding:8px 12px;font-size:11.5px;line-height:1.4;color:#ffd08a;background:#ffb34718;border-bottom:1px solid #ffb34733}
+.niyi-drive.show{display:block}
+.niyi-msgs{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.niyi-msg{max-width:92%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.niyi-msg.bot{align-self:flex-start;background:#0d1114;border:1px solid var(--line);color:#e6eef1;border-bottom-left-radius:5px}
+.niyi-msg.user{align-self:flex-end;background:#20c47722;border:1px solid #20c47744;color:#eef8f2;border-bottom-right-radius:5px}
+.niyi-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
+.niyi-chip{border:1px solid var(--line2);background:#222c33;color:var(--text);border-radius:999px;padding:7px 11px;font-size:11.5px;font-weight:600}
+.niyi-chip:hover{border-color:#20c47780;color:#9be3bf}
+.niyi-input-row{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px solid var(--line);background:#0d1114a8}
+.niyi-input{flex:1;min-width:0;border:1px solid var(--line2);background:#0d1114;color:var(--text);border-radius:11px;padding:10px 12px;font:inherit;font-size:13px}
+.niyi-input:focus{outline:none;border-color:#20c47799;box-shadow:0 0 0 3px #20c47733}
+.niyi-send{border:1px solid #20c477;background:linear-gradient(180deg,#27d083,var(--green2));color:#06150d;border-radius:11px;padding:10px 14px;font-size:12.5px;font-weight:700;flex:none}
+.niyi-send:disabled{opacity:.42;cursor:not-allowed}
+@media(max-width:390px){
+  .niyi-fab{width:50px;height:50px;font-size:12px;right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom))}
+  .niyi-panel{width:calc(100vw - 16px);right:8px;left:8px;bottom:max(10px,env(safe-area-inset-bottom));height:min(70dvh,520px);border-radius:16px}
+}
 </style>
 </head>
 <body class="welcome-open">
@@ -259,6 +294,27 @@ body.welcome-open{overflow:hidden}
   </div>
 </div>
 
+
+<button type="button" class="niyi-fab" id="niyiFab" aria-expanded="false" aria-controls="niyiPanel" title="Ask Niyi">Niyi</button>
+<div class="niyi-panel" id="niyiPanel" role="dialog" aria-modal="false" aria-labelledby="niyiTitle" hidden>
+  <div class="niyi-head">
+    <div class="niyi-head-title">
+      <strong id="niyiTitle">Niyi · Curve Guide helper</strong>
+      <span>Simple prototype helper — keyword answers, not a smart AI.</span>
+    </div>
+    <div class="niyi-head-actions">
+      <button type="button" class="niyi-icon" id="niyiSpeak" aria-pressed="false" title="Read answers aloud" aria-label="Read answers aloud">🔊</button>
+      <button type="button" class="niyi-icon" id="niyiClose" title="Close" aria-label="Close Niyi">✕</button>
+    </div>
+  </div>
+  <p class="niyi-drive" id="niyiDrive" role="status">For safety, please don't type while driving.</p>
+  <div class="niyi-msgs" id="niyiMsgs" aria-live="polite"></div>
+  <div class="niyi-chips" id="niyiChips"></div>
+  <form class="niyi-input-row" id="niyiForm" autocomplete="off">
+    <input class="niyi-input" id="niyiInput" type="text" maxlength="240" placeholder="Ask about Curve Guide…" aria-label="Message to Niyi">
+    <button class="niyi-send" id="niyiSend" type="submit">Send</button>
+  </form>
+</div>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
 (function(){
@@ -489,6 +545,11 @@ $('recenter').addEventListener('click',function(){if(current){setFollow(true);ap
 $('mapType').addEventListener('click',function(){setSatellite(!satellite)});
 $('clearRoute').addEventListener('click',clearRoute);
 window.addEventListener('beforeunload',function(){if(watchId!==null)navigator.geolocation.clearWatch(watchId)});
+window.__cgIsDriving=function(){
+  if(watchId===null||!current)return false;
+  var s=current.coords.speed;
+  return Number.isFinite(s)&&s>=0&&(s*3.6)>10;
+};
 setText('unit','Units: '+(useMph?'mph':'km/h'));
 setText('speedUnit',useMph?'mph':'km/h');
 initMap();
@@ -522,5 +583,154 @@ if(!rm)var wt=setInterval(function(){if(w.hidden){clearInterval(wt);return}j=(j+
 })();
 </script>
 <script>(function(){var v=document.getElementById('welcomeVideo');if(v&&window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){v.removeAttribute('autoplay');v.pause()}})();</script>
+
+<script>
+(function(){
+'use strict';
+var fab=document.getElementById('niyiFab');
+var panel=document.getElementById('niyiPanel');
+var msgs=document.getElementById('niyiMsgs');
+var chipsEl=document.getElementById('niyiChips');
+var form=document.getElementById('niyiForm');
+var input=document.getElementById('niyiInput');
+var speakBtn=document.getElementById('niyiSpeak');
+var closeBtn=document.getElementById('niyiClose');
+var driveNote=document.getElementById('niyiDrive');
+var speakOn=false;
+var tipI=0;
+var greeted=false;
+var tips=[
+  'Slow down before a bend, not in the middle of it.',
+  "Don't use your phone while driving — set Curve Guide up before you move.",
+  'Service your car regularly. Check brakes and tyres before long trips.',
+  'Keep a safe distance from the vehicle ahead.',
+  'Use headlights at night and in poor weather.',
+  'Prevention is better than cure.',
+  'Rest when you are tired — fatigue kills.',
+  'Always wear your seatbelt.',
+  "Obey traffic signs; they are there to protect you.",
+  'Phones down, eyes on the road.'
+];
+var chips=['How does it work?','Safety tip','GPS accuracy','Contact'];
+
+function escText(s){return String(s==null?'':s)}
+function addMsg(text,who){
+  var d=document.createElement('div');
+  d.className='niyi-msg '+(who==='user'?'user':'bot');
+  d.textContent=escText(text);
+  msgs.appendChild(d);
+  msgs.scrollTop=msgs.scrollHeight;
+  return d;
+}
+function renderChips(){
+  chipsEl.textContent='';
+  chips.forEach(function(label){
+    var b=document.createElement('button');
+    b.type='button';
+    b.className='niyi-chip';
+    b.textContent=label;
+    b.addEventListener('click',function(){ask(label)});
+    chipsEl.appendChild(b);
+  });
+}
+function speak(text){
+  if(!speakOn||!window.speechSynthesis)return;
+  try{
+    window.speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    u.rate=1;u.pitch=1;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function answer(q){
+  var t=String(q||'').toLowerCase().trim();
+  if(!t)return "Ask me how Curve Guide works, about GPS accuracy, units, the map, safety tips, or contact details.";
+  if(/contact|phone|email|call|whatsapp|reach/.test(t))
+    return 'You can reach Adeniyi Investments & Property Ltd. at +234 805 352 9802 or info@adeniyiltd.com.';
+  if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
+    return 'Curve Guide is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
+  if(/disclaim|liabilit|certified|safe to use|replace|prototype/.test(t))
+    return 'Curve Guide is an experimental prototype, not a certified safety or navigation system. Warnings can be missing, late, or wrong. Always obey the road and drive carefully.';
+  if(/gps|accur|±|plus.?minus|poor|fair|green|yellow|red chip/.test(t))
+    return 'The GPS chip shows your accuracy in metres (for example ±12 m). Green is good (about ±15 m or better), yellow is fair (up to about ±25 m), and red is poor. If accuracy is worse than ±25 m, Curve Guide pauses curve estimates until GPS improves.';
+  if(/unit|km\/?h|mph|miles|kilometr/.test(t))
+    return 'Tap Units to switch between km/h and mph. Your choice is saved on this device in the browser, so it comes back next time on the same phone. Clearing site data resets it.';
+  if(/satellit|3d|2d|map type|aerial|street/.test(t))
+    return 'Use the map buttons on the right of the map: Map/Sat switches street and satellite view, and 3D/2D tilts the view. These help you look at the road, but they do not change how curve estimates work.';
+  if(/how (does|do)|work|estimat|curve|heading|detect|what is curve guide|explain/.test(t))
+    return 'Curve Guide uses your phone GPS. As you move, it watches heading changes. A turn of more than about 22° is treated as a rough curve estimate. This is a prototype aid only — it is not verified road-curve data and must never replace careful driving.';
+  if(/tip|advice|safe|prevent|brake|tyre|tire|seatbelt|distance|headlight|fatigue|phone/.test(t)){
+    var tip=tips[tipI%tips.length];
+    tipI++;
+    return tip+' (Ask for another safety tip anytime.)';
+  }
+  if(/hello|hi\b|hey|good (morning|afternoon|evening)/.test(t))
+    return "Hi! I'm Niyi, a simple keyword helper for Curve Guide. Try a chip below, or ask about GPS, units, or safety.";
+  return "I'm still learning — I only match simple keywords. Try: How does it work?, Safety tip, GPS accuracy, or Contact.";
+}
+function refreshDriveNote(){
+  var driving=typeof window.__cgIsDriving==='function'&&window.__cgIsDriving();
+  driveNote.classList.toggle('show',!!driving);
+  input.disabled=!!driving;
+  document.getElementById('niyiSend').disabled=!!driving;
+  if(driving)input.blur();
+}
+function openPanel(){
+  panel.hidden=false;
+  panel.classList.add('open');
+  fab.setAttribute('aria-expanded','true');
+  if(!greeted){
+    greeted=true;
+    addMsg("Hi, I'm Niyi! Ask me how Curve Guide works or for a driving safety tip.",'bot');
+    renderChips();
+  }
+  refreshDriveNote();
+  if(!input.disabled)input.focus();
+}
+function closePanel(){
+  panel.classList.remove('open');
+  panel.hidden=true;
+  fab.setAttribute('aria-expanded','false');
+  if(window.speechSynthesis)try{window.speechSynthesis.cancel()}catch(e){}
+  fab.focus();
+}
+function ask(text){
+  var q=String(text||'').trim();
+  if(!q)return;
+  refreshDriveNote();
+  if(typeof window.__cgIsDriving==='function'&&window.__cgIsDriving()){
+    refreshDriveNote();
+    return;
+  }
+  addMsg(q,'user');
+  var a=answer(q);
+  addMsg(a,'bot');
+  speak(a);
+  renderChips();
+}
+fab.addEventListener('click',openPanel);
+closeBtn.addEventListener('click',closePanel);
+form.addEventListener('submit',function(e){
+  e.preventDefault();
+  var v=input.value;
+  input.value='';
+  ask(v);
+});
+if(!('speechSynthesis' in window)){
+  speakBtn.hidden=true;
+}else{
+  speakBtn.addEventListener('click',function(){
+    speakOn=!speakOn;
+    speakBtn.setAttribute('aria-pressed',speakOn?'true':'false');
+    speakBtn.title=speakOn?'Voice on — tap to mute':'Read answers aloud';
+    if(!speakOn)try{window.speechSynthesis.cancel()}catch(e){}
+  });
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&panel.classList.contains('open'))closePanel();
+});
+setInterval(refreshDriveNote,1500);
+})();
+</script>
 </body>
 </html>
