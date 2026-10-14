@@ -1,0 +1,14 @@
+{
+  "name": "Curve Guide",
+  "short_name": "Curve Guide",
+  "description": "Road safety prototype — curve awareness, routing, and guidance.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0d1114",
+  "theme_color": "#101820",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

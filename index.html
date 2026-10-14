@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Curve Guide is a road safety development prototype designed to support driver awareness around road curves.">
 <meta name="theme-color" content="#101820">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
 <title>Curve Guide 6.0 | Intelligent Road Safety System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2042,6 +2046,50 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Escape'&&panel.classList.contains('open'))closePanel();
 });
 setInterval(refreshDriveNote,1500);
+})();
+</script>
+
+<script>
+(function(){
+  var banner=document.getElementById('offlineBanner');
+  function sync(){ if(banner) banner.classList.toggle('show', !navigator.onLine); }
+  window.addEventListener('online', sync);
+  window.addEventListener('offline', sync);
+  sync();
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    });
+  }
+  var deferred=null;
+  var bar=document.getElementById('installBar');
+  var btn=document.getElementById('installBtn');
+  var txt=document.getElementById('installText');
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferred=e;
+    if(bar)bar.classList.add('show');
+  });
+  if(btn)btn.addEventListener('click', function(){
+    if(deferred){
+      deferred.prompt();
+      deferred.userChoice.finally(function(){deferred=null; if(bar)bar.classList.remove('show')});
+    }else if(/iphone|ipad|ipod/i.test(navigator.userAgent)){
+      if(txt)txt.textContent='iOS: tap Share, then “Add to Home Screen”.';
+      if(bar)bar.classList.add('show');
+    }else{
+      if(txt)txt.textContent='Install is not available in this browser right now. Try Chrome/Edge, or use the browser menu.';
+      if(bar)bar.classList.add('show');
+    }
+  });
+  // iOS hint if standalone not already
+  try{
+    var standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+    if(!standalone&&/iphone|ipad|ipod/i.test(navigator.userAgent)&&bar&&txt){
+      txt.textContent='iPhone: Share → Add to Home Screen to install Curve Guide.';
+      bar.classList.add('show');
+    }
+  }catch(e){}
 })();
 </script>
 </body>
