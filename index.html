@@ -1931,7 +1931,7 @@ function answer(q){
   if(/satellit|3d|2d|map type|aerial|street/.test(t))
     return 'Say “satellite”, “street map”, “3D on”, or “3D off” — or use the map buttons. Views do not change curve estimates.';
   if(/how (does|do)|work|estimat|curve|heading|detect|what is curve guide/.test(t))
-    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Version 6.0 also adds free search, OSRM routing, and browser voice navigation — still a prototype aid only.';
+    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Version 7.0 adds free search, OSRM routing, voice navigation, bend estimates, favourites, and more — still a prototype aid only.';
   if(/tip|advice|safe|prevent|brake|tyre|tire|seatbelt|distance|headlight|fatigue/.test(t)){
     var tip=tips[tipI%tips.length];
     tipI++;
