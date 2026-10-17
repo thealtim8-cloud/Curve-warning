@@ -242,8 +242,17 @@
     var ngn = cur === 'NGN';
     var monthly = $('priceMonthly');
     var yearly = $('priceYearly');
-    if (monthly) monthly.textContent = ngn ? '₦X,XXX / month (price TBD)' : '$X.XX / month (price TBD)';
-    if (yearly) yearly.textContent = ngn ? '₦XX,XXX / year (price TBD)' : '$XX.XX / year (price TBD)';
+    var ystrike = $('priceYearlyStrike');
+    if (monthly) monthly.textContent = ngn ? '₦450 / month' : '$1 / month';
+    if (yearly) {
+      if (ystrike) {
+        ystrike.textContent = ngn ? '₦5,400' : '$12';
+        // keep structure: strike + discounted
+        yearly.innerHTML = '<span class="price-strike" id="priceYearlyStrike">' + (ngn ? '₦5,400' : '$12') + '</span> ' + (ngn ? '₦3,780 / year' : '$8.40 / year');
+      } else {
+        yearly.textContent = ngn ? '₦3,780 / year' : '$8.40 / year';
+      }
+    }
     document.querySelectorAll('[data-currency]').forEach(function (b) {
       b.classList.toggle('active', b.getAttribute('data-currency') === cur);
     });
@@ -685,21 +694,30 @@
     var delAcc = $('deleteAccountBtn');
     if (delAcc)
       delAcc.onclick = function () {
-        if (!confirm('Delete account? This is a preview simulation.')) return;
+        if (!confirm('Delete your Curve Guide account? This cannot be undone.')) return;
         var typed = prompt('Type DELETE to confirm');
         if (typed !== 'DELETE') {
           alert('Cancelled — you must type DELETE.');
           return;
         }
-        auth().signOut().then(function () {
-          auth().setPlanLocal('free');
-          try {
-            localStorage.removeItem(PROFILE_KEY);
-          } catch (e) {}
+        var A = auth();
+        var fin = function () {
           closeAllOverlays();
-          syncAccountButton(auth().snapshot());
-          alert('Preview: account removed on this device.');
-        });
+          syncAccountButton(A.snapshot());
+          alert('Account deleted.');
+        };
+        if (A && A.deleteAccount) {
+          A.deleteAccount().then(fin).catch(function (err) {
+            var msg = (err && err.message) || String(err);
+            if (err && err.code === 'auth/requires-recent-login') {
+              alert('For security, sign in again, then delete the account. (' + msg + ')');
+              return;
+            }
+            alert('Could not delete account: ' + msg);
+          });
+        } else {
+          A.signOut().then(fin);
+        }
       };
 
     // Preview bar

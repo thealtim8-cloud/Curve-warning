@@ -304,6 +304,8 @@ body.navigating .dest-card{max-height:38%}
 .plan-card{border:1px solid var(--line2);border-radius:14px;padding:12px;background:#12181c}
 .plan-card strong{display:block;font-size:14px}
 .plan-card .price{color:#9be3bf;font-weight:800;margin:4px 0 8px;font-size:13px}
+.save-badge{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.3px;background:#20c47733;color:#9be3bf;border:1px solid #20c47766;vertical-align:middle}
+.price-strike{color:var(--muted);font-weight:600;text-decoration:line-through;margin-right:6px;font-size:12px}
 .currency-switch{display:inline-flex;gap:4px;margin:6px 0 10px}
 .currency-switch .btn.active{border-color:#20c477aa;color:#9be3bf;background:#20c47714}
 .btn.sm{padding:7px 10px;font-size:11.5px}
@@ -703,17 +705,17 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
     <div class="plan-cards">
       <div class="plan-card">
         <strong>Monthly</strong>
-        <div class="price" id="priceMonthly">₦X,XXX / month (price TBD)</div>
+        <div class="price" id="priceMonthly">₦450 / month</div>
         <button type="button" class="btn primary" data-pay-plan="monthly">Pay with Paystack</button>
       </div>
       <div class="plan-card">
-        <strong>Yearly</strong>
-        <div class="price" id="priceYearly">₦XX,XXX / year (price TBD)</div>
+        <strong>Yearly <span class="save-badge">Save 30%</span></strong>
+        <div class="price" id="priceYearly"><span class="price-strike" id="priceYearlyStrike">₦5,400</span> ₦3,780 / year</div>
         <button type="button" class="btn primary" data-pay-plan="yearly">Pay with Paystack</button>
       </div>
     </div>
     <p class="pay-msg" id="paystackMsg" hidden></p>
-    <p class="sheet-sub">Secure payments by Paystack. Cancel anytime. Prices are examples only until published. Curve Guide remains a prototype — never a substitute for careful driving.</p>
+    <p class="sheet-sub">Secure payments by Paystack. Cancel anytime. Cancel anytime. Curve Guide remains a prototype — never a substitute for careful driving.</p>
   </div>
 </div>
 
@@ -2270,7 +2272,8 @@ function doPageAction(t){
     return confirm('Opening sign-in. Firebase Auth is configured — enable Google & Email providers and authorized domains in the console.');
   }
   if(/\b(price|pricing|how much|cost|₦|naira|dollar)\b/.test(t)){
-    return confirm('Prices are not set yet. The Premium screen shows placeholder amounts (price TBD) in NGN or USD.');
+    if(window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
+    return confirm('Curve Guide Premium: ₦450/month or $1/month; yearly with 30% off is ₦3,780/year or $8.40/year (was ₦5,400 / $12). NGN for Nigeria, USD for foreign users. Payments not connected yet.');
   }
   if(/\b(profile|settings|account page)\b/.test(t)){
     if(window.__cgPremiumUI)window.__cgPremiumUI.showProfile();
@@ -2352,7 +2355,7 @@ function explainButton(t){
     'stop navigation':'Stop navigation ends voice guidance and hides the next-turn banner.',
     'clear':'Clear removes the destination pin and driving route.',
     'clear route':'Clear route removes the green GPS trail you have driven.',
-    'premium':'Premium is in preview — prices TBD, Paystack not connected yet.',
+    'premium':'Premium: ₦450/mo ($1) or ₦3,780/yr ($8.40, save 30%). Paystack not connected yet — upgrade is simulated in preview.',
     'sign in':'Sign in opens the account screen. Firebase Auth is configured for Google and email/password.',
     'profile':'Profile stores car icon, theme, and settings on this device in preview.',
     'recenter':'Reset view (or say reset map) turns follow back on and flies to your GPS position, or Lagos if GPS is off.',

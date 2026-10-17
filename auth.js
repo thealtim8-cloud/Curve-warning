@@ -417,6 +417,55 @@
     return syncNow();
   }
 
+
+  function deleteAccount() {
+    if (!fb.auth || !fb.auth.currentUser) {
+      cacheUser(null);
+      serverPremium = null;
+      try { localStorage.removeItem(AUTH_KEY); localStorage.removeItem(PROFILE_KEY); } catch (e) {}
+      emit();
+      return Promise.resolve({ localOnly: true });
+    }
+    var user = fb.auth.currentUser;
+    var uid = user.uid;
+    var wipeFs = Promise.resolve();
+    if (fb.db) {
+      wipeFs = userDoc(uid).delete().catch(function (err) {
+        // If doc missing, continue; otherwise surface
+        if (err && err.code === 'not-found') return;
+        console.warn('[Curve Guide] Firestore delete', err);
+        // still attempt auth delete
+      });
+    }
+    return wipeFs.then(function () {
+      return user.delete();
+    }).then(function () {
+      cacheUser(null);
+      serverPremium = null;
+      try {
+        localStorage.removeItem(AUTH_KEY);
+        localStorage.removeItem(PLAN_KEY);
+        // keep profile optional wipe
+        localStorage.removeItem(PROFILE_KEY);
+      } catch (e) {}
+      emit();
+      return { deleted: true, uid: uid };
+    });
+  }
+
+  function tryWritePremiumField() {
+    // Test helper: attempt an illegal client write of `premium` (must fail rules).
+    if (!fb.auth || !fb.auth.currentUser || !fb.db) {
+      return Promise.reject(new Error('Not signed in or Firestore unavailable'));
+    }
+    var uid = fb.auth.currentUser.uid;
+    return userDoc(uid).set({ premium: true }, { merge: true }).then(function () {
+      return { ok: true, unexpected: true };
+    }).catch(function (err) {
+      return { ok: false, code: err && err.code, message: (err && err.message) || String(err) };
+    });
+  }
+
   // Boot
   var boot = initFirebase();
 
@@ -450,6 +499,8 @@
     },
     saveProfileLocalAndCloud: saveProfileLocalAndCloud,
     saveFavouritesLocalAndCloud: saveFavouritesLocalAndCloud,
-    getFirebase: function () { return fb; }
+    getFirebase: function () { return fb; },
+    deleteAccount: deleteAccount,
+    tryWritePremiumField: tryWritePremiumField
   };
 })(typeof window !== 'undefined' ? window : this);
