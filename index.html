@@ -107,6 +107,20 @@ body.welcome-open{overflow:hidden}
 @media(max-width:420px){.welcome{padding:10px}.welcome-card{padding:18px 16px 14px;max-height:calc(100dvh - 20px)}.welcome-logo{width:220px}.welcome-card h2{font-size:20px}.welcome-intro{font-size:13px}.terms-box{max-height:150px}}
 .contact-line{font-size:11.5px;color:var(--muted);text-align:center}.contact{color:#5fe0a3;text-decoration:none;font-weight:600;white-space:nowrap}.contact:hover{text-decoration:underline}.contact:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766;border-radius:4px}.contact-line .sep{color:#4a5a65}
 .welcome-contact{margin-top:8px}
+.welcome-account{display:grid;gap:9px;margin-top:4px}
+.welcome-account [hidden]{display:none!important}
+.welcome-why{margin:0 0 2px;padding:10px 12px;border-radius:12px;background:linear-gradient(90deg,#20c47718,#ffb3471a);border:1px solid #20c47740;font-size:12.8px;line-height:1.5;color:#dff6ea;text-align:center}
+.welcome-why strong{color:#fff}
+.welcome .btn.welcome-guest{width:100%;padding:12px;font-size:13.5px;font-weight:600;background:transparent;border:1px solid var(--line2);color:var(--silver)}
+.welcome .btn.welcome-guest:not([disabled]):hover{border-color:#20c47788;color:var(--text)}
+.welcome .btn[disabled]{opacity:.5;cursor:not-allowed}
+.welcome-hint{margin:0;font-size:11.5px;color:var(--muted);text-align:center}
+.welcome-signed{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:#20c47712;border:1px solid #20c47744}
+.welcome-signed[hidden]{display:none}
+.welcome-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:#20c47733;color:#bff2d8;font-weight:800;font-size:15px}
+.welcome-signed-name{font-weight:700;font-size:14px;color:var(--text)}
+.welcome-signed-email{font-size:12px;color:var(--muted);word-break:break-all}
+@media(min-width:760px){.welcome-card{width:min(100%,600px);padding:26px 30px 20px}.welcome-account{grid-template-columns:1fr 1fr}.welcome-why,.welcome-signed,.welcome-hint{grid-column:1/-1}}
 
 :root{--s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px}
 .ico{width:15px;height:15px;flex:none;color:var(--green);vertical-align:-2px}
@@ -456,7 +470,17 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <li><strong>Changes.</strong> These terms may be updated at any time; continued use means you accept the current terms.</li>
     </ol>
     <label class="accept"><input type="checkbox" id="acceptTerms"> I have read and accept the Terms &amp; Conditions</label>
-    <button class="btn primary" id="welcomeContinue" disabled>Continue</button>
+    <div class="welcome-account" id="welcomeAccount">
+      <p class="welcome-why" id="welcomeWhy">✨ <strong>Sign in</strong> to use smart Niyi (20 free chats a day), keep your account, and unlock Apex.</p>
+      <div class="welcome-signed" id="welcomeSigned" hidden>
+        <span class="welcome-avatar" id="welcomeAvatar" aria-hidden="true">D</span>
+        <div><div class="welcome-signed-name" id="welcomeSignedName"></div><div class="welcome-signed-email" id="welcomeSignedEmail"></div></div>
+      </div>
+      <button class="btn primary" id="welcomeSignIn" disabled>Sign in / Create account</button>
+      <button class="btn primary" id="welcomeContinue" disabled hidden>Continue</button>
+      <button class="btn welcome-guest" id="welcomeGuest" disabled>Continue as guest</button>
+      <p class="welcome-hint" id="welcomeHint">Tick the box above to continue.</p>
+    </div>
     <div class="welcome-credit"><span>An Automotive Division of</span><a class="credit-card" href="https://adeniyiltd.com/" target="_blank" rel="noopener" title="Visit Adeniyi Investments &amp; Property Ltd." style="display:inline-block"><img src="assets/adeniyi-logo.png" alt="Adeniyi Investments &amp; Property Ltd."></a></div>
     <div class="contact-line welcome-contact">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
   </div>
@@ -2252,8 +2276,32 @@ initMap();
 (function(){
   var w=document.getElementById('welcome'),c=document.getElementById('acceptTerms'),b=document.getElementById('welcomeContinue'),card=document.getElementById('welcomeCard');
   var last=null;
-  c.addEventListener('change',function(){b.disabled=!c.checked});
-  b.addEventListener('click',function(){if(!c.checked)return;w.hidden=true;var wv=document.getElementById('welcomeVideo');if(wv)wv.pause();document.body.classList.remove('welcome-open');var g=document.getElementById('gps');if(g)g.focus();if(typeof window.__cgPulseNiyi==='function')window.__cgPulseNiyi()});
+  var si=document.getElementById('welcomeSignIn'),gu=document.getElementById('welcomeGuest'),hint=document.getElementById('welcomeHint');
+  function closeWelcome(focusApp){w.hidden=true;var wv=document.getElementById('welcomeVideo');if(wv)wv.pause();document.body.classList.remove('welcome-open');if(focusApp){var g=document.getElementById('gps');if(g)g.focus()}if(typeof window.__cgPulseNiyi==='function')window.__cgPulseNiyi()}
+  function signedUser(){try{var A=window.__cgAuth;var s=A&&A.snapshot&&A.snapshot();return s&&s.signedIn?s.user:null}catch(e){return null}}
+  function syncAccount(){
+    var u=signedUser();
+    document.getElementById('welcomeSigned').hidden=!u;
+    document.getElementById('welcomeWhy').hidden=!!u;
+    si.hidden=!!u; gu.hidden=!!u; b.hidden=!u;
+    if(u){
+      var nm=u.displayName||'Driver';
+      document.getElementById('welcomeSignedName').textContent='Signed in as '+nm;
+      document.getElementById('welcomeSignedEmail').textContent=u.email||'';
+      document.getElementById('welcomeAvatar').textContent=(nm.trim().charAt(0)||'D').toUpperCase();
+    }
+    [b,si,gu].forEach(function(x){x.disabled=!c.checked});
+    hint.hidden=c.checked;
+  }
+  c.addEventListener('change',syncAccount);
+  b.addEventListener('click',function(){if(!c.checked)return;closeWelcome(true)});
+  gu.addEventListener('click',function(){if(!c.checked)return;closeWelcome(true)});
+  si.addEventListener('click',function(){
+    if(!c.checked)return;closeWelcome(false);
+    if(window.__cgPremiumUI&&window.__cgPremiumUI.showAuth)window.__cgPremiumUI.showAuth('signin');
+  });
+  syncAccount();
+  (function attach(n){var A=window.__cgAuth;if(A&&A.onChange){A.onChange(syncAccount);syncAccount()}else if(n<20)setTimeout(function(){attach(n+1)},300)})(0);
   w.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var f=[].slice.call(w.querySelectorAll('input,button:not([disabled]),[tabindex="0"]'));if(!f.length)return;var a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}});
   card.focus();
 })();
