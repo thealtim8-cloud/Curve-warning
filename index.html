@@ -645,6 +645,31 @@ body.theme-light .profile-grid select{background-color:#f4f7fa}
 
 /* 8.0 light theme: darker accent text where the background is light (readable contrast) */
 body.theme-light .cg-sheet,body.theme-light .account-menu,body.theme-light .panel,body.theme-light header,body.theme-light .hero,body.theme-light .install-bar,body.theme-light .metric{--acc-text:var(--acc-deep);--acc-pale:var(--acc-deep)}
+
+/* 8.0.1 Start-GPS intro: car on a curvy road. Never blocks input (pointer-events:none); taps pass through and skip it. */
+.gps-intro{position:fixed;left:50%;top:50%;z-index:60;transform:translate(-50%,-50%);width:min(340px,90vw);padding:14px 12px 12px;border-radius:20px;background:#0d1114e6;border:1px solid rgb(var(--acc-rgb) / .35);box-shadow:0 24px 60px -20px #000e,0 0 0 6px rgb(var(--acc-rgb) / .08);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:none;opacity:0;transition:opacity .22s ease;text-align:center}
+.gps-intro.show{opacity:1}
+.gps-intro.leave{opacity:0;transition:opacity .3s ease .12s}
+.gps-intro .gi-road{position:relative;width:320px;height:84px;margin:0 auto;max-width:100%}
+.gps-intro .gi-road svg{position:absolute;inset:0;width:320px;height:84px}
+.gps-intro .gi-asphalt{fill:none;stroke:#2b353d;stroke-width:22;stroke-linecap:round}
+.gps-intro .gi-edge{fill:none;stroke:#3d4a54;stroke-width:24;stroke-linecap:round;opacity:.6}
+.gps-intro .gi-dash{fill:none;stroke:var(--acc);stroke-width:2.4;stroke-dasharray:9 9;stroke-linecap:round;animation:giDash .6s linear infinite}
+@keyframes giDash{to{stroke-dashoffset:-18}}
+.gps-intro .gi-car{position:absolute;left:0;top:0;width:34px;height:34px;display:grid;place-items:center;filter:drop-shadow(0 3px 4px #000a);
+  offset-path:path("M -10 58 C 40 12, 95 12, 140 42 S 235 78, 340 28");offset-distance:0%;offset-rotate:0deg;transition:offset-distance 1.8s cubic-bezier(.3,.6,.35,1)}
+.gps-intro .gi-car.arrow{offset-rotate:auto 90deg}
+.gps-intro .gi-car svg{width:30px;height:30px}
+.gps-intro.go .gi-car{offset-distance:62%}
+.gps-intro.leave .gi-car{offset-distance:108%;transition:offset-distance .36s cubic-bezier(.5,0,.9,.5)}
+@supports not (offset-path:path("M0 0 L1 1")){
+  .gps-intro .gi-car{top:25px;transform:translateX(-30px);transition:transform 1.8s cubic-bezier(.3,.6,.35,1)}
+  .gps-intro.go .gi-car{transform:translateX(180px)}
+  .gps-intro.leave .gi-car{transform:translateX(360px);transition:transform .36s ease-in}
+}
+.gps-intro .gi-text{margin-top:6px;font-size:13.5px;font-weight:700;color:var(--text)}
+.gps-intro .gi-sub{margin-top:2px;font-size:11px;color:var(--muted)}
+@media(prefers-reduced-motion:reduce){.gps-intro .gi-road{display:none}.gps-intro{padding:16px}}
 </style>
 </head>
 <body class="welcome-open">
@@ -1356,6 +1381,7 @@ function maybeEstimateCurve(pos){
 }
 var lastCamAt=0, lastBendUiAt=0, lastStatusAt=0, lastDestMetaAt=0;
 function onPosition(pos){
+  try{cgGpsIntro.fix()}catch(e){}
   previous=current;current=pos;
   try{if(pos&&pos.coords)localStorage.setItem('curveGuide.lastFix',JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude,acc:pos.coords.accuracy,t:pos.timestamp||Date.now()}))}catch(e){}
   var coord=[pos.coords.longitude,pos.coords.latitude];
@@ -1385,6 +1411,7 @@ function onPosition(pos){
   }
 }
 function onGpsError(err){
+  try{cgGpsIntro.done()}catch(e){}
   var msg='GPS unavailable. Check location permission and device settings.';
   if(err&&err.code===1)msg='Location permission was denied. Allow location access for this website to use GPS.';
   else if(err&&err.code===3)msg='GPS request timed out. Try again where the sky is more visible.';
@@ -1394,14 +1421,49 @@ function onGpsError(err){
   watchId=null;$('gps').disabled=false;$('stopGps').disabled=true;
   var chip=$('gpsChip');if(chip)chip.classList.remove('acc-good','acc-fair','acc-poor');
 }
+/* 8.0.1 Start-GPS intro animation (cosmetic only: GPS starts immediately, nothing waits for it). */
+var cgGpsIntro=(function(){
+  var el=null,timer=null,hideT=null,KEY='cgGpsIntroDone';
+  function vehicle(){
+    try{var UI=window.__cgPremiumUI,p=UI&&UI.loadProfile?UI.loadProfile():{},icons=(UI&&UI.CAR_ICONS)||{};
+      var k=icons[p.carIcon]?p.carIcon:'sedan';return {key:k,svg:icons[k]||'',color:p.carColor||'#20c477'}}catch(e){return {key:'sedan',svg:'',color:'#20c477'}}
+  }
+  function skip(){done(false)}
+  function done(){
+    clearTimeout(timer);if(!el)return;
+    var e=el;el=null;
+    document.removeEventListener('pointerdown',skip,true);
+    e.classList.add('leave');
+    hideT=setTimeout(function(){e.remove()},460);
+  }
+  function show(){
+    try{if(sessionStorage.getItem(KEY)==='1')return}catch(e){}
+    if(el)return;
+    var v=vehicle();
+    el=document.createElement('div');el.className='gps-intro';el.setAttribute('role','status');el.setAttribute('aria-live','polite');
+    var P='M -10 58 C 40 12, 95 12, 140 42 S 235 78, 340 28';
+    el.innerHTML='<div class="gi-road" aria-hidden="true"><svg viewBox="0 0 320 84"><path class="gi-edge" d="'+P+'"/><path class="gi-asphalt" d="'+P+'"/><path class="gi-dash" d="'+P+'"/></svg>'+
+      '<div class="gi-car '+(v.key==='arrow'?'arrow':'')+'" style="color:'+String(v.color).replace(/[^#a-zA-Z0-9(),.\s]/g,'')+'">'+v.svg+'</div></div>'+
+      '<div class="gi-text">Finding your location…</div><div class="gi-sub">Tap anywhere to skip</div>';
+    document.body.appendChild(el);
+    void el.offsetWidth;el.classList.add('show');
+    requestAnimationFrame(function(){if(el)el.classList.add('go')});
+    timer=setTimeout(done,2500);
+    setTimeout(function(){document.addEventListener('pointerdown',skip,true)},50); // passive: the tap still reaches the map/buttons
+  }
+  function fix(){try{sessionStorage.setItem(KEY,'1')}catch(e){}done()}
+  return {show:show,fix:fix,done:done};
+})();
 function startGps(){
   if(!navigator.geolocation){setWarning('This browser does not support geolocation.','warn');return}
   if(watchId!==null)return;
   setStatus('Requesting GPS','warn');setWarning('Waiting for your device to provide a GPS position…','warn');
   watchId=navigator.geolocation.watchPosition(onPosition,onGpsError,{enableHighAccuracy:true,maximumAge:1500,timeout:15000});
+  try{cgGpsIntro.show()}catch(e){}
   $('gps').disabled=true;$('stopGps').disabled=false;setText('analysisState','Waiting for GPS');
 }
 function stopGps(){
+  try{cgGpsIntro.done()}catch(e){}
   if(navigating)stopNavigation();
   if(watchId!==null)navigator.geolocation.clearWatch(watchId);
   watchId=null;$('gps').disabled=false;$('stopGps').disabled=true;

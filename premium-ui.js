@@ -349,13 +349,13 @@
   var WHY_APEX = {
     NGN: {
       sources: [
-        ['NBS Selected Food Price Watch, May 2026', 'https://microdata.nigerianstat.gov.ng/index.php/catalog/162'],
+        ['Yello.ng: Agege bread (medium) ₦700, checked Oct 2026', 'https://yello.ng/product/agege-bread-medium/'],
         ['FRSC 2025 report (Punch)', 'https://punchng.com/frsc-records-10446-crashes-5289-deaths-in-2025/'],
         ['FRSC Dec 2025 (BusinessDay)', 'https://businessday.ng/transport/article/speeding-remains-nigerias-deadliest-road-habit-frsc/'],
         ['US FHWA, horizontal curve safety', 'https://highways.dot.gov/safety/rwd/keep-vehicles-road/horizontal-curve-safety']
       ],
       lines: [
-        ['🍞', 'Apex costs <strong>₦15 a day</strong>, less than a quarter of a loaf of bread.', 1],
+        ['🍞', 'Apex costs <strong>₦450 a month</strong> (about ₦15 a day), less than one medium Agege bread.', 1],
         ['🛣️', 'FRSC recorded <strong>5,289 road deaths</strong> in Nigeria in 2025. Apex gives you extra heads-ups before sharp bends.', 2],
         ['⚠️', 'In December 2025, <strong>speeding was behind 41%</strong> of identified crash causes. Apex could help you ease off before the curve.', 3],
         ['🎉', 'Go yearly: <strong>₦3,780</strong> instead of ₦5,400, about <strong>₦10 a day</strong>.', 0],
