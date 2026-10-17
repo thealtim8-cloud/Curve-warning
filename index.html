@@ -12,6 +12,7 @@
 <title>Curve Guide 7.1 preview | Sign-in &amp; Apex</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://js.paystack.co">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
@@ -285,6 +286,10 @@ body.navigating .dest-card{max-height:38%}
 .cg-sheet .sheet-sub{color:var(--muted);font-size:12.5px;margin-bottom:12px;line-height:1.45}
 .cg-sheet .sheet-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
 .cg-sheet .icon-close{border:0;background:#ffffff10;color:var(--text);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:16px}
+.pay-msg.good{background:#20c47718;border-color:#20c47766;color:#9ff0c8}
+.pay-msg.warn{background:#ff5a5a14;border-color:#ff7a7a66;color:#ffb3b3}
+.pay-msg code{font-size:11px;word-break:break-all}
+.test-mode-note{margin:8px 0 4px;padding:6px 10px;border-radius:10px;border:1px dashed #ffb34788;color:#ffd08a;font-size:11.5px;font-weight:600}
 .auth-preview-note,.pay-msg,.auth-msg{margin:8px 0;padding:8px 10px;border-radius:10px;background:#ffb34718;border:1px solid #ffb34755;color:#ffd08a;font-size:12px;line-height:1.4}
 .auth-msg.good{background:#20c47718;border-color:#20c47755;color:#9be3bf}
 .auth-google{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:8px 0}
@@ -714,8 +719,9 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
         <button type="button" class="btn primary" data-pay-plan="yearly">Pay with Paystack</button>
       </div>
     </div>
-    <p class="pay-msg" id="paystackMsg" hidden></p>
-    <p class="sheet-sub">Secure payments by Paystack. Cancel anytime. Curve Guide remains a prototype — never a substitute for careful driving.</p>
+    <p class="pay-msg" id="paystackMsg" hidden aria-live="polite"></p>
+    <p class="test-mode-note">TEST MODE · Paystack test checkout, no real money is charged. Use a Paystack test card.</p>
+    <p class="sheet-sub">Secure payments by Paystack. Sign in first so Apex is saved to your account. Curve Guide remains a prototype — never a substitute for careful driving.</p>
   </div>
 </div>
 
@@ -799,7 +805,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
   <strong>Preview</strong>
   <label><input type="checkbox" id="previewGateToggle"> Gate Apex features</label>
   <label><input type="checkbox" id="previewPlanToggle"> Apex</label>
-  <span class="small" id="previewAuthNote">Paystack not connected · Apex simulated</span>
+  <span class="small" id="previewAuthNote">Paystack TEST mode · server verify not deployed</span>
 </div>
 
 <!-- FIREBASE_SDK: compat bundles from gstatic (v13.0.0 verified). Analytics skipped. -->

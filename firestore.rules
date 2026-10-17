@@ -20,6 +20,7 @@ service cloud.firestore {
       }
     }
 
+    // payments/{reference} is written only by server/verify-payment (service account).
     match /{document=**} {
       allow read, write: if false;
     }

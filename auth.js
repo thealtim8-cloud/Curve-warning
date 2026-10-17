@@ -3,12 +3,12 @@
  * Firebase web config is set below. Auth uses the compat SDK loaded from gstatic
  * (firebase-app, firebase-auth, firebase-firestore) — see index.html FIREBASE_SDK.
  *
- * Premium payments stay simulated until Paystack. The Firestore `premium` field is
- * read-only for clients (see firestore.rules); only Cloud Functions / Admin SDK
- * should set it. Preview can still simulate Premium via localStorage.
- *
- * Paystack later: set PAYSTACK_PUBLIC_KEY + serverless verify, then replace
- * simulatePremiumUpgrade().
+ * Apex payments use Paystack Inline (Popup) v2 in TEST mode (pk_test_ key).
+ * The Firestore `premium` field is read-only for clients (see firestore.rules);
+ * only the server step (server/verify-payment, Cloudflare Worker) may set it,
+ * after verifying the reference with Paystack using the SECRET key.
+ * Until VERIFY_URL is set, a successful test payment only turns on a local,
+ * clearly-labelled "test" Apex flag on this device (preview only).
  */
 (function (global) {
   'use strict';
@@ -23,7 +23,19 @@
     measurementId: 'G-GP56ZC45WC'
   };
 
-  var PAYSTACK_PUBLIC_KEY = null;
+  // Public TEST key — safe to commit. Never put the secret key (sk_...) in this file.
+  var PAYSTACK_PUBLIC_KEY = 'pk_test_94e4ea814054a2a166783d3982176f703f516c07';
+  var PAYSTACK_INLINE_SRC = 'https://js.paystack.co/v2/inline.js';
+  // Server verification endpoint (Cloudflare Worker), e.g.
+  // 'https://curveguide-verify.<you>.workers.dev'. Empty = server step not deployed yet.
+  var VERIFY_URL = '';
+
+  // Prices in the smallest unit (kobo / cents). Must match server/verify-payment PRICES.
+  var APEX_PRICES = {
+    NGN: { monthly: 45000, yearly: 378000 },
+    USD: { monthly: 100, yearly: 840 }
+  };
+  var TEST_REF_KEY = 'curveGuide.testApexPayment';
 
   var AUTH_KEY = 'curveGuide.previewAuth';
   var PLAN_KEY = 'curveGuide.previewPlan';
@@ -36,6 +48,20 @@
   var listeners = [];
   var fb = { app: null, auth: null, db: null, ready: false, firestoreOk: false, lastFsError: null };
   var serverPremium = null; // from Firestore read-only field when available
+  var serverPremiumInfo = null; // { active, plan, expiresAt, reference, ... } set by server
+
+  // `premium` may be a boolean (older docs) or a map written by the server:
+  // { active: true, plan: 'monthly'|'yearly', expiresAt: Timestamp, reference, currency, amount }
+  function parseServerPremium(v) {
+    if (typeof v === 'boolean') return v;
+    if (!v || typeof v !== 'object') return null;
+    if (v.active !== true) return false;
+    var exp = v.expiresAt;
+    var ms = exp && typeof exp.toMillis === 'function' ? exp.toMillis()
+      : (typeof exp === 'number' ? exp : (exp ? Date.parse(exp) : NaN));
+    if (!isNaN(ms) && ms < Date.now()) return false;
+    return true;
+  }
 
   function loadJson(key, fallback) {
     try {
@@ -92,8 +118,13 @@
     return loadJson(AUTH_KEY, null);
   }
 
+  function testApexPayment() { return loadJson(TEST_REF_KEY, null); }
+
   function plan() {
     if (serverPremium === true) return 'premium';
+    var t = testApexPayment(); // local TEST flag only (preview), tied to the signed-in user
+    var u = currentUser();
+    if (t && u && t.uid === u.uid) return 'premium';
     var p = loadJson(PLAN_KEY, 'free');
     return p === 'premium' ? 'premium' : 'free';
   }
@@ -117,7 +148,11 @@
       firestoreOk: fb.firestoreOk,
       lastFsError: fb.lastFsError,
       paystackReady: !!PAYSTACK_PUBLIC_KEY,
-      serverPremium: serverPremium
+      paystackTestMode: /^pk_test_/.test(PAYSTACK_PUBLIC_KEY || ''),
+      verifyReady: !!VERIFY_URL,
+      serverPremium: serverPremium,
+      serverPremiumInfo: serverPremiumInfo,
+      testApex: serverPremium === true ? null : testApexPayment()
     };
   }
 
@@ -187,7 +222,8 @@
         return pushUserCloud(uid, { seed: true });
       }
       var data = snap.data() || {};
-      if (typeof data.premium === 'boolean') serverPremium = data.premium;
+      serverPremium = parseServerPremium(data.premium);
+      serverPremiumInfo = (data.premium && typeof data.premium === 'object') ? data.premium : null;
       if (data.profile && typeof data.profile === 'object') {
         try {
           var local = loadJson(PROFILE_KEY, {});
@@ -373,30 +409,173 @@
     return p.catch(function () {}).then(function () {
       cacheUser(null);
       serverPremium = null;
+      serverPremiumInfo = null;
       emit();
     });
   }
 
-  function simulatePremiumUpgrade(planId) {
-    if (PAYSTACK_PUBLIC_KEY) {
-      return Promise.reject(new Error('Paystack key set but checkout not implemented yet'));
-    }
-    if (!currentUser()) {
-      return localFakeSignIn('preview', 'Apex Preview', 'apex.preview@curveguide.local').then(function () {
-        saveJson(PLAN_KEY, 'premium');
-        try { localStorage.setItem('curveGuide.previewPlanId', planId || 'monthly'); } catch (e) {}
-        emit();
-        return { preview: true, plan: 'premium', planId: planId || 'monthly' };
+  /* ---------- Paystack Inline (Popup) checkout — TEST mode ---------- */
+  var paystackLoading = null;
+  function loadPaystack() {
+    if (typeof global.PaystackPop === 'function') return Promise.resolve(global.PaystackPop);
+    if (paystackLoading) return paystackLoading;
+    paystackLoading = new Promise(function (resolve, reject) {
+      var sc = document.createElement('script');
+      sc.src = PAYSTACK_INLINE_SRC;
+      sc.async = true;
+      sc.onload = function () {
+        if (typeof global.PaystackPop === 'function') resolve(global.PaystackPop);
+        else { paystackLoading = null; reject(new Error('Paystack loaded but PaystackPop is missing')); }
+      };
+      sc.onerror = function () {
+        paystackLoading = null;
+        sc.remove();
+        reject(new Error('Could not load Paystack. Check your internet connection and try again.'));
+      };
+      document.head.appendChild(sc);
+    });
+    return paystackLoading;
+  }
+
+  function apexAmount(planId, cur) {
+    var table = APEX_PRICES[cur === 'USD' ? 'USD' : 'NGN'];
+    return table[planId === 'yearly' ? 'yearly' : 'monthly'];
+  }
+
+  function makeReference(uid, planId) {
+    var rand = Math.random().toString(36).slice(2, 8);
+    // Paystack allows only alphanumerics, '-', '.', '='
+    return ('CG-' + String(uid || 'guest').replace(/[^A-Za-z0-9]/g, '').slice(0, 10) + '-' +
+      (planId === 'yearly' ? 'Y' : 'M') + '-' + Date.now().toString(36) + '-' + rand);
+  }
+
+  function getIdToken() {
+    try {
+      if (fb.auth && fb.auth.currentUser) return fb.auth.currentUser.getIdToken();
+    } catch (e) {}
+    return Promise.resolve(null);
+  }
+
+  // Ask the server to verify the reference with Paystack and set users/{uid}.premium.
+  function verifyPayment(reference) {
+    if (!VERIFY_URL) return Promise.resolve({ ok: false, notConfigured: true, reference: reference });
+    return getIdToken().then(function (token) {
+      var headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = 'Bearer ' + token;
+      return fetch(VERIFY_URL.replace(/\/+$/, '') + '/verify', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ reference: reference })
       });
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (body) {
+        body = body || {};
+        body.httpStatus = res.status;
+        if (!res.ok) body.ok = false;
+        return body;
+      });
+    }).then(function (body) {
+      if (body.ok) {
+        try { localStorage.removeItem(TEST_REF_KEY); } catch (e) {}
+        var u = fb.auth && fb.auth.currentUser;
+        return (u ? pullUserCloud(u.uid) : Promise.resolve()).then(function () { emit(); return body; });
+      }
+      return body;
+    });
+  }
+
+  /**
+   * Opens the Paystack popup for Apex.
+   * hooks: { onOpen(), onPaid(transaction), onCancel(), onError(err) }
+   * Resolves { status: 'paid'|'cancelled', reference, verify }.
+   */
+  function startApexCheckout(planId, hooks) {
+    hooks = hooks || {};
+    planId = planId === 'yearly' ? 'yearly' : 'monthly';
+    var user = currentUser();
+    if (!user || !user.email || !(fb.auth && fb.auth.currentUser)) {
+      var e1 = new Error('Please sign in first so your Apex plan is saved to your account.');
+      e1.code = 'not-signed-in';
+      return Promise.reject(e1);
     }
-    saveJson(PLAN_KEY, 'premium');
-    try { localStorage.setItem('curveGuide.previewPlanId', planId || 'monthly'); } catch (e) {}
+    var cur = currency();
+    var amount = apexAmount(planId, cur);
+    var reference = makeReference(user.uid, planId);
+    return loadPaystack().then(function (PaystackPop) {
+      return new Promise(function (resolve, reject) {
+        var settled = false;
+        function fail(err) {
+          if (settled) return;
+          settled = true;
+          var msg = (err && err.message) || String(err || 'Payment could not start');
+          var e2 = new Error(msg);
+          e2.code = 'paystack-error';
+          e2.currency = cur;
+          if (cur === 'USD') e2.usdHint = true;
+          reject(e2);
+        }
+        var popup;
+        try {
+          popup = new PaystackPop();
+          popup.newTransaction({
+            key: PAYSTACK_PUBLIC_KEY,
+            email: user.email,
+            amount: amount,
+            currency: cur,
+            reference: reference,
+            metadata: {
+              uid: user.uid,
+              plan: planId,
+              product: 'apex',
+              app: 'curve-guide',
+              custom_fields: [
+                { display_name: 'Plan', variable_name: 'plan', value: 'Apex ' + planId },
+                { display_name: 'User ID', variable_name: 'uid', value: user.uid }
+              ]
+            },
+            onLoad: function () { if (hooks.onOpen) try { hooks.onOpen(); } catch (e) {} },
+            onSuccess: function (transaction) {
+              if (settled) return;
+              settled = true;
+              var ref = (transaction && (transaction.reference || transaction.trxref)) || reference;
+              var record = { reference: ref, plan: planId, currency: cur, amount: amount, uid: user.uid, at: Date.now(), test: true };
+              if (hooks.onPaid) try { hooks.onPaid(record); } catch (e) {}
+              verifyPayment(ref).then(function (v) {
+                if (!v.ok) {
+                  // Server step missing or failed: keep a LOCAL test flag only (never Firestore).
+                  saveJson(TEST_REF_KEY, record);
+                  emit();
+                }
+                resolve({ status: 'paid', reference: ref, record: record, verify: v });
+              }).catch(function (err) {
+                saveJson(TEST_REF_KEY, record);
+                emit();
+                resolve({ status: 'paid', reference: ref, record: record, verify: { ok: false, error: String(err && err.message || err) } });
+              });
+            },
+            onCancel: function () {
+              if (settled) return;
+              settled = true;
+              if (hooks.onCancel) try { hooks.onCancel(); } catch (e) {}
+              resolve({ status: 'cancelled', reference: reference });
+            },
+            onError: function (err) { fail(err); }
+          });
+        } catch (err) {
+          fail(err);
+        }
+      });
+    });
+  }
+
+  function clearTestApex() {
+    try { localStorage.removeItem(TEST_REF_KEY); } catch (e) {}
     emit();
-    return Promise.resolve({ preview: true, plan: 'premium', planId: planId || 'monthly' });
   }
 
   function setPlanLocal(planName) {
     saveJson(PLAN_KEY, planName === 'premium' ? 'premium' : 'free');
+    if (planName !== 'premium') { try { localStorage.removeItem(TEST_REF_KEY); } catch (e) {} }
     emit();
   }
 
@@ -445,6 +624,7 @@
       try {
         localStorage.removeItem(AUTH_KEY);
         localStorage.removeItem(PLAN_KEY);
+        localStorage.removeItem(TEST_REF_KEY);
         // keep profile optional wipe
         localStorage.removeItem(PROFILE_KEY);
       } catch (e) {}
@@ -489,7 +669,13 @@
     sendPasswordReset: sendPasswordReset,
     continueWithoutAccount: continueWithoutAccount,
     signOut: signOut,
-    simulatePremiumUpgrade: simulatePremiumUpgrade,
+    VERIFY_URL: VERIFY_URL,
+    APEX_PRICES: APEX_PRICES,
+    loadPaystack: loadPaystack,
+    startApexCheckout: startApexCheckout,
+    verifyPayment: verifyPayment,
+    testApexPayment: testApexPayment,
+    clearTestApex: clearTestApex,
     setPlanLocal: setPlanLocal,
     requiresPremium: requiresPremium,
     syncNow: syncNow,

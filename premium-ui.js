@@ -181,7 +181,7 @@
       var snap2 = auth() && auth().snapshot();
       if (snap2 && snap2.firebaseReady) {
         note.textContent = snap2.firestoreOk
-          ? 'Firebase Auth on · Firestore ok · Paystack TBD'
+          ? 'Firebase Auth on · Firestore ok · Paystack TEST' + (snap2.verifyReady ? ' · server verify on' : ' · server verify not deployed')
           : ('Firebase Auth on · Firestore offline' + (snap2.lastFsError ? ': ' + String(snap2.lastFsError).slice(0, 60) : '') + ' · using local');
       } else {
         note.textContent = 'Auth SDK not ready · local preview';
@@ -203,7 +203,7 @@
       var snap2 = auth() && auth().snapshot();
       if (snap2 && snap2.firebaseReady) {
         note.textContent = snap2.firestoreOk
-          ? 'Firebase Auth on · Firestore ok · Paystack TBD'
+          ? 'Firebase Auth on · Firestore ok · Paystack TEST' + (snap2.verifyReady ? ' · server verify on' : ' · server verify not deployed')
           : ('Firebase Auth on · Firestore offline' + (snap2.lastFsError ? ': ' + String(snap2.lastFsError).slice(0, 60) : '') + ' · using local');
       } else {
         note.textContent = 'Auth SDK not ready · local preview';
@@ -227,7 +227,9 @@
   function showPremium() {
     closeOverlay('accountMenu');
     openOverlay('premiumScreen');
+    payMsg('');
     renderPremium();
+    try { if (auth() && auth().loadPaystack) auth().loadPaystack().catch(function () {}); } catch (e) {}
   }
 
   function showProfile(section) {
@@ -258,12 +260,96 @@
     });
     var status = $('premiumStatusLine');
     if (status && snap) {
-      status.textContent = snap.premium
-        ? 'You are on Apex (preview).'
-        : snap.signedIn
-          ? 'You are on the Free plan.'
-          : 'Sign in to keep Apex across devices (when Firebase is connected).';
+      status.textContent = snap.serverPremium === true
+        ? 'You are on Apex.'
+        : snap.testApex
+          ? 'Apex is on for this device as a TEST (test payment ' + snap.testApex.reference + '). Server activation pending.'
+          : snap.premium
+            ? 'You are on Apex (preview toggle).'
+            : snap.signedIn
+              ? 'You are on the Free plan.'
+              : 'Sign in first to buy Apex, so it is saved to your account.';
     }
+  }
+
+  /* ---------- Apex checkout (Paystack TEST mode) ---------- */
+  var payBusy = false;
+  function payMsg(text, kind) {
+    var msg = $('paystackMsg');
+    if (!msg) return;
+    msg.hidden = !text;
+    msg.className = 'pay-msg' + (kind ? ' ' + kind : '');
+    msg.innerHTML = text || '';
+  }
+  function setPayButtonsDisabled(on) {
+    document.querySelectorAll('[data-pay-plan]').forEach(function (x) { x.disabled = !!on; });
+  }
+
+  function startCheckout(plan, btn) {
+    var a = auth();
+    if (!a || payBusy) return;
+    var snap = a.snapshot();
+    if (!snap.signedIn || !(a.getFirebase().auth && a.getFirebase().auth.currentUser)) {
+      payMsg('Please sign in first, so your Apex plan is saved to your account. Then tap <strong>Pay with Paystack</strong> again.', 'warn');
+      showAuth('signin');
+      return;
+    }
+    payBusy = true;
+    setPayButtonsDisabled(true);
+    var cur = a.currency();
+    payMsg('Opening Paystack secure checkout' + (snap.paystackTestMode ? ' (TEST mode, no real money)' : '') + '…');
+    a.startApexCheckout(plan, {
+      onOpen: function () {
+        payMsg('Paystack checkout is open' + (snap.paystackTestMode ? ' (TEST mode: use a Paystack test card, no real money)' : '') + '.');
+      },
+      onPaid: function (rec) {
+        payMsg('<strong>Payment received — activating Apex…</strong><br>Reference: <code>' + escapeHtml(rec.reference) + '</code>', 'good');
+      }
+    }).then(function (res) {
+      if (res.status === 'cancelled') {
+        payMsg('Payment cancelled. You were not charged.');
+        return;
+      }
+      var v = res.verify || {};
+      var ref = escapeHtml(res.reference);
+      if (v.ok) {
+        payMsg('<strong>Apex is active! 🎉</strong> Plan: ' + escapeHtml(v.plan || plan) +
+          (v.expiresAt ? ' · Renews/ends: ' + escapeHtml(new Date(v.expiresAt).toLocaleDateString()) : '') +
+          '<br>Reference: <code>' + ref + '</code>', 'good');
+      } else if (v.notConfigured) {
+        payMsg('<strong>Test payment succeeded</strong> (reference <code>' + ref + '</code>).<br>' +
+          'Apex activation needs the server step, which is not deployed yet. ' +
+          'For this preview, Apex is switched on <strong>on this device only, as a TEST</strong>.', 'good');
+      } else {
+        payMsg('<strong>Payment received</strong> (reference <code>' + ref + '</code>), but we could not activate Apex yet' +
+          (v.error ? ': ' + escapeHtml(String(v.error).slice(0, 120)) : '') +
+          '.<br>Don\'t pay again. Keep this reference and contact info@adeniyiltd.com. Apex is on for this device as a TEST for now.', 'warn');
+      }
+      syncAccountButton(auth().snapshot());
+      renderPremium();
+    }).catch(function (err) {
+      var text = escapeHtml((err && err.message) || 'Payment could not start.');
+      if (err && err.code === 'not-signed-in') {
+        payMsg(text, 'warn');
+        showAuth('signin');
+        return;
+      }
+      if (cur === 'USD') {
+        text = '<strong>USD payments aren\'t available yet.</strong> Paystack said: ' + text +
+          '<br>Please switch to <strong>NGN</strong> and try again. (USD has to be enabled on the Curve Guide Paystack account first.)';
+      }
+      payMsg(text, 'warn');
+    }).then(function () {
+      payBusy = false;
+      setPayButtonsDisabled(false);
+    });
+  }
+
+  function fmtDate(v) {
+    try {
+      var ms = v && typeof v.toMillis === 'function' ? v.toMillis() : (typeof v === 'number' ? v : Date.parse(v));
+      return isNaN(ms) ? '' : new Date(ms).toLocaleDateString();
+    } catch (e) { return ''; }
   }
 
   function loadFavsObj() {
@@ -392,7 +478,11 @@
     var planLine = $('profilePlanLine');
     if (planLine && snap) {
       planLine.innerHTML = snap.premium
-        ? '<strong>Apex</strong> · Renewal date: <em>TBD (preview)</em>'
+        ? (snap.serverPremium === true && snap.serverPremiumInfo && snap.serverPremiumInfo.expiresAt
+            ? '<strong>Apex</strong> · ' + escapeHtml(snap.serverPremiumInfo.plan || '') + ' · Ends: ' + escapeHtml(fmtDate(snap.serverPremiumInfo.expiresAt))
+            : snap.testApex
+              ? '<strong>Apex (TEST)</strong> · test payment <code>' + escapeHtml(snap.testApex.reference) + '</code> · server activation pending'
+              : '<strong>Apex</strong> · Renewal date: <em>TBD (preview)</em>')
         : '<strong>Free</strong> · <button type="button" class="btn primary sm" id="profilePlanUpgrade">Upgrade to Apex</button>';
       var pu = $('profilePlanUpgrade');
       if (pu) pu.onclick = function () { showPremium(); };
@@ -585,23 +675,7 @@
       };
     });
     document.querySelectorAll('[data-pay-plan]').forEach(function (b) {
-      b.onclick = function () {
-        var plan = b.getAttribute('data-pay-plan');
-        var msg = $('paystackMsg');
-        if (auth().isPreview() || !auth().snapshot().paystackReady) {
-          if (msg) {
-            msg.hidden = false;
-            msg.textContent = 'Payments not connected yet. Test mode coming soon — simulating Apex upgrade for this preview.';
-          }
-          auth().simulatePremiumUpgrade(plan).then(function () {
-            syncAccountButton(auth().snapshot());
-            renderPremium();
-            if (msg) msg.textContent = 'Preview: you are now on Apex on this device.';
-          });
-          return;
-        }
-        // Live Paystack path later
-      };
+      b.onclick = function () { startCheckout(b.getAttribute('data-pay-plan'), b); };
     });
 
     // Profile saves
@@ -650,7 +724,7 @@
     var cancelPrem = $('profileCancelPremium');
     if (cancelPrem)
       cancelPrem.onclick = function () {
-        if (!confirm('Cancel Apex on this device? (Preview only — no real subscription.)')) return;
+        if (!confirm('Turn off Apex on this device? (Preview / TEST only. This does not refund or cancel anything on Paystack.)')) return;
         auth().setPlanLocal('free');
         syncAccountButton(auth().snapshot());
         renderProfile('premium');

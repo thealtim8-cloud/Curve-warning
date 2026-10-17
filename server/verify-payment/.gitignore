@@ -1,0 +1,6 @@
+node_modules/
+.wrangler/
+.dev.vars
+*.json.key
+service-account*.json
+*-firebase-adminsdk-*.json
