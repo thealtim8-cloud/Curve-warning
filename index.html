@@ -114,6 +114,7 @@ body.welcome-open{overflow:hidden}
 .welcome .btn.welcome-guest{width:100%;padding:12px;font-size:13.5px;font-weight:600;background:transparent;border:1px solid var(--line2);color:var(--silver)}
 .welcome .btn.welcome-guest:not([disabled]):hover{border-color:#20c47788;color:var(--text)}
 .welcome .btn[disabled]{opacity:.5;cursor:not-allowed}
+.welcome-authnote{grid-column:1/-1;margin:0;padding:9px 11px;border-radius:10px;background:#ffb34714;border:1px solid #ffb34755;color:#ffe2b8;font-size:12px;line-height:1.45;text-align:center}
 .welcome-hint{margin:0;font-size:11.5px;color:var(--muted);text-align:center}
 .welcome-signed{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:#20c47712;border:1px solid #20c47744}
 .welcome-signed[hidden]{display:none}
@@ -480,6 +481,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <button class="btn primary" id="welcomeContinue" disabled hidden>Continue</button>
       <button class="btn welcome-guest" id="welcomeGuest" disabled>Continue as guest</button>
       <p class="welcome-hint" id="welcomeHint">Tick the box above to continue.</p>
+      <p class="welcome-authnote" id="welcomeAuthNote" role="status" hidden></p>
     </div>
     <div class="welcome-credit"><span>An Automotive Division of</span><a class="credit-card" href="https://adeniyiltd.com/" target="_blank" rel="noopener" title="Visit Adeniyi Investments &amp; Property Ltd." style="display:inline-block"><img src="assets/adeniyi-logo.png" alt="Adeniyi Investments &amp; Property Ltd."></a></div>
     <div class="contact-line welcome-contact">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
@@ -2278,9 +2280,16 @@ initMap();
   var last=null;
   var si=document.getElementById('welcomeSignIn'),gu=document.getElementById('welcomeGuest'),hint=document.getElementById('welcomeHint');
   function closeWelcome(focusApp){w.hidden=true;var wv=document.getElementById('welcomeVideo');if(wv)wv.pause();document.body.classList.remove('welcome-open');if(focusApp){var g=document.getElementById('gps');if(g)g.focus()}if(typeof window.__cgPulseNiyi==='function')window.__cgPulseNiyi()}
-  function signedUser(){try{var A=window.__cgAuth;var s=A&&A.snapshot&&A.snapshot();return s&&s.signedIn?s.user:null}catch(e){return null}}
+  function snap(){try{var A=window.__cgAuth;return (A&&A.snapshot&&A.snapshot())||{}}catch(e){return {}}}
+  function signedUser(){var s=snap();return s.signedIn?s.user:null}
+  var pendingRedirect=false;try{pendingRedirect=localStorage.getItem('curveGuide.authRedirect')==='1'}catch(e){}
   function syncAccount(){
-    var u=signedUser();
+    var u=signedUser(),S=snap(),note=document.getElementById('welcomeAuthNote');
+    if(note){
+      if(!u&&S.redirectFailed){note.hidden=false;note.textContent='Google sign-in didn\u2019t finish on this browser. Tap Sign in again (it opens a Google window), or use email and password.'}
+      else if(!u&&pendingRedirect&&!S.authResolved){note.hidden=false;note.textContent='Checking your sign-in…'}
+      else note.hidden=true;
+    }
     document.getElementById('welcomeSigned').hidden=!u;
     document.getElementById('welcomeWhy').hidden=!!u;
     si.hidden=!!u; gu.hidden=!!u; b.hidden=!u;

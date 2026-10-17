@@ -55,7 +55,8 @@
   var PENDING_REDIRECT = 'curveGuide.authRedirect';
 
   var listeners = [];
-  var fb = { app: null, auth: null, db: null, ready: false, firestoreOk: false, lastFsError: null };
+  var fb = { app: null, auth: null, db: null, ready: false, firestoreOk: false, lastFsError: null,
+    authResolved: false, redirectFailed: false };
   var serverPremium = null; // from Firestore read-only field when available
   var serverPremiumInfo = null; // { active, plan, expiresAt, reference, ... } set by server
 
@@ -164,6 +165,8 @@
       serverPremium: serverPremium,
       serverPremiumInfo: serverPremiumInfo,
       testApex: null,
+      authResolved: fb.authResolved || !FIREBASE_CONFIG,
+      redirectFailed: fb.redirectFailed,
       usdEnabled: USD_ENABLED,
       pendingPayment: pendingApexPayment()
     };
@@ -189,9 +192,19 @@
       }
       fb.ready = true;
 
-      // Complete redirect sign-in if pending (mobile Google)
-      return fb.auth.getRedirectResult().then(function (result) {
+      // Keep the session on this device (IndexedDB/localStorage), not just this tab.
+      var persist = Promise.resolve();
+      try { persist = fb.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function () {}); } catch (e) {}
+      var hadPendingRedirect = false;
+      try { hadPendingRedirect = localStorage.getItem(PENDING_REDIRECT) === '1'; } catch (e) {}
+      // Complete redirect sign-in if one was started (fallback path only since 7.2.3)
+      return persist.then(function () { return fb.auth.getRedirectResult(); }).then(function (result) {
         try { localStorage.removeItem(PENDING_REDIRECT); } catch (e) {}
+        if (hadPendingRedirect && !(result && result.user) && !fb.auth.currentUser) {
+          // Typical on iPhone/iPad (Safari & Chrome use WebKit storage partitioning):
+          // the redirect came back but the result was lost. Tell the user instead of looping.
+          fb.redirectFailed = true;
+        }
         if (result && result.user) {
           cacheUser(mapUser(result.user));
           return pullUserCloud(result.user.uid).then(function () { emit(); return true; });
@@ -202,7 +215,9 @@
         return true;
       }).then(function () {
         fb.auth.onAuthStateChanged(function (user) {
+          fb.authResolved = true;
           if (user) {
+            fb.redirectFailed = false;
             cacheUser(mapUser(user));
             pullUserCloud(user.uid).finally(function () { emit(); });
           } else {
@@ -338,10 +353,11 @@
       return localFakeSignIn('google', 'Google Preview', 'google.preview@curveguide.local');
     }
     var provider = googleProvider();
-    if (isMobileLike()) {
-      try { localStorage.setItem(PENDING_REDIRECT, '1'); } catch (e) {}
-      return fb.auth.signInWithRedirect(provider);
-    }
+    fb.redirectFailed = false;
+    // 7.2.3: always use a pop-up first, opened directly from the tap.
+    // signInWithRedirect with authDomain *.firebaseapp.com loses the result on iOS/iPadOS
+    // (Safari and Chrome both use WebKit, which partitions third-party storage), which sent
+    // users straight back to the sign-in screen. Redirect is only a fallback now.
     return fb.auth.signInWithPopup(provider).then(function (cred) {
       cacheUser(mapUser(cred.user));
       return pullUserCloud(cred.user.uid).then(function () {
@@ -353,9 +369,12 @@
         console.warn('[Curve Guide] Google auth not enabled yet — local preview account.', err);
         return localFakeSignIn('google', 'Google Preview', 'google.preview@curveguide.local');
       }
-      // Popup blocked / unsupported → redirect
-      if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user' ||
-          err.code === 'auth/cancelled-popup-request' || /popup/i.test(err.message || ''))) {
+      var code = (err && err.code) || '';
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request' || code === 'auth/user-cancelled') {
+        return Promise.reject(Object.assign(new Error('The Google window was closed before sign-in finished. Tap Continue with Google to try again.'), { code: code }));
+      }
+      // Pop-up blocked or not supported (e.g. some in-app browsers) → fall back to redirect.
+      if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') {
         try { localStorage.setItem(PENDING_REDIRECT, '1'); } catch (e) {}
         return fb.auth.signInWithRedirect(provider);
       }

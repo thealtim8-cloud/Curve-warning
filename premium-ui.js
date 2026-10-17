@@ -200,6 +200,10 @@
     setAuthMode(mode || 'signin');
     var note = $('authPreviewNote');
     if (note) note.hidden = true;
+    var sn = auth() && auth().snapshot();
+    if (sn && sn.redirectFailed && !sn.signedIn) {
+      setStatusMsg($('authMsg'), 'Google sign-in didn\'t finish last time. Tap Continue with Google again (a Google window opens), or use email and password.', 'warn');
+    }
   }
 
   function setAuthMode(mode) {
