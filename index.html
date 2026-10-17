@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<title>Curve Guide 7.0.4 | Intelligent Road Safety System</title>
+<title>Curve Guide 7.0.5 | Intelligent Road Safety System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -265,6 +265,24 @@ body.navigating .dest-card{max-height:38%}
 .install-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid #20c47744;background:#20c47712;font-size:12px}
 .install-bar.show{display:flex}
 
+
+/* Reset view — free map control */
+.map-reset{position:absolute;z-index:4;left:12px;bottom:62px;display:none;align-items:center;gap:7px;border:0;border-radius:999px;padding:10px 12px;background:#12181cf2;color:#eef3f5;font-size:12px;font-weight:750;box-shadow:0 8px 28px -10px #000c;border:1px solid #ffffff24;pointer-events:auto;cursor:pointer}
+.map-reset.show{display:inline-flex}
+.map-reset.needs-reset{border-color:#20c47799;color:#9be3bf;box-shadow:0 8px 28px -10px #000c,0 0 0 3px #20c47722}
+.map-reset svg{width:16px;height:16px;flex:0 0 auto}
+.map-reset .map-reset-label{display:none}
+@media(min-width:760px){
+  .map-reset .map-reset-label{display:inline}
+  .map-reset{padding:10px 14px}
+}
+@media(max-width:390px){
+  .map-reset{bottom:78px;left:10px;padding:9px 11px}
+}
+/* In focus: keep reset visible, clear of HUD (left/top) and attribution */
+body.focus-mode .map-reset{display:none;z-index:56;left:12px;bottom:max(28px, calc(16px + env(safe-area-inset-bottom)));right:auto}
+body.focus-mode .map-reset.show{display:inline-flex}
+
 /* Focus mode: clean map-first overlay (normal layout unchanged — 6.0 style) */
 body.focus-mode{overflow:hidden}
 body.focus-mode .app > header,
@@ -346,7 +364,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <div>
         <h1>Curve Guide</h1>
         <div class="tagline">Safer turns. Smarter drives.</div>
-        <div class="subtitle">Intelligent Road Safety System · Development prototype v7.0.4</div>
+        <div class="subtitle">Intelligent Road Safety System · Development prototype v7.0.5</div>
       </div>
     </div>
     <div class="header-actions">
@@ -355,7 +373,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
         Ask Niyi
       </button>
-      <div class="pill">PROTOTYPE · v7.0.4 3D</div>
+      <div class="pill">PROTOTYPE · v7.0.5 3D</div>
     </div>
   </header>
   <div class="install-bar" id="installBar"><span id="installText">Install Curve Guide on your phone for quicker access.</span><button type="button" class="btn primary" id="installBtn">Install</button></div>
@@ -383,10 +401,15 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
           <button class="icon-btn" id="zin" aria-label="Zoom in" title="Zoom in">+</button>
           <button class="icon-btn" id="zout" aria-label="Zoom out" title="Zoom out">−</button>
           <button class="icon-btn" id="tilt" aria-label="Toggle 3D tilt" title="Toggle 3D tilt">3D</button>
-          <button class="icon-btn" id="orient" aria-label="Change map orientation" title="Change orientation">↗</button>
+          <button class="icon-btn" id="orient" aria-label="Toggle heading-up or reset north" title="Heading-up / Reset north">↗</button>
           <button class="icon-btn map-type" id="mapType" aria-label="Toggle satellite view" aria-pressed="false" title="Switch to satellite view">Sat</button>
         </div>
-        <div class="map-search" id="mapSearchWrap">
+        
+        <button type="button" class="map-reset" id="mapReset" title="Reset view — follow GPS and restore camera" aria-label="Reset view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2.2 2.2M16.8 16.8L19 19M19 5l-2.2 2.2M5 19l2.2-2.2"/></svg>
+          <span class="map-reset-label">Reset view</span>
+        </button>
+<div class="map-search" id="mapSearchWrap">
           <div class="dest-search-wrap">
             <svg class="dest-search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
             <input class="dest-search" id="destSearch" type="search" placeholder="Search destination" autocomplete="off" aria-label="Search destination" aria-autocomplete="list" aria-controls="destResults">
@@ -465,7 +488,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
           </div>
           <div class="small" style="line-height:1.6;margin-top:9px">The map uses community map data. Destination search uses Nominatim; driving routes use the public OSRM demo. Road geometry, routes, and curve estimates may be incomplete or inaccurate.</div>
           <div class="actions">
-            <button class="btn" id="recenter">Recenter map</button>
+            <button class="btn" id="recenter">Reset view</button>
             <button class="btn" id="clearRoute">Clear route</button>
           </div>
         </div>
@@ -490,7 +513,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
     <div class="credit-copy">&copy; 2026 Curve Guide — Automotive Division of <a href="https://adeniyiltd.com/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Adeniyi Investments &amp; Property Ltd.</a> All rights reserved.</div>
     <div class="contact-line">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
   </div>
-  <footer>Curve Guide 7.0.4 · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
+  <footer>Curve Guide 7.0.5 · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
   </div>
 </div>
 
@@ -596,13 +619,64 @@ function updateCurveFeature(coord){
   if(!ready||!map.getSource('curve'))return;
   map.getSource('curve').setData(coord?{type:'FeatureCollection',features:[{type:'Feature',properties:{kind:'estimated-curve'},geometry:{type:'Point',coordinates:coord}}]}:EMPTY);
 }
-function applyCamera(){
-  if(!map||!current)return;
-  var center=[current.coords.longitude,current.coords.latitude];
-  var h=Number.isFinite(current.coords.heading)&&current.coords.heading>=0?current.coords.heading:(lastHeading||0);
-  map.easeTo({center:center,zoom:Math.max(map.getZoom(),16),pitch:tilted?55:0,bearing:headingUp?h:0,duration:450,essential:true});
+var mapFree=false, camLock=false, DEFAULT_CENTER=[3.3792,6.5244], DEFAULT_ZOOM=13, FOLLOW_ZOOM=16;
+function syncResetBtn(){
+  var b=$('mapReset');
+  if(!b)return;
+  var show=mapFree||!follow;
+  b.classList.toggle('show', show);
+  b.classList.toggle('needs-reset', show);
 }
-function setFollow(on){follow=on;setText('follow','Follow: '+(follow?'On':'Off'));$('follow').classList.toggle('active',follow)}
+function setFollow(on){
+  follow=!!on;
+  if(follow)mapFree=false;
+  var fb=$('follow');
+  if(fb){setText('follow','Follow: '+(follow?'On':'Off'));fb.classList.toggle('active',follow)}
+  syncResetBtn();
+}
+function applyCamera(){
+  if(!map)return;
+  runCam(function(){
+    if(current&&Number.isFinite(current.coords.longitude)){
+      var center=[current.coords.longitude,current.coords.latitude];
+      var h=Number.isFinite(current.coords.heading)&&current.coords.heading>=0?current.coords.heading:(lastHeading||0);
+      map.easeTo({center:center,zoom:Math.max(map.getZoom(),FOLLOW_ZOOM),pitch:tilted?55:0,bearing:headingUp?h:0,duration:450,essential:true});
+    }else{
+      map.easeTo({center:DEFAULT_CENTER,zoom:DEFAULT_ZOOM,pitch:tilted?55:0,bearing:0,duration:500,essential:true});
+    }
+  });
+}
+function onUserMapGesture(){
+  if(!map||camLock)return;
+  mapFree=true;
+  if(follow)setFollow(false);
+  else syncResetBtn();
+}
+function runCam(fn){
+  camLock=true;
+  try{fn()}finally{
+    if(map){
+      map.once('moveend', function(){ camLock=false; });
+      setTimeout(function(){ camLock=false; }, 700);
+    }else camLock=false;
+  }
+}
+function bindMapFreeControl(){
+  if(!map||map.__cgFreeBound)return;
+  map.__cgFreeBound=true;
+  ['dragstart','rotatestart','pitchstart'].forEach(function(ev){
+    map.on(ev, onUserMapGesture);
+  });
+  map.on('zoomstart', function(e){ if(e&&e.originalEvent) onUserMapGesture(); });
+}
+function resetMapView(){
+  mapFree=false;
+  setFollow(true);
+  if(navigating){headingUp=true;setText('orient','↗')}
+  applyCamera();
+  setStatus(navigating?'Navigation camera restored':'View reset','good');
+  syncResetBtn();
+}
 var satellite=false,satHidden=[];
 function setupSatellite(){
   try{
@@ -681,7 +755,7 @@ function initMap(){
           }catch(e){/* The base map remains usable if 3D building data is not available. */}
         }
         setupSatellite();
-        ready=true;setStatus('Map ready · 3D view enabled','good');setText('mapMode','3D perspective');setFollow(true);bindMapDestinationGestures();paintHazards();
+        ready=true;setStatus('Map ready · 3D view enabled','good');setText('mapMode','3D perspective');setFollow(true);bindMapDestinationGestures();bindMapFreeControl();paintHazards();
         if(!sourceId)setText('mapMode','Tilted map');
       }catch(e){setStatus('Map loaded with limited features','warn')}
     });
@@ -737,7 +811,9 @@ function onPosition(pos){
   if(follow&&map&&now-lastCamAt>450){
     lastCamAt=now;
     var h=Number.isFinite(pos.coords.heading)&&pos.coords.heading>=0?pos.coords.heading:(lastHeading||0);
-    map.easeTo({center:coord,zoom:Math.max(map.getZoom(),16),pitch:tilted?50:0,bearing:headingUp?h:0,duration:380,essential:true});
+    runCam(function(){
+      map.easeTo({center:coord,zoom:Math.max(map.getZoom(),FOLLOW_ZOOM),pitch:tilted?50:0,bearing:headingUp?h:0,duration:380,essential:true});
+    });
   }
   if(now-lastStatusAt>2000){lastStatusAt=now;setStatus(navigating?'Navigating':'GPS active','good')}
   if(destination&&now-lastDestMetaAt>1500){lastDestMetaAt=now;updateDestMeta()}
@@ -774,13 +850,16 @@ function stopGps(){
 function clearRoute(){route=[];updateRoute();updateCurveFeature(null);setText('curveDistance','—');setText('analysisState',watchId===null?'Not active':'Monitoring')}
 $('gps').addEventListener('click',startGps);
 $('stopGps').addEventListener('click',stopGps);
-$('follow').addEventListener('click',function(){setFollow(!follow)});
+$('follow').addEventListener('click',function(){var next=!follow;setFollow(next);if(next){mapFree=false;applyCamera()}else{mapFree=true;syncResetBtn()}});
 $('unit').addEventListener('click',function(){useMph=!useMph;setText('unit','Units: '+(useMph?'mph':'km/h'));setText('speedUnit',useMph?'mph':'km/h');saveSettings({useMph:useMph});if(current)updateMetrics(current)});
 $('zin').addEventListener('click',function(){if(map)map.zoomTo(Math.min(20,map.getZoom()+1),{duration:250})});
 $('zout').addEventListener('click',function(){if(map)map.zoomTo(Math.max(2,map.getZoom()-1),{duration:250})});
 $('tilt').addEventListener('click',function(){tilted=!tilted;setText('tilt',tilted?'3D':'2D');if(map)map.easeTo({pitch:tilted?55:0,duration:450});setText('mapMode',tilted?'3D perspective':'Flat view')});
 $('orient').addEventListener('click',function(){headingUp=!headingUp;setText('orient',headingUp?'↗':'N');if(map)map.easeTo({bearing:headingUp&&current&&Number.isFinite(current.coords.heading)?current.coords.heading:0,duration:400});});
-$('recenter').addEventListener('click',function(){if(current){setFollow(true);applyCamera()}else if(map)map.easeTo({center:[3.3792,6.5244],zoom:13,pitch:tilted?55:0,bearing:0,duration:500})});
+$('recenter').addEventListener('click',function(){resetMapView()});
+var mapResetBtn=$('mapReset');
+if(mapResetBtn)mapResetBtn.addEventListener('click',function(){resetMapView()});
+syncResetBtn();
 $('mapType').addEventListener('click',function(){setSatellite(!satellite)});
 $('clearRoute').addEventListener('click',clearRoute);
 window.addEventListener('beforeunload',function(){if(watchId!==null)navigator.geolocation.clearWatch(watchId)});
@@ -808,7 +887,8 @@ window.__cgApi={
   },
   goFavourite:goFavourite, reportHazardAt:reportHazardAt, loadFavs:loadFavs,
   setNightMode:setNightMode, getNightMode:function(){return nightMode},
-  setFocusMode:setFocusMode, toggleFocusMode:toggleFocusMode, getFocusMode:function(){return focusMode}
+  setFocusMode:setFocusMode, toggleFocusMode:toggleFocusMode, getFocusMode:function(){return focusMode},
+  resetMapView:resetMapView, setFollow:setFollow, getFollow:function(){return follow}, getMapFree:function(){return mapFree}
 };
 
 /* Destination search + OSRM routing (prototype) */
@@ -1919,6 +1999,11 @@ function doPageAction(t){
   if(/\b(unmute voice|unmute navigation|voice on)\b/.test(t)){
     A.setNavVoice(true);return confirm('Navigation voice unmuted.');
   }
+  if(/\b(reset (map|view)|recenter( map)?|reset camera|follow (me|gps))\b/.test(t)||/^(reset|recenter)$/i.test(t)){
+    if(A.resetMapView)A.resetMapView();
+    else if(A.setFollow){A.setFollow(true)}
+    return confirm('Map view reset — follow is on again.');
+  }
   if(/\bfocus mode\b|^focus$|exit focus/.test(t)){
     if(/exit|off|disable|leave/.test(t)){A.setFocusMode(false);return confirm('Focus mode off.');}
     if(/on|enable|enter/.test(t)||/^focus$/.test(t)||/^focus mode$/.test(t)){A.setFocusMode(true);return confirm('Focus mode on.');}
@@ -1977,7 +2062,8 @@ function explainButton(t){
     'stop navigation':'Stop navigation ends voice guidance and hides the next-turn banner.',
     'clear':'Clear removes the destination pin and driving route.',
     'clear route':'Clear route removes the green GPS trail you have driven.',
-    'recenter':'Recenter map jumps the camera back to your GPS position (or Lagos if GPS is off).',
+    'recenter':'Reset view (or say reset map) turns follow back on and flies to your GPS position, or Lagos if GPS is off.',
+    'reset map':'Reset view turns follow back on and restores the camera (GPS or default start view).',
     'ask niyi':'Ask Niyi opens this helper. I match keywords and can tap a few page controls — I am not a smart AI.',
     'niyi':'Ask Niyi opens this helper. I match keywords and can tap a few page controls — I am not a smart AI.'
   };
@@ -2026,7 +2112,7 @@ function pickPlace(it){
 }
 function answer(q){
   var t=String(q||'').toLowerCase().trim();
-  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 7.0.4.";
+  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 7.0.5.";
   var explained=explainButton(t);
   if(explained)return explained;
   if(/voice|speak|mute|unmute|speech|talk|announce|mic|microphone/.test(t))
@@ -2036,7 +2122,7 @@ function answer(q){
   if(/destin|search|route|how do i (set|find)|directions?/.test(t)&&!extractPlace(q))
     return 'Say “go to …” or “take me to …”, or type in Search destination on the map. Then Route and Start navigation.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
-    return 'Curve Guide 7.0.4 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
+    return 'Curve Guide 7.0.5 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
   if(/disclaim|liabilit|certified|safe to use|replace|prototype/.test(t))
     return 'Curve Guide is an experimental prototype, not a certified safety or navigation system. Warnings and routes can be wrong. Always obey the road.';
   if(/gps|accur|±|plus.?minus|poor|fair|green|yellow|red chip/.test(t))
@@ -2046,14 +2132,14 @@ function answer(q){
   if(/satellit|3d|2d|map type|aerial|street/.test(t))
     return 'Say “satellite”, “street map”, “3D on”, or “3D off” — or use the map buttons. Views do not change curve estimates.';
   if(/how (does|do)|work|estimat|curve|heading|detect|what is curve guide/.test(t))
-    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Version 7.0.4 adds free search, OSRM routing, voice navigation, bend estimates, favourites, and more — still a prototype aid only.';
+    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Version 7.0.5 adds free search, OSRM routing, voice navigation, bend estimates, favourites, and more — still a prototype aid only.';
   if(/tip|advice|safe|prevent|brake|tyre|tire|seatbelt|distance|headlight|fatigue/.test(t)){
     var tip=tips[tipI%tips.length];
     tipI++;
     return tip+' (Ask for another safety tip anytime.)';
   }
   if(/hello|hi\b|hey|good (morning|afternoon|evening)/.test(t))
-    return "Hi! I'm Niyi for Curve Guide 7.0.4 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
+    return "Hi! I'm Niyi for Curve Guide 7.0.5 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
   return "I'm still learning — I match simple keywords and a few page actions. Try: go to …, start GPS, satellite, Contact us, or Navigation.";
 }
 function refreshDriveNote(){
