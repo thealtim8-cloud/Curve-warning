@@ -554,6 +554,23 @@ body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc
 .niyi-msg.bot.has-face>.niyi-bubble-body{min-width:0;flex:1}
 .niyi-msg.typing .niyi-bubble-face{width:20px;height:20px}
 .niyi-msg.typing{display:flex;align-items:center;gap:8px}
+
+/* 8.0 SOS contacts (safety colours fixed) */
+.emerg-sheet{max-height:calc(100dvh - 32px);overflow:auto;max-width:480px;margin:0 auto;gap:10px}
+.emerg-sheet .emerg-call{min-height:48px;font-size:14px}
+.emerg-loc{font-size:12.5px;color:var(--silver);padding:8px 10px;border-radius:10px;background:#ffffff08;border:1px solid var(--line)}
+.emerg-send{display:flex;flex-direction:column;gap:8px}
+.emerg-send .btn{min-height:44px}
+.emerg-contact{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)}
+.emerg-contact span{font-size:12.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.emerg-contact .acts{display:flex;gap:6px;flex:none}
+.emerg-contact .btn{min-height:40px;padding:8px 11px}
+.emerg-note{margin:0;font-size:11.5px;color:var(--muted);line-height:1.45}
+.emerg-row{display:flex;gap:8px;justify-content:space-between}
+.emerg-row .btn{flex:1;min-height:44px}
+.sos-list{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.sos-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
+.sos-item .small{display:block}
 </style>
 </head>
 <body class="welcome-open">
@@ -758,12 +775,15 @@ body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc
 
 
 <button type="button" class="emerg-fab" id="emergFab" title="Emergency">SOS</button>
-<div class="emerg-sheet" id="emergSheet" hidden>
-  <strong style="font-size:14px">Emergency options</strong>
-  <span class="small">Confirm before calling. Location share uses WhatsApp with a Google Maps link from your GPS (when available).</span>
-  <button type="button" class="btn primary" id="emergCall">Call 112 (Nigeria emergency)</button>
+<div class="emerg-sheet" id="emergSheet" hidden role="dialog" aria-label="Emergency options">
+  <strong style="font-size:15px">Emergency options</strong>
+  <button type="button" class="btn primary emerg-call" id="emergCall">📞 Call 112 (Nigeria emergency)</button>
+  <div class="emerg-loc" id="emergLoc" role="status">📍 Getting your location…</div>
+  <div class="emerg-send" id="emergSend"></div>
   <button type="button" class="btn" id="emergWhatsApp">Share my location on WhatsApp</button>
-  <button type="button" class="btn" id="emergClose">Close</button>
+  <button type="button" class="btn" id="emergShare" hidden>Share my location…</button>
+  <p class="emerg-note">Curve Guide can’t send texts by itself in the background. Your messages app opens with the text ready — <strong>you tap Send</strong>.</p>
+  <div class="emerg-row"><button type="button" class="btn sm" id="emergManage">Emergency contacts</button><button type="button" class="btn sm" id="emergClose">Close</button></div>
 </div>
 <button type="button" class="niyi-fab" id="niyiFab" aria-expanded="false" aria-controls="niyiPanel" title="Ask Niyi" aria-label="Ask Niyi"><span class="niyi-fab-label">Niyi</span></button>
 <div class="niyi-panel" id="niyiPanel" role="dialog" aria-modal="false" aria-labelledby="niyiTitle" hidden>
@@ -913,6 +933,18 @@ body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc
       <p class="small car-pick-hint" id="carPickHint">Start typing to search. Not listed? Choose “Other — type it” or just type it.</p>
       <button type="button" class="btn primary sm" id="saveCarDetails" style="margin-top:8px">Save car details</button>
       <p class="small auth-msg good" id="carSaveMsg" hidden></p>
+    </section>
+
+    <section class="profile-section" data-profile-section="sos">
+      <h3>Emergency contacts (SOS)</h3>
+      <p class="small">Up to 5 people. From the SOS button you can text or WhatsApp them your location in one tap (you still tap Send). Free for everyone.</p>
+      <div id="sosContactList" class="sos-list"></div>
+      <div class="profile-grid two sos-add" id="sosAddRow">
+        <input id="sosName" placeholder="Name (e.g. Mum)" aria-label="Contact name" autocomplete="off" maxlength="40">
+        <input id="sosPhone" placeholder="Phone (e.g. 0803 123 4567)" aria-label="Contact phone" inputmode="tel" autocomplete="off" maxlength="24">
+      </div>
+      <button type="button" class="btn sm" id="sosAddBtn" style="margin-top:8px">Add contact</button>
+      <p class="small auth-msg" id="sosMsg" hidden></p>
     </section>
 
     <section class="profile-section" data-profile-section="saved">
@@ -1229,6 +1261,7 @@ function maybeEstimateCurve(pos){
 var lastCamAt=0, lastBendUiAt=0, lastStatusAt=0, lastDestMetaAt=0;
 function onPosition(pos){
   previous=current;current=pos;
+  try{if(pos&&pos.coords)localStorage.setItem('curveGuide.lastFix',JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude,acc:pos.coords.accuracy,t:pos.timestamp||Date.now()}))}catch(e){}
   var coord=[pos.coords.longitude,pos.coords.latitude];
   if(!Number.isFinite(coord[0])||!Number.isFinite(coord[1]))return;
   if(!(pos.coords.accuracy>50)&&(route.length===0||distance(route[route.length-1],coord)>4)){route.push(coord);if(route.length>800)route.shift();updateRoute()}
@@ -3177,43 +3210,87 @@ setInterval(refreshDriveNote,1500);
 </script>
 
 <script>
+/* 8.0 SOS: call 112 first; then one-tap "send my location" to saved contacts via SMS / WhatsApp / Share.
+   The app cannot send messages silently — the user's own messages app opens with the text ready. */
 (function(){
   var fab=document.getElementById('emergFab');
   var sheet=document.getElementById('emergSheet');
   var callBtn=document.getElementById('emergCall');
   var waBtn=document.getElementById('emergWhatsApp');
+  var shareBtn=document.getElementById('emergShare');
   var closeBtn=document.getElementById('emergClose');
-  function open(){ if(sheet){sheet.hidden=false; sheet.classList.add('open')} }
+  var manageBtn=document.getElementById('emergManage');
+  var locEl=document.getElementById('emergLoc');
+  var sendEl=document.getElementById('emergSend');
+  var fix=null;
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  function contacts(){try{var p=JSON.parse(localStorage.getItem('curveGuide.profile')||'{}');return Array.isArray(p.sosContacts)?p.sosContacts.slice(0,5):[]}catch(e){return []}}
+  function myName(){try{var u=window.__cgAuth&&window.__cgAuth.currentUser();return u&&u.displayName?u.displayName:''}catch(e){return ''}}
+  function hhmm(t){try{return new Date(t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}catch(e){return ''}}
+  function message(){
+    var who=myName();
+    var head='SOS'+(who?' from '+who:'')+' via Curve Guide. I need help.';
+    if(!fix)return head+' (My phone could not get a GPS location.)';
+    return head+' My location: https://maps.google.com/?q='+fix.lat.toFixed(6)+','+fix.lng.toFixed(6)+
+      ' (accuracy ~'+Math.max(1,Math.round(fix.acc||0))+'m, '+hhmm(fix.t)+(fix.old?', last known':'')+')';
+  }
+  function smsHref(nums){var body=encodeURIComponent(message());return 'sms:'+nums.join(',')+(isIOS?'&body=':'?body=')+body}
+  function waHref(num){return 'https://wa.me/'+String(num||'').replace(/\D/g,'')+'?text='+encodeURIComponent(message())}
+  function setLoc(){
+    if(!locEl)return;
+    if(!fix){locEl.textContent='📍 No GPS location yet — messages will say so. Move to open sky if you can.';return}
+    locEl.textContent='📍 '+(fix.old?'Last known location ('+hhmm(fix.t)+')':'Location ready')+' · accuracy ~'+Math.max(1,Math.round(fix.acc||0))+' m';
+  }
+  function render(){
+    if(!sendEl)return;
+    sendEl.textContent='';
+    var list=contacts();
+    if(!list.length){
+      var add=document.createElement('button');add.type='button';add.className='btn';add.textContent='➕ Add emergency contacts (to text your location)';
+      add.onclick=manage;sendEl.appendChild(add);return;
+    }
+    var all=document.createElement('a');all.className='btn emerg-sms-all';
+    all.textContent='📩 Text my location to '+(list.length===1?list[0].name:list.length+' contacts');
+    all.href=smsHref(list.map(function(c){return c.phone}));
+    all.onclick=function(){all.href=smsHref(list.map(function(c){return c.phone}))};
+    sendEl.appendChild(all);
+    list.forEach(function(c){
+      var row=document.createElement('div');row.className='emerg-contact';
+      var nm=document.createElement('span');nm.textContent=c.name+' · '+c.phone;row.appendChild(nm);
+      var acts=document.createElement('div');acts.className='acts';
+      var sms=document.createElement('a');sms.className='btn sm';sms.textContent='SMS';sms.setAttribute('aria-label','Text '+c.name);
+      sms.href=smsHref([c.phone]);sms.onclick=function(){sms.href=smsHref([c.phone])};
+      var wa=document.createElement('a');wa.className='btn sm';wa.textContent='WhatsApp';wa.target='_blank';wa.rel='noopener';wa.setAttribute('aria-label','WhatsApp '+c.name);
+      wa.href=waHref(c.phone);wa.onclick=function(){wa.href=waHref(c.phone)};
+      acts.appendChild(sms);acts.appendChild(wa);row.appendChild(acts);sendEl.appendChild(row);
+    });
+  }
+  function locate(){
+    try{var lf=JSON.parse(localStorage.getItem('curveGuide.lastFix')||'null');if(lf&&isFinite(lf.lat)&&!fix)fix={lat:lf.lat,lng:lf.lng,acc:lf.acc,t:lf.t,old:true}}catch(e){}
+    setLoc();render();
+    if(!navigator.geolocation)return;
+    if(locEl&&!fix)locEl.textContent='📍 Getting your location…';
+    navigator.geolocation.getCurrentPosition(function(p){
+      fix={lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy,t:p.timestamp||Date.now(),old:false};
+      try{localStorage.setItem('curveGuide.lastFix',JSON.stringify(fix))}catch(e){}
+      setLoc();render();
+    },function(){setLoc()},{enableHighAccuracy:true,timeout:7000,maximumAge:15000});
+  }
+  function open(){ if(sheet){sheet.hidden=false; sheet.classList.add('open'); locate()} }
   function close(){ if(sheet){sheet.classList.remove('open'); sheet.hidden=true} }
+  function manage(){close();if(window.__cgPremiumUI&&window.__cgPremiumUI.showProfile)window.__cgPremiumUI.showProfile('sos')}
   if(fab)fab.addEventListener('click', open);
   if(closeBtn)closeBtn.addEventListener('click', close);
+  if(manageBtn)manageBtn.addEventListener('click', manage);
   if(callBtn)callBtn.addEventListener('click', function(){
     if(window.confirm('Call 112 now? (Nigeria emergency number)')){
       window.location.href='tel:112';
     }
   });
-  if(waBtn)waBtn.addEventListener('click', function(){
-    var api=window.__cgApi;
-    var lat=null, lon=null;
-    // read from last GPS via inject-less: use geolocation once if needed
-    function share(la, lo){
-      var maps=Number.isFinite(la)&&Number.isFinite(lo)
-        ? ('https://maps.google.com/?q='+la+','+lo)
-        : '';
-      var msg=maps
-        ? ('Emergency — my location from Curve Guide: '+maps)
-        : 'Emergency — I need help. (Curve Guide did not have a GPS fix yet.)';
-      var url='https://wa.me/?text='+encodeURIComponent(msg);
-      window.open(url, '_blank', 'noopener');
-    }
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(
-        function(p){ share(p.coords.latitude, p.coords.longitude) },
-        function(){ share(null,null) },
-        {enableHighAccuracy:true, timeout:8000, maximumAge:10000}
-      );
-    }else share(null,null);
-  });
+  if(waBtn)waBtn.addEventListener('click', function(){ window.open('https://wa.me/?text='+encodeURIComponent(message()), '_blank', 'noopener') });
+  if(shareBtn&&navigator.share){shareBtn.hidden=false;shareBtn.addEventListener('click',function(){navigator.share({title:'SOS — my location',text:message()}).catch(function(){})})}
+  document.addEventListener('cg:sos-changed',render);
+  window.__cgSosMessage=message;
   window.__cgOpenEmergency=open;
 })();
 </script>

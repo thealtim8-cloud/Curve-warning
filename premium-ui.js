@@ -36,6 +36,7 @@
       car: { make: '', model: '', year: '', colour: '', plate: '' },
       theme: 'dark', // dark | light | auto
       accent: 'green', // 7.2.5 app colour (free): see ACCENTS
+      sosContacts: [], // 8.0: [{name, phone}] up to 5
       // favourites stay in curveGuide.favourites; profile may mirror labels later
     };
   }
@@ -51,7 +52,8 @@
         carColor: o.carColor || d.carColor,
         car: Object.assign({}, d.car, o.car || {}),
         theme: /^(dark|light|auto)$/.test(o.theme) ? o.theme : 'dark',
-        accent: ACCENTS[o.accent] ? o.accent : 'green'
+        accent: ACCENTS[o.accent] ? o.accent : 'green',
+        sosContacts: Array.isArray(o.sosContacts) ? o.sosContacts.filter(function (c) { return c && c.phone; }).slice(0, 5) : []
       };
     } catch (e) {
       return defaultProfile();
@@ -64,6 +66,7 @@
     if (partial.carColor != null) cur.carColor = partial.carColor;
     if (partial.theme != null && /^(dark|light|auto)$/.test(partial.theme)) cur.theme = partial.theme;
     if (partial.accent != null && ACCENTS[partial.accent]) cur.accent = partial.accent;
+    if (Array.isArray(partial.sosContacts)) cur.sosContacts = partial.sosContacts.slice(0, 5);
     if (partial.car) cur.car = Object.assign({}, cur.car, partial.car);
     try {
       localStorage.setItem(PROFILE_KEY, JSON.stringify(cur));
@@ -627,6 +630,7 @@
         renderProfile('car');
       };
     }
+    bindSos(); renderSos();
     var car = p.car || {};
     setupCarPickers(car);
     ['make', 'model', 'year', 'colour', 'plate'].forEach(function (f) {
@@ -823,6 +827,66 @@
           if (my === modelReq) show(list);
         }).catch(function () { clearTimeout(to); });
     }, 450);
+  }
+
+  /* ---------- 8.0 SOS emergency contacts ---------- */
+  // Nigerian numbers: 0803 123 4567 / 803 123 4567 / 234803... -> +2348031234567. Other countries: +<8-15 digits>.
+  function normalizePhone(raw) {
+    var s = String(raw || '').trim();
+    var plus = /^\+/.test(s) || /^00/.test(s);
+    var d = s.replace(/\D/g, '');
+    if (/^00/.test(s)) d = d.slice(2);
+    if (!plus) {
+      if (/^0[789]\d{9}$/.test(d) || /^0[1-9]\d{7,9}$/.test(d)) d = '234' + d.slice(1);
+      else if (/^[789]\d{9}$/.test(d)) d = '234' + d;
+      else if (!/^234\d{10}$/.test(d)) return null;
+    }
+    if (/^234/.test(d)) { if (!/^234[1-9]\d{7,9}$/.test(d)) return null; }
+    else if (!/^[1-9]\d{7,14}$/.test(d)) return null;
+    return '+' + d;
+  }
+  function prettyPhone(e164) {
+    var m = String(e164).match(/^\+234(\d{3})(\d{3})(\d{4})$/);
+    return m ? '+234 ' + m[1] + ' ' + m[2] + ' ' + m[3] : e164;
+  }
+  function renderSos() {
+    var box = $('sosContactList');
+    if (!box) return;
+    var list = loadProfile().sosContacts || [];
+    box.innerHTML = list.length ? '' : '<p class="small">No emergency contacts yet.</p>';
+    list.forEach(function (c, i) {
+      var row = document.createElement('div');
+      row.className = 'sos-item';
+      row.innerHTML = '<div><strong>' + escapeHtml(c.name || 'Contact') + '</strong><span class="small">' + escapeHtml(prettyPhone(c.phone)) + '</span></div>' +
+        '<button type="button" class="btn sm danger-outline" aria-label="Remove ' + escapeHtml(c.name || 'contact') + '">Remove</button>';
+      row.querySelector('button').onclick = function () {
+        var l = (loadProfile().sosContacts || []).slice(); l.splice(i, 1);
+        saveProfile({ sosContacts: l }); renderSos(); document.dispatchEvent(new CustomEvent('cg:sos-changed'));
+      };
+      box.appendChild(row);
+    });
+    var add = $('sosAddRow'), ab = $('sosAddBtn');
+    if (add) add.hidden = list.length >= 5;
+    if (ab) { ab.hidden = list.length >= 5; }
+  }
+  function bindSos() {
+    var ab = $('sosAddBtn');
+    if (!ab || ab._bound) return;
+    ab._bound = true;
+    ab.onclick = function () {
+      var nm = ($('sosName').value || '').trim().slice(0, 40), ph = normalizePhone($('sosPhone').value);
+      var msg = $('sosMsg');
+      if (!nm) { setStatusMsg(msg, 'Please enter a name.', 'warn'); return; }
+      if (!ph) { setStatusMsg(msg, 'That phone number doesn\'t look right. Use e.g. 0803 123 4567, or +44 7700 900123 for other countries.', 'warn'); return; }
+      var l = (loadProfile().sosContacts || []).slice();
+      if (l.some(function (c) { return c.phone === ph; })) { setStatusMsg(msg, 'That number is already saved.', 'warn'); return; }
+      if (l.length >= 5) { setStatusMsg(msg, 'You can save up to 5 contacts.', 'warn'); return; }
+      l.push({ name: nm, phone: ph });
+      saveProfile({ sosContacts: l });
+      $('sosName').value = ''; $('sosPhone').value = '';
+      setStatusMsg(msg, 'Saved ' + nm + ' (' + prettyPhone(ph) + ').', 'good');
+      renderSos(); document.dispatchEvent(new CustomEvent('cg:sos-changed'));
+    };
   }
 
   var FEATURE_TIPS = {
@@ -1212,6 +1276,7 @@
       apexPrompt: apexPrompt,
       apexInfo: apexInfo,
       celebrateApex: celebrateApex,
+      normalizePhone: normalizePhone,
       ACCENTS: ACCENTS,
       CAR_ICONS: CAR_ICONS
     };
