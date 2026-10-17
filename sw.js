@@ -1,9 +1,11 @@
 /* Curve Guide offline shell cache — prototype */
-const CACHE = 'curveguide-shell-v800-live';
+const CACHE = 'curveguide-shell-v802-preview';
 const ASSETS = [
   './',
   './index.html',
   './vehicles.js',
+  './carfacts.js',
+  './ambient.js',
   './manifest.json',
   './assets/curveguide-logo.png',
   './assets/favicon.png',
