@@ -36,6 +36,7 @@
       car: { make: '', model: '', year: '', colour: '', plate: '' },
       theme: 'dark', // dark | light | auto
       accent: 'green', // 7.2.5 app colour (free): see ACCENTS
+      bg: 'waves', // 8.0 ambient background: see ambient.js
       sosContacts: [], // 8.0: [{name, phone}] up to 5
       // favourites stay in curveGuide.favourites; profile may mirror labels later
     };
@@ -53,6 +54,7 @@
         car: Object.assign({}, d.car, o.car || {}),
         theme: /^(dark|light|auto)$/.test(o.theme) ? o.theme : 'dark',
         accent: ACCENTS[o.accent] ? o.accent : 'green',
+        bg: /^(waves|trees|road|city|stars|bokeh|glow|off)$/.test(o.bg) ? o.bg : 'waves',
         sosContacts: Array.isArray(o.sosContacts) ? o.sosContacts.filter(function (c) { return c && c.phone; }).slice(0, 5) : []
       };
     } catch (e) {
@@ -66,6 +68,7 @@
     if (partial.carColor != null) cur.carColor = partial.carColor;
     if (partial.theme != null && /^(dark|light|auto)$/.test(partial.theme)) cur.theme = partial.theme;
     if (partial.accent != null && ACCENTS[partial.accent]) cur.accent = partial.accent;
+    if (partial.bg != null && /^(waves|trees|road|city|stars|bokeh|glow|off)$/.test(partial.bg)) cur.bg = partial.bg;
     if (Array.isArray(partial.sosContacts)) cur.sosContacts = partial.sosContacts.slice(0, 5);
     if (partial.car) cur.car = Object.assign({}, cur.car, partial.car);
     try {
@@ -707,6 +710,24 @@
         accBox.appendChild(b);
       });
     }
+    var ambBox = $('ambientOpts'), AMB = window.__cgAmbient;
+    if (ambBox && AMB) {
+      ambBox.innerHTML = '';
+      AMB.styles.forEach(function (k) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'amb-opt' + (p.bg === k ? ' active' : '');
+        b.setAttribute('aria-pressed', p.bg === k ? 'true' : 'false');
+        b.innerHTML = '<span class="amb-prev">' + (k === 'off' ? '<span class="amb-off">⦸</span>' : '<span class="cg-ambient amb-' + k + '">' + AMB.art(k) + '</span>') + '</span>' + escapeHtml(AMB.labels[k]);
+        b.onclick = function () {
+          saveProfile({ bg: k });
+          AMB.apply(k);
+          renderProfile('appearance');
+        };
+        ambBox.appendChild(b);
+      });
+    }
+    renderCarFacts();
     var unitsBtn = $('profileUnits');
     if (unitsBtn && window.__cgApi) {
       unitsBtn.textContent = 'Units: ' + (window.__cgApi.getUseMph() ? 'mph' : 'km/h');
@@ -742,6 +763,70 @@
       var sec = document.querySelector('[data-profile-section="' + focusSection + '"]');
       if (sec) sec.scrollIntoView({ block: 'start' });
     }
+  }
+
+
+  /* ---------- 8.0 Car facts: curated (carfacts.js) first, optional Niyi AI for signed-in users ---------- */
+  var CF_AI_KEY = 'curveGuide.carFactsAI';
+  function cfNorm(x) { return String(x || '').trim().toLowerCase().replace(/\s+/g, ' '); }
+  function curatedFacts(make, model) {
+    var F = window.CG_CAR_FACTS || { makes: {}, models: {} };
+    var mkKey = cfNorm(findMake(make) || make);
+    var base = mkKey.replace(/\s*\(.*\)$/, '').replace(/ motorcycles$/, ' motorcycles');
+    var list = F.models[mkKey] || F.models[base] || [];
+    var m = cfNorm(model);
+    if (m) for (var i = 0; i < list.length; i++) if (list[i][0].test(m)) return { kind: 'model', facts: list[i][1] };
+    var mf = F.makes[mkKey] || F.makes[base];
+    return mf ? { kind: 'make', facts: mf } : null;
+  }
+  function readAiFacts() { try { return JSON.parse(localStorage.getItem(CF_AI_KEY) || '{}') || {}; } catch (e) { return {}; } }
+  function renderCarFacts() {
+    var box = $('carFacts'), mk = $('carField_make'), md = $('carField_model');
+    if (!box || !mk) return;
+    var make = mk.value.trim(), model = md ? md.value.trim() : '';
+    if (!make) { box.hidden = true; box.innerHTML = ''; return; }
+    var known = findMake(make) || make;
+    var title = escapeHtml(known.replace(/\s*\(.*\)$/, '')) + (model ? ' ' + escapeHtml(model) : '');
+    var cur = curatedFacts(make, model);
+    var aiKey = cfNorm(known + '|' + model), ai = readAiFacts()[aiKey];
+    var html = '';
+    if (cur && (cur.kind === 'model' || !model)) {
+      html = '<h4>🚗 ' + (cur.kind === 'model' ? title : escapeHtml(known.replace(/\s*\(.*\)$/, ''))) + ' facts</h4><ul>' +
+        cur.facts.slice(0, 3).map(function (f) { return '<li>' + escapeHtml(f) + '</li>'; }).join('') + '</ul><div class="cf-src">Curated by Curve Guide</div>';
+    } else if (ai && ai.facts && ai.facts.length) {
+      html = '<h4>🚗 ' + title + ' facts</h4><ul>' + ai.facts.map(function (f) { return '<li>' + escapeHtml(f) + '</li>'; }).join('') +
+        '</ul><span class="cf-ai">Facts by Niyi AI, may not be perfect</span>';
+    } else {
+      if (cur) html = '<h4>🚗 ' + escapeHtml(known.replace(/\s*\(.*\)$/, '')) + ' facts</h4><ul>' +
+        cur.facts.slice(0, 3).map(function (f) { return '<li>' + escapeHtml(f) + '</li>'; }).join('') + '</ul><div class="cf-src">Curated by Curve Guide</div>';
+      var Au = window.__cgAuth, signed = !!(Au && Au.isSignedIn && Au.isSignedIn() && Au.niyiChat);
+      if (model || !cur) {
+        html += signed
+          ? '<button type="button" class="btn sm" id="carFactsAsk">✨ Ask Niyi about the ' + title + '</button>'
+          : (cur ? '' : '<div class="cf-src">No facts for this one yet. Sign in to ask Niyi.</div>');
+      }
+      if (!html) { box.hidden = true; box.innerHTML = ''; return; }
+    }
+    box.innerHTML = html; box.hidden = false;
+    var ask = $('carFactsAsk');
+    if (ask) ask.onclick = function () {
+      ask.disabled = true; ask.textContent = 'Asking Niyi…';
+      var yr = ($('carField_year') && $('carField_year').value) || '';
+      var q = 'Give exactly 3 short, accurate facts (max 16 words each) about the ' + (yr ? yr + ' ' : '') + known.replace(/\s*\(.*\)$/, '') + ' ' + (model || '') +
+        ' vehicle: when it was first launched, its country of origin, and one notable fact. If you are not sure of a fact, leave it out. One fact per line, no intro.';
+      window.__cgAuth.niyiChat([{ role: 'user', content: q }], { purpose: 'car-facts' }).then(function (res) {
+        var facts = String(res.reply || '').split(/\n+/).map(function (l) { return l.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, '').replace(/\*\*/g, '').trim(); })
+          .filter(function (l) { return l.length > 3 && l.length < 200; }).slice(0, 3);
+        if (!facts.length) throw new Error('empty');
+        var all = readAiFacts(); all[aiKey] = { t: Date.now(), facts: facts };
+        var ks = Object.keys(all); if (ks.length > 30) ks.sort(function (a, b) { return all[a].t - all[b].t; }).slice(0, ks.length - 30).forEach(function (k) { delete all[k]; });
+        try { localStorage.setItem(CF_AI_KEY, JSON.stringify(all)); } catch (e) {}
+        renderCarFacts();
+      }).catch(function (err) {
+        ask.disabled = false;
+        ask.textContent = err && err.code === 'limit' ? 'Niyi\u2019s free chats are used up for today' : 'Couldn\u2019t get facts. Tap to try again';
+      });
+    };
   }
 
   /* ---------- 7.2.5 Car make / model / year pickers ----------
@@ -787,6 +872,10 @@
     if (md) md.addEventListener('input', function () {
       if (md.value === OTHER) { md.value = ''; md.placeholder = 'Type the model'; }
     });
+    var factsT = null;
+    function queueFacts() { clearTimeout(factsT); factsT = setTimeout(renderCarFacts, 250); }
+    if (mk) { mk.addEventListener('input', queueFacts); mk.addEventListener('change', queueFacts); }
+    if (md) { md.addEventListener('input', queueFacts); md.addEventListener('change', queueFacts); }
   }
   function readVpicCache() { try { return JSON.parse(localStorage.getItem(VPIC_CACHE_KEY) || '{}') || {}; } catch (e) { return {}; } }
   var modelTimer = null, modelReq = 0;

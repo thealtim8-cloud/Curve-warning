@@ -198,7 +198,7 @@ body.welcome-open{overflow:hidden}
 .niyi-header-btn svg{width:16px;height:16px;flex:none}
 @keyframes niyiPulse{0%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 rgb(var(--acc-rgb) / 0.4)}70%{box-shadow:0 10px 28px -8px #000c,0 0 0 14px rgb(var(--acc-rgb) / 0)}100%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 rgb(var(--acc-rgb) / 0)}}
 .niyi-fab.niyi-pulse{animation:niyiPulse 1.2s ease-out 2}
-@media(max-width:420px){.pill{display:none}.niyi-header-btn{padding:8px 10px;font-size:12px;gap:5px}.niyi-header-btn svg{width:15px;height:15px}.header-actions{gap:6px;flex:none}.night-toggle{padding:8px 10px}.account-btn{width:36px;height:36px}header{gap:8px}.brand{flex:1 1 auto;gap:9px}.brand h1{font-size:19px}.brand .tagline{white-space:normal;letter-spacing:.6px;font-size:9px;line-height:1.3}.logo-img{width:42px;height:42px}}
+@media(max-width:540px){.pill{display:none}.niyi-header-btn{padding:8px 10px;font-size:12px;gap:5px}.niyi-header-btn svg{width:15px;height:15px}.header-actions{gap:6px;flex:none}.night-toggle{padding:8px 10px}.account-btn{width:36px;height:36px}header{gap:8px}.brand{flex:1 1 auto;gap:9px}.brand h1{font-size:19px}.brand .tagline{white-space:normal;letter-spacing:.6px;font-size:9px;line-height:1.3}.logo-img{width:42px;height:42px}}
 /* Destination search */
 .map-search{position:absolute;z-index:5;left:12px;right:12px;top:52px;pointer-events:none}
 .map-search>*{pointer-events:auto}
@@ -670,6 +670,64 @@ body.theme-light .cg-sheet,body.theme-light .account-menu,body.theme-light .pane
 .gps-intro .gi-text{margin-top:6px;font-size:13.5px;font-weight:700;color:var(--text)}
 .gps-intro .gi-sub{margin-top:2px;font-size:11px;color:var(--muted)}
 @media(prefers-reduced-motion:reduce){.gps-intro .gi-road{display:none}.gps-intro{padding:16px}}
+
+/* 8.0 ambient backgrounds (ambient.js). Non-map surfaces only; transform/opacity animation only. */
+header{position:relative;isolation:isolate}
+.welcome>.welcome-card,.cg-overlay>.cg-sheet{position:relative;z-index:1}
+.cg-ambient{position:absolute;inset:0;overflow:hidden;pointer-events:none;color:var(--acc);z-index:0;contain:strict}
+.cg-ambient.amb-header{z-index:-1;inset:-4px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.cg-ambient svg{display:block;width:100%;height:100%;fill:currentColor;stroke:currentColor}
+.amb-band{position:absolute;left:0;bottom:0;width:200%;height:42%;will-change:transform;animation:ambSlide var(--dur,40s) linear infinite}
+.amb-band svg{stroke:none}
+@keyframes ambSlide{to{transform:translate3d(-50%,0,0)}}
+.amb-w1{opacity:.10;--dur:38s}.amb-w2{opacity:.07;--dur:26s;animation-direction:reverse;height:36%}.amb-w3{opacity:.12;--dur:52s;height:30%}
+.amb-h1,.amb-h2,.amb-r1,.amb-c1{height:auto;aspect-ratio:6/1}
+.amb-h1{opacity:.07;--dur:110s;bottom:4%}.amb-h2{opacity:.12;--dur:70s}
+.amb-r1{opacity:.9;--dur:9s}.amb-r1 .amb-lane{fill:currentColor;opacity:.035}.amb-r1 .amb-dash{fill:none;stroke:currentColor;stroke-width:3;opacity:.16;stroke-linecap:round}
+.amb-c1{opacity:.11;--dur:120s}.amb-c1 .amb-stroke line{stroke:currentColor;stroke-width:1.2;fill:none}.amb-c1 .amb-stroke rect{stroke:none}
+.amb-c1 .amb-wins rect{fill:#fff;opacity:.2;animation:ambTwinkle 5s ease-in-out infinite alternate}
+.amb-field{position:absolute;inset:0}
+.amb-star{position:absolute;width:var(--s);height:var(--s);border-radius:50%;background:currentColor;opacity:.12;animation:ambTwinkle var(--t) ease-in-out var(--d) infinite alternate}
+@keyframes ambTwinkle{from{opacity:.06}to{opacity:.4}}
+.amb-moon{position:absolute;top:9%;right:9%;width:44px;height:44px;border-radius:50%;box-shadow:inset -11px 5px 0 0 currentColor;opacity:.16;transform:rotate(-20deg)}
+.amb-bok{position:absolute;width:calc(var(--s) + 24px);height:calc(var(--s) + 24px);border-radius:50%;background:radial-gradient(circle,rgb(var(--acc-rgb) / .16),rgb(var(--acc-rgb) / .05) 55%,transparent 70%);animation:ambFloat calc(var(--t) * 2) ease-in-out var(--d) infinite alternate;will-change:transform}
+@keyframes ambFloat{from{transform:translate3d(0,0,0)}to{transform:translate3d(14px,-46px,0)}}
+.amb-glow{position:absolute;width:130%;height:auto;aspect-ratio:1;border-radius:50%;will-change:transform;animation:ambDrift 26s ease-in-out infinite alternate}
+.amb-glow.g1{left:-55%;top:-60%;background:radial-gradient(circle,rgb(var(--acc-rgb) / .16),transparent 62%)}
+.amb-glow.g2{right:-60%;bottom:-70%;background:radial-gradient(circle,rgb(var(--acc-rgb) / .11),transparent 62%);animation-duration:34s;animation-direction:alternate-reverse}
+@keyframes ambDrift{to{transform:translate3d(12%,9%,0)}}
+body.theme-light .cg-ambient{opacity:.75}
+body.amb-paused .cg-ambient,body.amb-paused .cg-ambient *{animation-play-state:paused!important}
+.amb-opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.amb-opt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--text);font:inherit;font-size:11px;cursor:pointer;min-width:74px}
+.amb-opt.active{border-color:var(--acc);box-shadow:0 0 0 2px rgb(var(--acc-rgb) / .25)}
+.amb-prev{position:relative;display:block;width:64px;height:40px;border-radius:8px;overflow:hidden;background:#0c1114;border:1px solid var(--line)}
+body.theme-light .amb-prev{background:#eef3f1}
+.amb-prev .amb-moon{width:13px;height:13px;top:5px;right:6px;box-shadow:inset -3px 1px 0 0 currentColor;opacity:.35}
+.amb-prev .amb-bok{width:calc(var(--s) * .22 + 6px);height:calc(var(--s) * .22 + 6px)}
+.amb-prev .amb-star{opacity:.3}
+.amb-prev .amb-band{height:60%}.amb-prev .amb-h1,.amb-prev .amb-h2,.amb-prev .amb-r1,.amb-prev .amb-c1{height:auto}
+.amb-prev .amb-off{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:16px}
+/* Car facts card */
+.car-facts{margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid rgb(var(--acc-rgb) / .3);background:rgb(var(--acc-rgb) / .06)}
+.car-facts h4{margin:0 0 4px;font-size:12.5px;color:var(--acc-text)}
+.car-facts ul{margin:0;padding-left:18px;font-size:12.5px;line-height:1.45}
+.car-facts .cf-src{margin-top:6px;font-size:10.5px;color:var(--muted)}
+.car-facts .cf-ai{display:inline-block;margin-top:6px;font-size:10.5px;padding:2px 7px;border-radius:999px;background:#ffb34720;border:1px solid #ffb34755;color:#ffd08a}
+body.theme-light .car-facts .cf-ai{color:#8a5a00}
+.car-facts .btn{margin-top:8px}
+
+/* 8.0 phone pass fixes */
+.app{grid-template-columns:minmax(0,1fr)}
+.app>*{min-width:0}
+html,body{overflow-x:clip}
+.maplibregl-ctrl-group button{width:36px!important;height:36px!important}
+#carColorPick{min-height:36px;min-width:52px;vertical-align:middle}
+.niyi-panel.kb-open{transition:none}
+#acceptTerms{width:22px;height:22px;flex:none}
+label.accept{min-height:40px}
+@media(max-width:540px){header .subtitle{display:none}.brand h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+@media(max-width:759px){.app{padding-bottom:calc(88px + env(safe-area-inset-bottom))}}
 </style>
 </head>
 <body class="welcome-open">
@@ -687,6 +745,9 @@ body.theme-light .cg-sheet,body.theme-light .account-menu,body.theme-light .pane
       <li><strong>App colours</strong>, smooth animations and a cleaner layout</li>
       <li><strong>Car picker</strong> for make, model and year</li>
       <li><strong>Google Maps links</strong>: paste any link into search</li>
+      <li><strong>Backgrounds</strong>: Waves, Trees &amp; hills, Road lines, City skyline, Night sky, Bokeh or Glow (Profile › Appearance)</li>
+      <li><strong>Car facts</strong>: pick your make and model to see quick facts</li>
+      <li><strong>Start GPS</strong> now shows your car driving a curvy road while it finds you</li>
     </ul></details>
     <p class="welcome-quote" id="welcomeQuote" aria-live="off">“Prevention is better than cure.”</p>
     <h3 class="terms-title">Terms &amp; Conditions</h3>
@@ -1038,6 +1099,7 @@ body.theme-light .cg-sheet,body.theme-light .account-menu,body.theme-light .pane
         <input id="carField_plate" placeholder="Plate (optional)" aria-label="Plate number">
       </div>
       <datalist id="carMakeList"></datalist><datalist id="carModelList"></datalist>
+      <div class="car-facts" id="carFacts" hidden aria-live="polite"></div>
       <p class="small car-pick-hint" id="carPickHint">Start typing to search. Not listed? Choose “Other — type it” or just type it.</p>
       <button type="button" class="btn primary sm" id="saveCarDetails" style="margin-top:8px">Save car details</button>
       <p class="small auth-msg good" id="carSaveMsg" hidden></p>
@@ -1069,6 +1131,8 @@ body.theme-light .cg-sheet,body.theme-light .account-menu,body.theme-light .pane
       </div>
       <p class="small" style="margin:12px 0 0">App colour <span class="small" style="opacity:.8">(free for everyone)</span></p>
       <div class="accent-opts" id="accentOpts" role="group" aria-label="App colour"></div>
+      <p class="small" style="margin:12px 0 0">Background <span class="small" style="opacity:.8">(gentle, never over the map; pauses while driving)</span></p>
+      <div class="amb-opts" id="ambientOpts" role="group" aria-label="Background"></div>
       <div class="actions" style="margin-top:8px">
         <button type="button" class="btn sm" id="profileNight">Night map</button>
         <button type="button" class="btn sm" id="profileUnits">Units</button>
@@ -1091,6 +1155,9 @@ body.theme-light .cg-sheet,body.theme-light .account-menu,body.theme-light .pane
       <li><strong>App colours</strong>, smooth animations and a cleaner layout</li>
       <li><strong>Car picker</strong> for make, model and year</li>
       <li><strong>Google Maps links</strong>: paste any link into search</li>
+      <li><strong>Backgrounds</strong>: Waves, Trees &amp; hills, Road lines, City skyline, Night sky, Bokeh or Glow (Profile › Appearance)</li>
+      <li><strong>Car facts</strong>: pick your make and model to see quick facts</li>
+      <li><strong>Start GPS</strong> now shows your car driving a curvy road while it finds you</li>
     </ul></details>
     </section>
 
@@ -1131,6 +1198,18 @@ body.theme-light .cg-sheet,body.theme-light .account-menu,body.theme-light .pane
 <script src="auth.js"></script>
 <script src="vehicles.js"></script>
 <script src="premium-ui.js"></script>
+<script src="carfacts.js"></script>
+<script src="ambient.js"></script>
+<script>
+/* Android Chrome: let the keyboard resize the layout (iOS ignores/warns, so only set it off iOS). */
+(function(){try{if(/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent))return;var m=document.querySelector('meta[name=viewport]');if(m&&m.content.indexOf('interactive-widget')<0)m.content+=', interactive-widget=resizes-content'}catch(e){}})();
+/* 8.0: keep Niyi's input above the on-screen keyboard (iOS Safari doesn't resize fixed panels). */
+(function(){var vv=window.visualViewport;if(!vv)return;var p=document.getElementById('niyiPanel');if(!p)return;
+function fit(){var kb=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+ if(kb>120&&!p.hidden){p.classList.add('kb-open');p.style.bottom=(kb+8)+'px';p.style.height=Math.max(220,Math.min(520,vv.height-16))+'px'}
+ else if(p.classList.contains('kb-open')){p.classList.remove('kb-open');p.style.bottom='';p.style.height=''}}
+vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit);document.addEventListener('focusout',function(){setTimeout(fit,250)});})();
+</script>
 
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
