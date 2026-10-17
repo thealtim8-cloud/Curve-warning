@@ -101,9 +101,14 @@ Both are blocked for the app by `firestore.rules`; only this server writes them.
   10,000 neurons/day per account.
 * Needs a Firebase sign-in token. Apex is read from `users/{uid}.premium` (active + `expiresAt` in the
   future; plan `creator` with a far-future date counts).
-* Limits: Free 20 chats/day, Apex 150/day (fair use), 1 request / 2 s per user. Counts live in
-  Firestore `niyiUsage/{uid}_{YYYYMMDD}` (server only; clients can't read/write it).
-* Returns `{ ok, reply, actions[], apex, used, limit }`. Actions are whitelisted
+* Limits (quiet, never shown in the app): Free 60 chats/day per user, Apex no per-user cap,
+  1 request / 2 s per user. A day-wide counter `niyiUsage/_global_{YYYYMMDD}` switches everyone to the
+  cheaper 8B model after 150 chats and pauses Niyi after 3000. Counts live in Firestore
+  `niyiUsage/{uid}_{YYYYMMDD}` (server only; clients can't read/write it).
+* Over a limit (or if Workers AI fails / the allowance is used up) it returns 429
+  `{ ok:false, code:'rest', reply:'Niyi needs a short rest — please try again a bit later.' }`; the app
+  shows that as Niyi's reply. No numbers, no upsell.
+* Returns `{ ok, reply, actions[], apex }`. Actions are whitelisted
   (set_destination, map_view, units, start_nav, stop_nav, …) and run by the app.
 * When deploying through the API instead of wrangler, keep secrets with `"keep_bindings": ["secret_text"]`
   and include the `{ "type": "ai", "name": "AI" }` binding.
