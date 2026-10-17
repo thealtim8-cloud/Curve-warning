@@ -15,6 +15,17 @@
     arrow: '<svg viewBox="0 0 48 48" width="26" height="30" aria-hidden="true"><path fill="currentColor" d="M24 4l16 28h-10v12h-12V32H8L24 4z"/></svg>'
   };
 
+  // 7.2.5 app colour themes. Safety colours (danger red, bend/warning orange, emergency) never change.
+  var ACCENTS = {
+    green: { label: 'Curve Green', sw: '#20c477' },
+    blue: { label: 'Ocean Blue', sw: '#3b8cff' },
+    purple: { label: 'Royal Purple', sw: '#9b6bff' },
+    orange: { label: 'Sunset Orange', sw: '#ff8a3d' },
+    pink: { label: 'Rose Pink', sw: '#ff5fa2' },
+    gold: { label: 'Gold', sw: '#f2c230' },
+    red: { label: 'Cherry Red', sw: '#e5484d' }
+  };
+
   function $(id) { return document.getElementById(id); }
   function auth() { return window.__cgAuth || null; }
 
@@ -24,6 +35,8 @@
       carColor: '#20c477',
       car: { make: '', model: '', year: '', colour: '', plate: '' },
       theme: 'dark', // dark | light | auto
+      accent: 'green', // 7.2.5 app colour (free): see ACCENTS
+      sosContacts: [], // 8.0: [{name, phone}] up to 5
       // favourites stay in curveGuide.favourites; profile may mirror labels later
     };
   }
@@ -38,7 +51,9 @@
         carIcon: CAR_ICONS[o.carIcon] ? o.carIcon : d.carIcon,
         carColor: o.carColor || d.carColor,
         car: Object.assign({}, d.car, o.car || {}),
-        theme: /^(dark|light|auto)$/.test(o.theme) ? o.theme : 'dark'
+        theme: /^(dark|light|auto)$/.test(o.theme) ? o.theme : 'dark',
+        accent: ACCENTS[o.accent] ? o.accent : 'green',
+        sosContacts: Array.isArray(o.sosContacts) ? o.sosContacts.filter(function (c) { return c && c.phone; }).slice(0, 5) : []
       };
     } catch (e) {
       return defaultProfile();
@@ -50,6 +65,8 @@
     if (partial.carIcon != null) cur.carIcon = CAR_ICONS[partial.carIcon] ? partial.carIcon : cur.carIcon;
     if (partial.carColor != null) cur.carColor = partial.carColor;
     if (partial.theme != null && /^(dark|light|auto)$/.test(partial.theme)) cur.theme = partial.theme;
+    if (partial.accent != null && ACCENTS[partial.accent]) cur.accent = partial.accent;
+    if (Array.isArray(partial.sosContacts)) cur.sosContacts = partial.sosContacts.slice(0, 5);
     if (partial.car) cur.car = Object.assign({}, cur.car, partial.car);
     try {
       localStorage.setItem(PROFILE_KEY, JSON.stringify(cur));
@@ -71,6 +88,16 @@
     }
     document.body.classList.toggle('theme-light', mode === 'light');
     document.documentElement.style.colorScheme = mode === 'light' ? 'light' : 'dark';
+    var acc = ACCENTS[p.accent] ? p.accent : 'green';
+    if (document.body.getAttribute('data-accent') !== acc) {
+      if (acc === 'green') document.body.removeAttribute('data-accent');
+      else document.body.setAttribute('data-accent', acc);
+      try {
+        var tc = document.querySelector('meta[name="theme-color"]');
+        if (tc && mode !== 'light') tc.setAttribute('content', '#0d1114');
+      } catch (e) {}
+      document.dispatchEvent(new CustomEvent('cg:accent-changed', { detail: { accent: acc } }));
+    }
   }
 
   function applyCarMarker() {
@@ -84,27 +111,107 @@
     el.setAttribute('data-car-icon', p.carIcon);
   }
 
+  /* 7.2.5 micro-animations helpers */
+  function reducedMotion() { return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
+  function stagger(el) {
+    if (!el || reducedMotion()) return;
+    el.classList.remove('cg-stagger'); void el.offsetWidth; el.classList.add('cg-stagger');
+    clearTimeout(el._cgStag); el._cgStag = setTimeout(function () { el.classList.remove('cg-stagger'); }, 650);
+  }
   function openOverlay(id) {
     var el = $(id);
     if (!el) return;
+    if (el._cgCloseT) { clearTimeout(el._cgCloseT); el._cgCloseT = null; }
+    el.classList.remove('cg-closing');
+    var wasOpen = el.classList.contains('open');
     el.hidden = false;
     el.classList.add('open');
     document.body.classList.add('cg-overlay-open');
+    if (!wasOpen && el.classList.contains('cg-overlay')) stagger(el.querySelector('.cg-sheet'));
   }
   function closeOverlay(id) {
     var el = $(id);
     if (!el) return;
+    var wasOpen = el.classList.contains('open');
     el.classList.remove('open');
-    el.hidden = true;
+    el.hidden = true; // state changes at once; the fade-out below is visual only (pointer-events off)
+    if (wasOpen && !reducedMotion()) {
+      el.classList.add('cg-closing');
+      clearTimeout(el._cgCloseT);
+      el._cgCloseT = setTimeout(function () { el.classList.remove('cg-closing'); el._cgCloseT = null; }, 180);
+    }
     if (!document.querySelector('.cg-overlay.open')) document.body.classList.remove('cg-overlay-open');
   }
   function closeAllOverlays() {
     ['authModal', 'premiumScreen', 'profileScreen', 'accountMenu'].forEach(closeOverlay);
   }
 
+  function celebrateApex(label) {
+    try {
+      var driving = typeof window.__cgIsDriving === 'function' && window.__cgIsDriving();
+      var t = document.createElement('div');
+      t.className = 'cg-toast'; t.setAttribute('role', 'status');
+      t.textContent = '✨ ' + (label || 'Apex') + ' is active';
+      document.body.appendChild(t);
+      setTimeout(function () { t.remove(); }, 2700);
+      if (driving || reducedMotion()) return; // never distract while driving
+      var box = document.createElement('div');
+      box.className = 'cg-confetti'; box.setAttribute('aria-hidden', 'true');
+      var cs = getComputedStyle(document.body);
+      var cols = [cs.getPropertyValue('--acc').trim() || '#20c477', cs.getPropertyValue('--acc-hi').trim() || '#27d083', '#f2c230', '#ffffff', cs.getPropertyValue('--acc-text').trim() || '#9be3bf'];
+      for (var i = 0; i < 36; i++) {
+        var c = document.createElement('i');
+        var ang = Math.random() * Math.PI * 2, dist = 120 + Math.random() * 260;
+        c.style.setProperty('--x', Math.round(Math.cos(ang) * dist) + 'px');
+        c.style.setProperty('--y', Math.round(Math.sin(ang) * dist * 0.8 + 90) + 'px');
+        c.style.setProperty('--r', Math.round(Math.random() * 720 - 360) + 'deg');
+        c.style.setProperty('--d', (0.75 + Math.random() * 0.35).toFixed(2) + 's');
+        c.style.background = cols[i % cols.length];
+        if (i % 3 === 0) { c.style.borderRadius = '50%'; c.style.width = c.style.height = '7px'; }
+        box.appendChild(c);
+      }
+      document.body.appendChild(box);
+      setTimeout(function () { box.remove(); }, 1300);
+    } catch (e) {}
+  }
+  // Celebrate once per plan/expiry per account (new payment, renewal, or a granted plan).
+  var CELEBRATED_KEY = 'curveGuide.apexCelebrated';
+  function maybeCelebrate(snap) {
+    if (!snap || !snap.premium || !snap.user || snap.serverPremium !== true) return;
+    var info = snap.serverPremiumInfo || {};
+    var key = snap.user.uid + '|' + (info.plan || '') + '|' + (info.expiresAt || '');
+    var seen = null;
+    try { seen = localStorage.getItem(CELEBRATED_KEY); } catch (e) {}
+    if (seen === key) return;
+    try { localStorage.setItem(CELEBRATED_KEY, key); } catch (e) {}
+    celebrateApex((apexInfo(snap) || {}).label);
+  }
+
+  // 7.2.5: one place that describes the user's Apex plan (creator / monthly / yearly).
+  function apexInfo(snap) {
+    snap = snap || (auth() && auth().snapshot()) || {};
+    if (!snap.premium) return null;
+    var info = snap.serverPremiumInfo || {};
+    var plan = String(info.plan || '').toLowerCase();
+    var ms = toMs(info.expiresAt);
+    var never = plan === 'creator' || (!isNaN(ms) && new Date(ms).getUTCFullYear() >= 2090) || (info.active === true && !info.expiresAt);
+    var name = plan === 'creator' ? 'Creator' : plan === 'yearly' ? 'Yearly' : plan === 'monthly' ? 'Monthly' : (plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : '');
+    var until = never ? 'never expires' : (!isNaN(ms) ? 'Active until ' + new Date(ms).toLocaleDateString() : '');
+    return {
+      plan: plan, name: name, never: never, until: until, test: !!info.test, creator: plan === 'creator',
+      label: 'Apex' + (name ? ' — ' + name : '') + (never ? ' (never expires)' : ''),
+      line: 'Apex' + (name ? ' — ' + name : '') + (never ? ' (never expires)' : (until ? ' · ' + until : ''))
+    };
+  }
+  function toMs(v) {
+    try {
+      return v && typeof v.toMillis === 'function' ? v.toMillis() : (typeof v === 'number' ? v : (v ? Date.parse(v) : NaN));
+    } catch (e) { return NaN; }
+  }
+
   function badgeHtml(snap) {
     if (!snap.signedIn) return '<span class="plan-badge free">Guest</span>';
-    if (snap.premium) return '<span class="plan-badge premium">Apex</span>';
+    if (snap.premium) { var ai = apexInfo(snap); return '<span class="plan-badge premium">' + escapeHtml(ai && ai.creator ? 'Apex · Creator' : 'Apex') + '</span>'; }
     return '<span class="plan-badge free">Free</span>';
   }
 
@@ -121,14 +228,18 @@
     var menu = $('accountMenu');
     if (!btn) return;
     snap = snap || (auth() && auth().snapshot()) || { signedIn: false, premium: false };
+    // Only touch the button's inner HTML when it really changes. Rewriting it during a tap
+    // detached the tapped <span>, so the "click outside closes the menu" handler closed the
+    // menu instantly (7.2.4 fix: account button "shows nothing" on iPad/iPhone).
+    function setBtnHtml(html) { if (btn.getAttribute('data-html') !== html) { btn.innerHTML = html; btn.setAttribute('data-html', html); } }
     if (snap.signedIn && snap.user) {
       btn.classList.add('signed-in');
-      btn.innerHTML = '<span class="account-avatar" aria-hidden="true">' + initials(snap.user) + '</span>';
+      setBtnHtml('<span class="account-avatar" aria-hidden="true">' + initials(snap.user) + '</span>');
       btn.title = snap.user.displayName || snap.user.email || 'Account';
       btn.setAttribute('aria-label', 'Account menu');
     } else {
       btn.classList.remove('signed-in');
-      btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>';
+      setBtnHtml('<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>');
       btn.title = 'Sign in';
       btn.setAttribute('aria-label', 'Sign in');
     }
@@ -141,7 +252,7 @@
           '</div>' + badgeHtml(snap) + '</div></div>' +
           '<button type="button" class="btn" data-acct="profile">Profile &amp; settings</button>' +
           (snap.premium
-            ? '<button type="button" class="btn" data-acct="premium">Manage plan</button>'
+            ? '<button type="button" class="btn" data-acct="premium">✨ ' + escapeHtml((apexInfo(snap) || {}).line || 'Apex') + '</button>'
             : '<button type="button" class="btn primary" data-acct="upgrade">Upgrade to Apex</button>') +
           '<button type="button" class="btn" data-acct="signout">Sign out</button>';
       }
@@ -200,6 +311,10 @@
     setAuthMode(mode || 'signin');
     var note = $('authPreviewNote');
     if (note) note.hidden = true;
+    var sn = auth() && auth().snapshot();
+    if (sn && sn.redirectFailed && !sn.signedIn) {
+      setStatusMsg($('authMsg'), 'Google sign-in didn\'t finish last time. Tap Continue with Google again (a Google window opens), or use email and password.', 'warn');
+    }
   }
 
   function setAuthMode(mode) {
@@ -218,6 +333,7 @@
   function showPremium() {
     closeOverlay('accountMenu');
     openOverlay('premiumScreen');
+    var gt = $('premiumGateTip'); if (gt) gt.hidden = true;
     payMsg('');
     renderPremium();
     try { if (auth() && auth().loadPaystack) auth().loadPaystack().catch(function () {}); } catch (e) {}
@@ -233,13 +349,13 @@
   var WHY_APEX = {
     NGN: {
       sources: [
-        ['NBS Selected Food Price Watch, May 2026', 'https://microdata.nigerianstat.gov.ng/index.php/catalog/162'],
+        ['Yello.ng: Agege bread (medium) ₦700, checked Oct 2026', 'https://yello.ng/product/agege-bread-medium/'],
         ['FRSC 2025 report (Punch)', 'https://punchng.com/frsc-records-10446-crashes-5289-deaths-in-2025/'],
         ['FRSC Dec 2025 (BusinessDay)', 'https://businessday.ng/transport/article/speeding-remains-nigerias-deadliest-road-habit-frsc/'],
         ['US FHWA, horizontal curve safety', 'https://highways.dot.gov/safety/rwd/keep-vehicles-road/horizontal-curve-safety']
       ],
       lines: [
-        ['🍞', 'Apex costs <strong>₦15 a day</strong>, less than a quarter of a loaf of bread.', 1],
+        ['🍞', 'Apex costs <strong>₦450 a month</strong> (about ₦15 a day), less than one medium Agege bread.', 1],
         ['🛣️', 'FRSC recorded <strong>5,289 road deaths</strong> in Nigeria in 2025. Apex gives you extra heads-ups before sharp bends.', 2],
         ['⚠️', 'In December 2025, <strong>speeding was behind 41%</strong> of identified crash causes. Apex could help you ease off before the curve.', 3],
         ['🎉', 'Go yearly: <strong>₦3,780</strong> instead of ₦5,400, about <strong>₦10 a day</strong>.', 0],
@@ -281,8 +397,34 @@
     }).join(' · ');
   }
 
+  // Hide every pay call-to-action for Apex users and show their plan instead.
+  function setApexMode(snap) {
+    var sheet = $('premiumScreen');
+    if (!sheet) return false;
+    var ai = apexInfo(snap);
+    sheet.classList.toggle('is-apex', !!ai);
+    var box = $('premiumActiveBox');
+    if (box) {
+      box.hidden = !ai;
+      if (ai) {
+        box.innerHTML = '<strong>✅ You\'re on ' + escapeHtml(ai.label) + '</strong>' +
+          (ai.never ? '' : (ai.until ? '<br><span class="small">' + escapeHtml(ai.until) + '. One-time payment, nothing renews automatically.</span>' : '')) +
+          (ai.test ? ' <span class="plan-badge free">Paystack test payment</span>' : '') +
+          '<br><span class="small">Everything in Apex is unlocked: spoken voice navigation, bends-ahead list with safe-speed tips, favourites and danger reports synced across your phones, and smart Niyi.</span>';
+      }
+    }
+    var title = $('premiumTitle');
+    if (title) title.textContent = ai ? 'Your Apex plan' : 'Curve Guide Apex';
+    return !!ai;
+  }
+
   function renderPremium() {
     var snap = auth() && auth().snapshot();
+    if (setApexMode(snap)) {
+      var st = $('premiumStatusLine');
+      if (st) st.textContent = (apexInfo(snap) || {}).line || 'You are on Apex.';
+      return;
+    }
     var cur = (auth() && auth().currency()) || 'NGN';
     var ngn = cur === 'NGN';
     renderWhyApex(cur);
@@ -488,11 +630,14 @@
         renderProfile('car');
       };
     }
+    bindSos(); renderSos();
     var car = p.car || {};
+    setupCarPickers(car);
     ['make', 'model', 'year', 'colour', 'plate'].forEach(function (f) {
       var inp = $('carField_' + f);
       if (inp) inp.value = car[f] || '';
     });
+    fillModels(car.make || '');
 
     // favs
     var favList = $('profileFavList');
@@ -502,6 +647,17 @@
       var keys = Object.keys(favs);
       if (!keys.length) {
         favList.innerHTML = '<p class="small">No saved places yet. Save Home / School / Work from the map destination card.</p>';
+      }
+      var syncNote = document.createElement('p');
+      syncNote.className = 'small';
+      syncNote.style.marginTop = '6px';
+      syncNote.innerHTML = (snap && snap.premium)
+        ? '☁️ Apex: your favourites and danger reports sync across your phones when you sign in.'
+        : '📱 Saved on this phone. <button type="button" class="btn sm" id="profileSyncUpgrade">Sync across phones with Apex</button>';
+      favList.appendChild(syncNote);
+      var su = $('profileSyncUpgrade');
+      if (su) su.onclick = function () { apexPrompt('cloud sync'); };
+      if (!keys.length) {
       } else {
         keys.forEach(function (k) {
           var f = favs[k];
@@ -533,6 +689,24 @@
     document.querySelectorAll('[data-theme-opt]').forEach(function (b) {
       b.classList.toggle('active', b.getAttribute('data-theme-opt') === p.theme);
     });
+    var accBox = $('accentOpts');
+    if (accBox) {
+      accBox.innerHTML = '';
+      Object.keys(ACCENTS).forEach(function (k) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'accent-opt' + (p.accent === k ? ' active' : '');
+        b.setAttribute('data-accent-opt', k);
+        b.setAttribute('aria-pressed', p.accent === k ? 'true' : 'false');
+        b.innerHTML = '<span class="sw" style="background:' + ACCENTS[k].sw + '"></span>' + escapeHtml(ACCENTS[k].label);
+        b.onclick = function () {
+          saveProfile({ accent: k });
+          applyTheme();
+          renderProfile('appearance');
+        };
+        accBox.appendChild(b);
+      });
+    }
     var unitsBtn = $('profileUnits');
     if (unitsBtn && window.__cgApi) {
       unitsBtn.textContent = 'Units: ' + (window.__cgApi.getUseMph() ? 'mph' : 'km/h');
@@ -546,12 +720,12 @@
     // premium section
     var planLine = $('profilePlanLine');
     if (planLine && snap) {
-      planLine.innerHTML = snap.premium
-        ? (snap.serverPremium === true && snap.serverPremiumInfo && snap.serverPremiumInfo.expiresAt
-            ? '<strong>Apex</strong> · ' + escapeHtml(snap.serverPremiumInfo.plan || '') + ' · Active until ' + escapeHtml(fmtDate(snap.serverPremiumInfo.expiresAt)) +
-              (snap.serverPremiumInfo.test ? ' <span class="plan-badge free">Paystack test payment</span>' : '') +
-              '<br><span class="small">One-time payment: it won\'t renew or charge you again automatically. Pay again any time to add more time.</span>'
-            : '<strong>Apex</strong>')
+      var pai = apexInfo(snap);
+      planLine.innerHTML = pai
+        ? ('<strong>' + escapeHtml(pai.line) + '</strong>' +
+            (pai.test ? ' <span class="plan-badge free">Paystack test payment</span>' : '') +
+            (pai.never ? '<br><span class="small">All Apex features are unlocked on this account.</span>'
+              : '<br><span class="small">One-time payment: it won\'t renew or charge you again automatically.</span>'))
         : (snap.pendingPayment
             ? '<strong>Free</strong> · payment <code>' + escapeHtml(snap.pendingPayment.reference) + '</code> is being activated. If Apex doesn\'t appear soon, contact ' + SUPPORT_HTML + '.'
             : '<strong>Free</strong> · <button type="button" class="btn primary sm" id="profilePlanUpgrade">Upgrade to Apex</button>');
@@ -570,17 +744,178 @@
     }
   }
 
-  function gateOrRun(featureId, fn) {
-    var A = auth();
-    if (A && A.requiresPremium(featureId)) {
+  /* ---------- 7.2.5 Car make / model / year pickers ----------
+     Bundled list (vehicles.js) works offline; online, models are topped up from the free NHTSA vPIC API
+     (US government public-domain data) and cached on this phone for 30 days. Free text always allowed. */
+  var OTHER = 'Other — type it';
+  var VPIC_CACHE_KEY = 'curveGuide.vpicModels';
+  function vehicles() { return window.CG_VEHICLES || {}; }
+  function findMake(name) {
+    var v = vehicles(), n = String(name || '').trim().toLowerCase();
+    if (!n) return null;
+    for (var k in v) { if (k.toLowerCase() === n || k.toLowerCase().replace(/\s*\(.*\)$/, '') === n) return k; }
+    return null;
+  }
+  function setOptions(dl, list) {
+    if (!dl) return;
+    dl.innerHTML = '';
+    list.forEach(function (x) { var o = document.createElement('option'); o.value = x; dl.appendChild(o); });
+  }
+  var carPickersBound = false;
+  function setupCarPickers(car) {
+    var v = vehicles();
+    var makes = Object.keys(v).sort(function (a, b) { return a.localeCompare(b); });
+    setOptions($('carMakeList'), makes.concat([OTHER]));
+    var ys = $('carField_year');
+    if (ys) {
+      var next = new Date().getFullYear() + 1, html = '<option value="">Year</option>';
+      for (var y = next; y >= 1980; y--) html += '<option value="' + y + '">' + y + '</option>';
+      html += '<option value="Before 1980">Before 1980</option>';
+      var cy = String(car.year || '').trim();
+      if (cy && !/^(19[89]\d|20\d\d|Before 1980)$/.test(cy)) html += '<option value="' + escapeHtml(cy) + '">' + escapeHtml(cy) + '</option>'; // keep older saved text
+      ys.innerHTML = html;
+    }
+    if (carPickersBound) return;
+    carPickersBound = true;
+    var mk = $('carField_make'), md = $('carField_model');
+    if (mk) mk.addEventListener('input', function () {
+      if (mk.value === OTHER) { mk.value = ''; mk.placeholder = 'Type the make'; return; }
+      var known = findMake(mk.value);
+      if (known && known !== mk.value && mk.value.toLowerCase() === known.toLowerCase()) mk.value = known;
+      fillModels(mk.value);
+    });
+    if (md) md.addEventListener('input', function () {
+      if (md.value === OTHER) { md.value = ''; md.placeholder = 'Type the model'; }
+    });
+  }
+  function readVpicCache() { try { return JSON.parse(localStorage.getItem(VPIC_CACHE_KEY) || '{}') || {}; } catch (e) { return {}; } }
+  var modelTimer = null, modelReq = 0;
+  function fillModels(makeName) {
+    var dl = $('carModelList');
+    if (!dl) return;
+    var known = findMake(makeName);
+    var base = known ? vehicles()[known].models.slice() : [];
+    var key = String(known || makeName || '').trim().toLowerCase().replace(/\s*\(.*\)$/, '');
+    var cache = readVpicCache(), hit = cache[key];
+    function show(extra) {
+      var seen = {}, list = [];
+      base.concat(extra || []).forEach(function (m) {
+        var t = String(m || '').trim(); var k = t.toLowerCase();
+        if (t && !seen[k]) { seen[k] = 1; list.push(t); }
+      });
+      list.sort(function (a, b) { return a.localeCompare(b, undefined, { numeric: true }); });
+      setOptions(dl, list.concat([OTHER]));
+    }
+    show(hit && hit.list);
+    clearTimeout(modelTimer);
+    if (!key || key.length < 2 || (hit && Date.now() - hit.t < 30 * 864e5) || navigator.onLine === false) return;
+    if (!known && key.length < 3) return;
+    var my = ++modelReq;
+    modelTimer = setTimeout(function () {
+      var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var to = setTimeout(function () { if (ctl) ctl.abort(); }, 6000);
+      var q = key.replace(/ motorcycles?$| buses$/, '');
+      fetch('https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/' + encodeURIComponent(q) + '?format=json', { signal: ctl ? ctl.signal : undefined })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          clearTimeout(to);
+          if (!d || !Array.isArray(d.Results)) return;
+          var list = d.Results.map(function (x) { return x.Model_Name; }).filter(Boolean).slice(0, 300);
+          var c = readVpicCache(); c[key] = { t: Date.now(), list: list };
+          var ks = Object.keys(c); if (ks.length > 40) ks.sort(function (a, b) { return c[a].t - c[b].t; }).slice(0, ks.length - 40).forEach(function (k) { delete c[k]; });
+          try { localStorage.setItem(VPIC_CACHE_KEY, JSON.stringify(c)); } catch (e) {}
+          if (my === modelReq) show(list);
+        }).catch(function () { clearTimeout(to); });
+    }, 450);
+  }
+
+  /* ---------- 8.0 SOS emergency contacts ---------- */
+  // Nigerian numbers: 0803 123 4567 / 803 123 4567 / 234803... -> +2348031234567. Other countries: +<8-15 digits>.
+  function normalizePhone(raw) {
+    var s = String(raw || '').trim();
+    var plus = /^\+/.test(s) || /^00/.test(s);
+    var d = s.replace(/\D/g, '');
+    if (/^00/.test(s)) d = d.slice(2);
+    if (!plus) {
+      if (/^0[789]\d{9}$/.test(d) || /^0[1-9]\d{7,9}$/.test(d)) d = '234' + d.slice(1);
+      else if (/^[789]\d{9}$/.test(d)) d = '234' + d;
+      else if (!/^234\d{10}$/.test(d)) return null;
+    }
+    if (/^234/.test(d)) { if (!/^234[1-9]\d{7,9}$/.test(d)) return null; }
+    else if (!/^[1-9]\d{7,14}$/.test(d)) return null;
+    return '+' + d;
+  }
+  function prettyPhone(e164) {
+    var m = String(e164).match(/^\+234(\d{3})(\d{3})(\d{4})$/);
+    return m ? '+234 ' + m[1] + ' ' + m[2] + ' ' + m[3] : e164;
+  }
+  function renderSos() {
+    var box = $('sosContactList');
+    if (!box) return;
+    var list = loadProfile().sosContacts || [];
+    box.innerHTML = list.length ? '' : '<p class="small">No emergency contacts yet.</p>';
+    list.forEach(function (c, i) {
+      var row = document.createElement('div');
+      row.className = 'sos-item';
+      row.innerHTML = '<div><strong>' + escapeHtml(c.name || 'Contact') + '</strong><span class="small">' + escapeHtml(prettyPhone(c.phone)) + '</span></div>' +
+        '<button type="button" class="btn sm danger-outline" aria-label="Remove ' + escapeHtml(c.name || 'contact') + '">Remove</button>';
+      row.querySelector('button').onclick = function () {
+        var l = (loadProfile().sosContacts || []).slice(); l.splice(i, 1);
+        saveProfile({ sosContacts: l }); renderSos(); document.dispatchEvent(new CustomEvent('cg:sos-changed'));
+      };
+      box.appendChild(row);
+    });
+    var add = $('sosAddRow'), ab = $('sosAddBtn');
+    if (add) add.hidden = list.length >= 5;
+    if (ab) { ab.hidden = list.length >= 5; }
+  }
+  function bindSos() {
+    var ab = $('sosAddBtn');
+    if (!ab || ab._bound) return;
+    ab._bound = true;
+    ab.onclick = function () {
+      var nm = ($('sosName').value || '').trim().slice(0, 40), ph = normalizePhone($('sosPhone').value);
+      var msg = $('sosMsg');
+      if (!nm) { setStatusMsg(msg, 'Please enter a name.', 'warn'); return; }
+      if (!ph) { setStatusMsg(msg, 'That phone number doesn\'t look right. Use e.g. 0803 123 4567, or +44 7700 900123 for other countries.', 'warn'); return; }
+      var l = (loadProfile().sosContacts || []).slice();
+      if (l.some(function (c) { return c.phone === ph; })) { setStatusMsg(msg, 'That number is already saved.', 'warn'); return; }
+      if (l.length >= 5) { setStatusMsg(msg, 'You can save up to 5 contacts.', 'warn'); return; }
+      l.push({ name: nm, phone: ph });
+      saveProfile({ sosContacts: l });
+      $('sosName').value = ''; $('sosPhone').value = '';
+      setStatusMsg(msg, 'Saved ' + nm + ' (' + prettyPhone(ph) + ').', 'good');
+      renderSos(); document.dispatchEvent(new CustomEvent('cg:sos-changed'));
+    };
+  }
+
+  var FEATURE_TIPS = {
+    'voice navigation': 'Spoken turn-by-turn directions are part of Apex. Navigation with the on-screen banner stays free.',
+    'bend alerts': 'The list of bends ahead, suggested safe speeds and spoken bend warnings are part of Apex. The basic on-screen curve alert stays free for everyone.',
+    'niyi': 'You\'ve used today\'s free Niyi messages. Apex gives you unlimited smart Niyi.',
+    'cloud sync': 'Saving favourites and danger reports across all your phones is part of Apex. They still save on this phone for free.'
+  };
+  function apexPrompt(featureId, customMsg) {
+    var sn = auth() && auth().snapshot();
+    if (sn && sn.premium) {
+      // Apex already: no pay screen. (A stale "locked" button can still be on screen for a moment.)
       showPremium();
-      var tip = $('premiumGateTip');
-      if (tip) {
-        tip.hidden = false;
-        tip.textContent = '“' + featureId + '” is an Apex feature.';
-      }
+      var t2 = $('premiumGateTip');
+      if (t2) { t2.hidden = false; t2.className = 'auth-msg good'; t2.textContent = '✅ This is included in your Apex plan, so it\'s unlocked.'; }
+      document.dispatchEvent(new CustomEvent('cg:premium-changed', { detail: sn }));
       return;
     }
+    showPremium();
+    var tip = $('premiumGateTip');
+    if (tip) {
+      tip.hidden = false;
+      tip.className = 'auth-msg';
+      tip.textContent = '✨ Upgrade to Apex: ' + (customMsg || FEATURE_TIPS[featureId] || 'this is an Apex feature.');
+    }
+  }
+  function gateOrRun(featureId, fn) {
+    var A = auth();
+    if (A && A.requiresPremium(featureId)) { apexPrompt(featureId); return; }
     if (typeof fn === 'function') fn();
   }
 
@@ -593,12 +928,7 @@
           if (!(A && A.requiresPremium(el.getAttribute('data-pro-feature')))) return;
           e.preventDefault();
           e.stopImmediatePropagation();
-          showPremium();
-          var tip = $('premiumGateTip');
-          if (tip) {
-            tip.hidden = false;
-            tip.textContent = 'This is an Apex feature.';
-          }
+          apexPrompt(el.getAttribute('data-pro-feature'));
         },
         true
       );
@@ -637,7 +967,10 @@
       var menu = $('accountMenu');
       var btn = $('accountBtn');
       if (!menu || !menu.classList.contains('open')) return;
+      var path = e.composedPath ? e.composedPath() : [];
+      if (path.indexOf(menu) >= 0 || (btn && path.indexOf(btn) >= 0)) return;
       if (menu.contains(e.target) || (btn && btn.contains(e.target))) return;
+      if (e.target && e.target.isConnected === false) return; // element was re-rendered mid-tap
       closeOverlay('accountMenu');
     });
 
@@ -812,7 +1145,7 @@
           return;
         }
         var sub = encodeURIComponent('Curve Guide feedback — ' + cat);
-        var body = encodeURIComponent('Category: ' + cat + '\n\n' + msg + '\n\n— Sent from Curve Guide 7.1');
+        var body = encodeURIComponent('Category: ' + cat + '\n\n' + msg + '\n\n— Sent from Curve Guide 8.0');
         window.location.href = 'mailto:info@adeniyiltd.com?subject=' + sub + '&body=' + body;
       };
 
@@ -894,13 +1227,41 @@
     });
 
     if (auth()) {
+      var lastPrem = null;
       auth().onChange(function (snap) {
+        snap = (auth() && auth().snapshot()) || snap;
         syncAccountButton(snap);
+        var key = String(!!snap.premium) + '|' + JSON.stringify((apexInfo(snap) || {}).line || '');
+        if (key !== lastPrem) {
+          lastPrem = key;
+          var ps = $('premiumScreen'), pr = $('profileScreen');
+          if (ps && ps.classList.contains('open')) renderPremium();
+          if (pr && pr.classList.contains('open')) renderProfile();
+          document.dispatchEvent(new CustomEvent('cg:premium-changed', { detail: snap }));
+          maybeCelebrate(snap);
+        }
       });
       syncAccountButton(auth().snapshot());
     }
 
     bindProGates();
+
+    // Ripple on tap (accent colour). Passive and never blocks the click.
+    document.addEventListener('pointerdown', function (e) {
+      if (reducedMotion()) return;
+      var b = e.target && e.target.closest && e.target.closest('.btn,.niyi-chip,.niyi-action,.accent-opt,.niyi-send,.niyi-header-btn,.icon-btn');
+      if (!b || b.disabled || b.closest('.nav-banner,.emerg-sheet,.emerg-fab')) return;
+      try {
+        if (getComputedStyle(b).position === 'static') b.style.position = 'relative';
+        var r = b.getBoundingClientRect();
+        var wrap = document.createElement('span'); wrap.className = 'cg-ripple-wrap';
+        var dot = document.createElement('span'); dot.className = 'cg-ripple';
+        dot.style.left = (e.clientX - r.left) + 'px'; dot.style.top = (e.clientY - r.top) + 'px';
+        dot.style.setProperty('--cg-rs', String(Math.ceil(Math.max(r.width, r.height) / 6)));
+        wrap.appendChild(dot); b.appendChild(wrap);
+        setTimeout(function () { wrap.remove(); }, 360);
+      } catch (err) {}
+    }, { passive: true });
 
     // Expose for Niyi / tests
     window.__cgPremiumUI = {
@@ -912,6 +1273,11 @@
       loadProfile: loadProfile,
       saveProfile: saveProfile,
       gateOrRun: gateOrRun,
+      apexPrompt: apexPrompt,
+      apexInfo: apexInfo,
+      celebrateApex: celebrateApex,
+      normalizePhone: normalizePhone,
+      ACCENTS: ACCENTS,
       CAR_ICONS: CAR_ICONS
     };
   }

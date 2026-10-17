@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<title>Curve Guide 7.1 | Safer turns. Smarter drives.</title>
+<title>Curve Guide 8.0 | Safer turns. Smarter drives.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://js.paystack.co">
@@ -17,19 +17,19 @@
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--bg:#0d1114;--bg2:#13191d;--panel:#161d22;--panel2:#1c252b;--line:#263139;--line2:#33414b;--text:#eef3f5;--muted:#93a3ad;--silver:#c9d1d6;--lime:#20c477;--green:#20c477;--green2:#17a863;--orange:#ffb347;--red:#ff625c;--radius:18px;--shadow:0 1px 0 #ffffff08 inset,0 10px 30px -12px #000a}
+:root{color-scheme:dark;--bg:#0d1114;--bg2:#13191d;--panel:#161d22;--panel2:#1c252b;--line:#263139;--line2:#33414b;--text:#eef3f5;--muted:#93a3ad;--silver:#c9d1d6;--acc:#20c477;--acc-rgb:32 196 119;--acc-hi:#27d083;--acc2:#17a863;--acc-text:#9be3bf;--acc-pale:#dff6ea;--acc-ink:#06150d;--acc-deep:#0f7a47;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2);--orange:#ffb347;--red:#ff625c;--radius:18px;--shadow:0 1px 0 #ffffff08 inset,0 10px 30px -12px #000a}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);background:radial-gradient(900px 420px at 15% -10%,#20c47714,transparent 60%),radial-gradient(800px 400px at 100% 0,#c9d1d60d,transparent 60%),var(--bg);background-attachment:fixed}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);background:radial-gradient(900px 420px at 15% -10%,rgb(var(--acc-rgb) / 0.078),transparent 60%),radial-gradient(800px 400px at 100% 0,#c9d1d60d,transparent 60%),var(--bg);background-attachment:fixed}
 button{font:inherit;cursor:pointer}
 .app{width:min(100%,1160px);margin:0 auto;padding:16px;display:grid;gap:14px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 2px 4px}
 .brand{display:flex;align-items:center;gap:13px;min-width:0}
-.logo-img{width:52px;height:52px;border-radius:14px;object-fit:cover;flex:none;background:#1a1d20;display:block;border:1px solid var(--line2);box-shadow:0 6px 18px -6px #000c,0 0 0 4px #20c4770d}
+.logo-img{width:52px;height:52px;border-radius:14px;object-fit:cover;flex:none;background:#1a1d20;display:block;border:1px solid var(--line2);box-shadow:0 6px 18px -6px #000c,0 0 0 4px rgb(var(--acc-rgb) / 0.051)}
 h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;color:#f4f7f8}
 .tagline{font-size:10.5px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--green);margin-top:5px}
 .subtitle{font-size:12px;color:var(--muted);margin-top:3px}
-.pill{border:1px solid #20c47740;background:#20c47712;border-radius:999px;padding:7px 11px;font-size:10.5px;font-weight:600;letter-spacing:.4px;color:#9be3bf;white-space:nowrap}
+.pill{border:1px solid rgb(var(--acc-rgb) / 0.251);background:rgb(var(--acc-rgb) / 0.071);border-radius:999px;padding:7px 11px;font-size:10.5px;font-weight:600;letter-spacing:.4px;color:var(--acc-text);white-space:nowrap}
 .panel{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px 12px;border-bottom:1px solid var(--line)}
 .panel-head h2{font-size:14px;font-weight:700;margin:0;letter-spacing:-.1px}
@@ -42,7 +42,7 @@ h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;
 .map-controls{position:absolute;z-index:3;right:12px;bottom:62px;display:grid;gap:7px}
 .icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid #ffffff26;background:#0d1114e8;color:#fff;font-size:17px;font-weight:600;display:grid;place-items:center;box-shadow:0 4px 14px #0005;backdrop-filter:blur(8px);transition:background .15s,border-color .15s,transform .1s}
 .icon-btn.map-type{font-size:11.5px;letter-spacing:.2px}
-.icon-btn:hover{background:#1c252b;border-color:#20c47780}
+.icon-btn:hover{background:#1c252b;border-color:rgb(var(--acc-rgb) / 0.502)}
 .icon-btn:active{transform:scale(.96)}
 .maplibregl-ctrl-bottom-left,.maplibregl-ctrl-bottom-right{z-index:2}
 .maplibregl-ctrl-group{background:#161d22!important;border:1px solid #ffffff24!important}
@@ -53,7 +53,7 @@ h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;
 .car-marker:after{content:"";position:absolute;left:8px;top:7px;width:7px;height:9px;border-radius:3px;background:#1c252b}
 .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .metric{position:relative;padding:13px 13px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;min-width:0;box-shadow:var(--shadow);overflow:hidden}
-.metric:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--green),#20c47700)}
+.metric:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--green),rgb(var(--acc-rgb) / 0))}
 .metric-label{font-size:10.5px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .metric-value{font-size:clamp(19px,4.4vw,26px);font-weight:750;letter-spacing:-.6px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .metric-unit{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0}
@@ -61,17 +61,17 @@ h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;
 .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .section-title{font-size:14px;font-weight:700;letter-spacing:-.1px}
 .status-box{margin-top:12px;padding:12px 14px;border-radius:12px;background:#0d1114a0;border:1px solid var(--line);border-left-width:3px;font-size:13px;line-height:1.55;color:#dbe3e7}
-.status-box.good{border-color:#20c47766;border-left-color:var(--green)}
+.status-box.good{border-color:#20c47766;border-left-color:#20c477}
 .status-box.warn{border-color:#ffb34755;border-left-color:var(--orange)}
 .status-box.danger{border-color:#ff625c66;border-left-color:var(--red)}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .btn{border:1px solid var(--line2);background:#222c33;color:var(--text);border-radius:11px;padding:10px 14px;font-size:12.5px;font-weight:600;transition:background .15s,border-color .15s,color .15s,box-shadow .15s,transform .1s}
 .btn:hover:not(:disabled){background:#2a363e;border-color:#4a5a65}
 .btn:active:not(:disabled){transform:translateY(1px)}
-.btn:focus-visible,.icon-btn:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766}
-.btn.primary{background:linear-gradient(180deg,#27d083,var(--green2));border-color:#20c477;color:#06150d;box-shadow:0 6px 16px -6px #20c477aa}
+.btn:focus-visible,.icon-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.4)}
+.btn.primary{background:linear-gradient(180deg,var(--acc-hi),var(--green2));border-color:var(--acc);color:var(--acc-ink);box-shadow:0 6px 16px -6px rgb(var(--acc-rgb) / 0.667)}
 .btn.primary:hover:not(:disabled){background:linear-gradient(180deg,#34dc8f,#1bb46b);border-color:#34dc8f}
-.btn.active{border-color:#20c477aa;color:#5fe0a3;background:#20c47714}
+.btn.active{border-color:rgb(var(--acc-rgb) / 0.667);color:var(--acc-text);background:rgb(var(--acc-rgb) / 0.078)}
 .btn:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}
 .notice{font-size:11.5px;line-height:1.6;color:var(--muted);padding:14px 16px 14px 18px;position:relative;background:linear-gradient(180deg,#1f1a12,#18160f);border-color:#ffb34730}
 .notice:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--orange)}
@@ -85,7 +85,7 @@ h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;
 footer{text-align:center;color:#6f7f89;font-size:10.5px;line-height:1.5;padding:0}
 @media(min-width:760px){.app{padding:24px;gap:16px}.dashboard{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr);gap:16px;align-items:start}.map-panel{grid-row:span 2}.map-wrap{height:600px}.side-stack{display:grid;gap:16px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}.metric-label{margin:0}.metric-value{font-size:23px}h1{font-size:24px}.logo-img{width:56px;height:56px}}
 @media(max-width:390px){.app{padding:12px}.pill{font-size:9.5px;padding:6px 9px}.map-wrap{min-height:290px}.btn{padding:9px 12px}.subtitle{display:none}.tagline{letter-spacing:.8px;font-size:9.5px;white-space:nowrap}.brand{gap:10px}.logo-img{width:46px;height:46px}}
-.welcome{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:16px;background:radial-gradient(700px 400px at 50% 0,#20c4771f,transparent 70%),#07090bdd;backdrop-filter:blur(8px)}
+.welcome{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:16px;background:radial-gradient(700px 400px at 50% 0,rgb(var(--acc-rgb) / 0.122),transparent 70%),#07090bdd;backdrop-filter:blur(8px)}
 .welcome[hidden]{display:none}
 body.welcome-open{overflow:hidden}
 .welcome-card{width:min(100%,560px);max-height:calc(100dvh - 32px);overflow:auto;background:linear-gradient(180deg,#1c1f22,#14181b);border:1px solid var(--line2);border-radius:22px;box-shadow:0 30px 80px -20px #000e,0 0 0 1px #ffffff08 inset;padding:22px 22px 18px;outline:none}
@@ -105,15 +105,30 @@ body.welcome-open{overflow:hidden}
 .welcome-credit .credit-card{padding:5px 10px;border-radius:9px}
 .welcome-credit .credit-card img{height:30px}
 @media(max-width:420px){.welcome{padding:10px}.welcome-card{padding:18px 16px 14px;max-height:calc(100dvh - 20px)}.welcome-logo{width:220px}.welcome-card h2{font-size:20px}.welcome-intro{font-size:13px}.terms-box{max-height:150px}}
-.contact-line{font-size:11.5px;color:var(--muted);text-align:center}.contact{color:#5fe0a3;text-decoration:none;font-weight:600;white-space:nowrap}.contact:hover{text-decoration:underline}.contact:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766;border-radius:4px}.contact-line .sep{color:#4a5a65}
+.contact-line{font-size:11.5px;color:var(--muted);text-align:center}.contact{color:var(--acc-text);text-decoration:none;font-weight:600;white-space:nowrap}.contact:hover{text-decoration:underline}.contact:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.4);border-radius:4px}.contact-line .sep{color:#4a5a65}
 .welcome-contact{margin-top:8px}
+.welcome-account{display:grid;gap:9px;margin-top:4px}
+.welcome-account [hidden]{display:none!important}
+.welcome-why{margin:0 0 2px;padding:10px 12px;border-radius:12px;background:linear-gradient(90deg,rgb(var(--acc-rgb) / 0.094),#ffb3471a);border:1px solid rgb(var(--acc-rgb) / 0.251);font-size:12.8px;line-height:1.5;color:var(--acc-pale);text-align:center}
+.welcome-why strong{color:#fff}
+.welcome .btn.welcome-guest{width:100%;padding:12px;font-size:13.5px;font-weight:600;background:transparent;border:1px solid var(--line2);color:var(--silver)}
+.welcome .btn.welcome-guest:not([disabled]):hover{border-color:rgb(var(--acc-rgb) / 0.533);color:var(--text)}
+.welcome .btn[disabled]{opacity:.5;cursor:not-allowed}
+.welcome-authnote{grid-column:1/-1;margin:0;padding:9px 11px;border-radius:10px;background:#ffb34714;border:1px solid #ffb34755;color:#ffe2b8;font-size:12px;line-height:1.45;text-align:center}
+.welcome-hint{margin:0;font-size:11.5px;color:var(--muted);text-align:center}
+.welcome-signed{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:rgb(var(--acc-rgb) / 0.071);border:1px solid rgb(var(--acc-rgb) / 0.267)}
+.welcome-signed[hidden]{display:none}
+.welcome-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:rgb(var(--acc-rgb) / 0.2);color:var(--acc-pale);font-weight:800;font-size:15px}
+.welcome-signed-name{font-weight:700;font-size:14px;color:var(--text)}
+.welcome-signed-email{font-size:12px;color:var(--muted);word-break:break-all}
+@media(min-width:760px){.welcome-card{width:min(100%,600px);padding:26px 30px 20px}.welcome-account{grid-template-columns:1fr 1fr}.welcome-why,.welcome-signed,.welcome-hint{grid-column:1/-1}}
 
 :root{--s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px}
 .ico{width:15px;height:15px;flex:none;color:var(--green);vertical-align:-2px}
 .panel-head h2,.section-title{display:flex;align-items:center;gap:8px}
 .metric-label{display:flex;align-items:center;gap:7px}.metric-label .ico{width:14px;height:14px}
 .panel{transition:border-color .2s,box-shadow .2s}.panel:hover{border-color:var(--line2)}
-.hero{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);padding:var(--s3) var(--s4);border-radius:14px;border:1px solid #20c47733;background:linear-gradient(90deg,#20c47718,#20c47705 60%,transparent);font-size:12.5px;color:var(--silver)}
+.hero{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);padding:var(--s3) var(--s4);border-radius:14px;border:1px solid rgb(var(--acc-rgb) / 0.2);background:linear-gradient(90deg,rgb(var(--acc-rgb) / 0.094),rgb(var(--acc-rgb) / 0.02) 60%,transparent);font-size:12.5px;color:var(--silver)}
 .hero b{color:#fff;font-weight:700}.hero-items{display:flex;gap:var(--s4);flex-wrap:wrap}
 .hero-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);white-space:nowrap}
 .tips{position:relative}
@@ -127,8 +142,8 @@ body.welcome-open{overflow:hidden}
 .tip-dot[aria-current="true"]{width:18px;background:var(--green)}
 .tip-arrows{display:flex;gap:6px}
 .tip-arrow{width:30px;height:30px;border-radius:9px;border:1px solid var(--line2);background:#1c252b;color:var(--text);display:grid;place-items:center;font-size:14px}
-.tip-arrow:hover{border-color:#20c47780}.tip-arrow:focus-visible,.tip-dot:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766}
-.welcome-quote{margin:-4px 0 14px;padding:9px 12px;border-radius:10px;background:#20c47710;border:1px solid #20c47730;text-align:center;font-size:12.5px;font-style:italic;color:#bfeed6;transition:opacity .45s;min-height:38px;display:flex;align-items:center;justify-content:center}
+.tip-arrow:hover{border-color:rgb(var(--acc-rgb) / 0.502)}.tip-arrow:focus-visible,.tip-dot:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.4)}
+.welcome-quote{margin:-4px 0 14px;padding:9px 12px;border-radius:10px;background:rgb(var(--acc-rgb) / 0.063);border:1px solid rgb(var(--acc-rgb) / 0.188);text-align:center;font-size:12.5px;font-style:italic;color:var(--acc-pale);transition:opacity .45s;min-height:38px;display:flex;align-items:center;justify-content:center}
 .welcome-quote.fade{opacity:0}
 .notice{display:flex;gap:10px}.notice .ico{color:var(--orange);margin-top:2px}
 @media(max-width:600px){.hero-items{display:none}.hero{font-size:12px}}
@@ -142,9 +157,9 @@ body.welcome-open{overflow:hidden}
 #gpsChip.acc-good{border-color:#20c47799;color:#9be3bf}#gpsChip.acc-fair{border-color:#ffb34799;color:#ffd08a}#gpsChip.acc-poor{border-color:#ff625c99;color:#ffaaa6}
 
 /* Niyi helper */
-.niyi-fab{position:fixed;z-index:40;right:max(14px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;border:1px solid #20c47766;background:linear-gradient(180deg,#1c252b,#13191d);color:#9be3bf;font-weight:800;font-size:13px;letter-spacing:-.2px;box-shadow:0 10px 28px -8px #000c,0 0 0 4px #20c47714;display:grid;place-items:center;padding:0}
-.niyi-fab:hover{border-color:#20c477;color:#fff;background:linear-gradient(180deg,#243038,#1a2228)}
-.niyi-fab:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766,0 10px 28px -8px #000c}
+.niyi-fab{position:fixed;z-index:40;right:max(14px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;border:1px solid rgb(var(--acc-rgb) / 0.4);background:linear-gradient(180deg,#1c252b,#13191d);color:var(--acc-text);font-weight:800;font-size:13px;letter-spacing:-.2px;box-shadow:0 10px 28px -8px #000c,0 0 0 4px rgb(var(--acc-rgb) / 0.078);display:grid;place-items:center;padding:0}
+.niyi-fab:hover{border-color:var(--acc);color:#fff;background:linear-gradient(180deg,#243038,#1a2228)}
+.niyi-fab:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.4),0 10px 28px -8px #000c}
 .niyi-fab[aria-expanded="true"]{display:none}
 .niyi-panel{position:fixed;z-index:45;right:max(12px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:min(360px,calc(100vw - 24px));height:min(520px,calc(100dvh - 32px));display:none;flex-direction:column;background:linear-gradient(180deg,#1c252b,#14191d);border:1px solid var(--line2);border-radius:18px;box-shadow:0 24px 60px -16px #000e,0 0 0 1px #ffffff08 inset;overflow:hidden}
 .niyi-panel.open{display:flex}
@@ -154,22 +169,22 @@ body.welcome-open{overflow:hidden}
 .niyi-head-title span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}
 .niyi-head-actions{display:flex;gap:6px;flex:none}
 .niyi-icon{width:34px;height:34px;border-radius:10px;border:1px solid var(--line2);background:#222c33;color:var(--text);display:grid;place-items:center;font-size:14px;padding:0}
-.niyi-icon:hover{border-color:#20c47780}
-.niyi-icon[aria-pressed="true"]{border-color:#20c477aa;color:#5fe0a3;background:#20c47714}
+.niyi-icon:hover{border-color:rgb(var(--acc-rgb) / 0.502)}
+.niyi-icon[aria-pressed="true"]{border-color:rgb(var(--acc-rgb) / 0.667);color:var(--acc-text);background:rgb(var(--acc-rgb) / 0.078)}
 .niyi-icon[hidden]{display:none}
 .niyi-drive{display:none;margin:0;padding:8px 12px;font-size:11.5px;line-height:1.4;color:#ffd08a;background:#ffb34718;border-bottom:1px solid #ffb34733}
 .niyi-drive.show{display:block}
 .niyi-msgs{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
 .niyi-msg{max-width:92%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .niyi-msg.bot{align-self:flex-start;background:#0d1114;border:1px solid var(--line);color:#e6eef1;border-bottom-left-radius:5px}
-.niyi-msg.user{align-self:flex-end;background:#20c47722;border:1px solid #20c47744;color:#eef8f2;border-bottom-right-radius:5px}
+.niyi-msg.user{align-self:flex-end;background:rgb(var(--acc-rgb) / 0.133);border:1px solid rgb(var(--acc-rgb) / 0.267);color:var(--acc-pale);border-bottom-right-radius:5px}
 .niyi-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
 .niyi-chip{border:1px solid var(--line2);background:#222c33;color:var(--text);border-radius:999px;padding:7px 11px;font-size:11.5px;font-weight:600}
-.niyi-chip:hover{border-color:#20c47780;color:#9be3bf}
+.niyi-chip:hover{border-color:rgb(var(--acc-rgb) / 0.502);color:var(--acc-text)}
 .niyi-input-row{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px solid var(--line);background:#0d1114a8}
 .niyi-input{flex:1;min-width:0;border:1px solid var(--line2);background:#0d1114;color:var(--text);border-radius:11px;padding:10px 12px;font:inherit;font-size:13px}
-.niyi-input:focus{outline:none;border-color:#20c47799;box-shadow:0 0 0 3px #20c47733}
-.niyi-send{border:1px solid #20c477;background:linear-gradient(180deg,#27d083,var(--green2));color:#06150d;border-radius:11px;padding:10px 14px;font-size:12.5px;font-weight:700;flex:none}
+.niyi-input:focus{outline:none;border-color:rgb(var(--acc-rgb) / 0.6);box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.2)}
+.niyi-send{border:1px solid var(--acc);background:linear-gradient(180deg,var(--acc-hi),var(--green2));color:var(--acc-ink);border-radius:11px;padding:10px 14px;font-size:12.5px;font-weight:700;flex:none}
 .niyi-send:disabled{opacity:.42;cursor:not-allowed}
 @media(max-width:390px){
   .niyi-fab{width:50px;height:50px;font-size:12px;right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom))}
@@ -178,24 +193,24 @@ body.welcome-open{overflow:hidden}
 
 /* Header Ask Niyi */
 .header-actions{display:flex;align-items:center;gap:8px;flex:none}
-.niyi-header-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border-radius:999px;border:1px solid #20c47766;background:#20c47718;color:#9be3bf;font-size:12.5px;font-weight:700;white-space:nowrap}
-.niyi-header-btn:hover{border-color:#20c477;background:#20c47728;color:#fff}
+.niyi-header-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border-radius:999px;border:1px solid rgb(var(--acc-rgb) / 0.4);background:rgb(var(--acc-rgb) / 0.094);color:var(--acc-text);font-size:12.5px;font-weight:700;white-space:nowrap}
+.niyi-header-btn:hover{border-color:var(--acc);background:rgb(var(--acc-rgb) / 0.157);color:#fff}
 .niyi-header-btn svg{width:16px;height:16px;flex:none}
-@keyframes niyiPulse{0%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 #20c47766}70%{box-shadow:0 10px 28px -8px #000c,0 0 0 14px #20c47700}100%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 #20c47700}}
+@keyframes niyiPulse{0%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 rgb(var(--acc-rgb) / 0.4)}70%{box-shadow:0 10px 28px -8px #000c,0 0 0 14px rgb(var(--acc-rgb) / 0)}100%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 rgb(var(--acc-rgb) / 0)}}
 .niyi-fab.niyi-pulse{animation:niyiPulse 1.2s ease-out 2}
 @media(max-width:420px){.pill{display:none}.niyi-header-btn{padding:8px 10px;font-size:12px;gap:5px}.niyi-header-btn svg{width:15px;height:15px}.header-actions{gap:6px;flex:none}.night-toggle{padding:8px 10px}.account-btn{width:36px;height:36px}header{gap:8px}.brand{flex:1 1 auto;gap:9px}.brand h1{font-size:19px}.brand .tagline{white-space:normal;letter-spacing:.6px;font-size:9px;line-height:1.3}.logo-img{width:42px;height:42px}}
 /* Destination search */
 .map-search{position:absolute;z-index:5;left:12px;right:12px;top:52px;pointer-events:none}
 .map-search>*{pointer-events:auto}
 .dest-search{width:100%;border:1px solid #ffffff26;background:#0d1114f0;color:var(--text);border-radius:12px;padding:11px 14px 11px 38px;font:inherit;font-size:13.5px;font-weight:500;box-shadow:0 8px 24px -10px #000c;backdrop-filter:blur(10px)}
-.dest-search:focus{outline:none;border-color:#20c47799;box-shadow:0 0 0 3px #20c47733,0 8px 24px -10px #000c}
+.dest-search:focus{outline:none;border-color:rgb(var(--acc-rgb) / 0.6);box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.2),0 8px 24px -10px #000c}
 .dest-search-wrap{position:relative}
 .dest-search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
 .dest-results{margin-top:6px;background:#0d1114f5;border:1px solid var(--line2);border-radius:12px;overflow:hidden;box-shadow:0 14px 36px -12px #000d;max-height:220px;overflow-y:auto}
 .dest-results[hidden]{display:none}
 .dest-result{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--text);padding:10px 12px;font:inherit;font-size:12.5px;line-height:1.4;cursor:pointer}
 .dest-result:last-child{border-bottom:0}
-.dest-result:hover,.dest-result:focus{background:#20c47718;outline:none}
+.dest-result:hover,.dest-result:focus{background:rgb(var(--acc-rgb) / 0.094);outline:none}
 .dest-result small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 .dest-card{position:absolute;z-index:5;left:12px;right:58px;bottom:12px;background:#0d1114f2;border:1px solid var(--line2);border-radius:14px;padding:12px 12px 10px;box-shadow:0 14px 36px -12px #000d;backdrop-filter:blur(10px);max-height:46%;overflow:auto}
 .dest-card[hidden]{display:none}
@@ -205,7 +220,7 @@ body.welcome-open{overflow:hidden}
 .dest-actions .btn{padding:8px 12px;font-size:12px}
 .dest-note{margin:0;font-size:10.5px;line-height:1.45;color:#6f7f89}
 .dest-steps{margin:8px 0;border:1px solid var(--line);border-radius:10px;background:#13191d;overflow:hidden}
-.dest-steps summary{cursor:pointer;padding:8px 10px;font-size:11.5px;font-weight:600;color:#9be3bf;list-style:none}
+.dest-steps summary{cursor:pointer;padding:8px 10px;font-size:11.5px;font-weight:600;color:var(--acc-text);list-style:none}
 .dest-steps summary::-webkit-details-marker{display:none}
 .dest-steps ol{margin:0;padding:0 12px 10px 28px;font-size:11.5px;line-height:1.45;color:#cfd8dd}
 .dest-steps li{margin:5px 0}
@@ -218,15 +233,15 @@ body.welcome-open{overflow:hidden}
 /* Voice navigation */
 .nav-banner{position:absolute;z-index:7;left:10px;right:10px;top:10px;display:none;flex-direction:column;gap:6px;pointer-events:none}
 .nav-banner.open{display:flex}
-.nav-banner-main{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:12px 12px;border-radius:16px;background:linear-gradient(180deg,#122018f5,#0d1114f2);border:1px solid #20c47755;box-shadow:0 16px 40px -14px #000e;backdrop-filter:blur(12px)}
-.nav-arrow{width:52px;height:52px;border-radius:14px;background:#20c47722;border:1px solid #20c47755;color:#9be3bf;display:grid;place-items:center;font-size:28px;font-weight:800;flex:none}
+.nav-banner-main{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:12px 12px;border-radius:16px;background:linear-gradient(180deg,#122018f5,#0d1114f2);border:1px solid rgb(var(--acc-rgb) / 0.333);box-shadow:0 16px 40px -14px #000e;backdrop-filter:blur(12px)}
+.nav-arrow{width:52px;height:52px;border-radius:14px;background:rgb(var(--acc-rgb) / 0.133);border:1px solid rgb(var(--acc-rgb) / 0.333);color:var(--acc-text);display:grid;place-items:center;font-size:28px;font-weight:800;flex:none}
 .nav-instr{min-width:0;flex:1}
 .nav-dist{font-size:20px;font-weight:800;letter-spacing:-.4px;color:#fff;line-height:1.1}
 .nav-text{font-size:13px;line-height:1.35;color:#d5e7dd;margin-top:3px;font-weight:600}
 .nav-mute{width:40px;height:40px;border-radius:12px;border:1px solid var(--line2);background:#222c33;color:var(--text);flex:none;font-size:16px;padding:0}
 .nav-mute[aria-pressed="true"]{border-color:#ffb34766;color:#ffd08a}
 .nav-banner-sub{pointer-events:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;padding:7px 10px;border-radius:11px;background:#0d1114e8;border:1px solid #ffffff14;font-size:11px;color:#cfd8dd}
-.nav-remain{font-weight:700;color:#9be3bf}
+.nav-remain{font-weight:700;color:var(--acc-text)}
 .nav-safety{color:#ffd08a;font-weight:600}
 body.navigating .map-search{top:128px}
 body.navigating .map-status{opacity:.0;pointer-events:none}
@@ -239,8 +254,8 @@ body.navigating .dest-card{max-height:38%}
 }
 
 .niyi-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.niyi-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #20c47766;background:#20c47718;color:#9be3bf;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;text-decoration:none;cursor:pointer}
-.niyi-action:hover{border-color:#20c477;background:#20c47728;color:#fff}
+.niyi-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgb(var(--acc-rgb) / 0.4);background:rgb(var(--acc-rgb) / 0.094);color:var(--acc-text);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;text-decoration:none;cursor:pointer}
+.niyi-action:hover{border-color:var(--acc);background:rgb(var(--acc-rgb) / 0.157);color:#fff}
 .niyi-action.btnish{font:inherit}
 .niyi-mic{width:40px;height:40px;border-radius:11px;border:1px solid var(--line2);background:#222c33;color:var(--text);flex:none;font-size:16px;padding:0}
 .niyi-mic[aria-pressed="true"]{border-color:#ff625c99;color:#ffaaa6;background:#ff625c18}
@@ -249,11 +264,15 @@ body.navigating .dest-card{max-height:38%}
 
 /* Route bends + hazards + favs + night + offline + emergency */
 .bend-list{margin:8px 0;padding:8px 10px;border-radius:10px;background:#13191d;border:1px solid var(--line);font-size:11.5px;line-height:1.45;color:#cfd8dd}
-.bend-list strong{color:#9be3bf}
+.bend-list strong{color:var(--acc-text)}
 .bend-item{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid #ffffff0d}
 .bend-item:last-child{border-bottom:0}
 .bend-tag{font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px}
 .bend-tag.mild{color:#ffd08a}.bend-tag.moderate{color:#ffb347}.bend-tag.sharp{color:#ff625c}
+.apex-upsell{margin-top:8px;background:linear-gradient(90deg,rgb(var(--acc-rgb) / 0.2),#ffb34733);border-color:rgb(var(--acc-rgb) / 0.533);color:var(--acc-pale)}
+.linkish{background:none;border:0;padding:0;color:#7fe0b0;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.niyi-msg.typing{opacity:.7;font-style:italic}
+.niyi-limit{font-size:11px;color:var(--muted);padding:2px 12px 6px;text-align:right}
 .speed-bend-banner{display:none;margin-top:6px;padding:8px 10px;border-radius:10px;background:#ff625c22;border:1px solid #ff625c66;color:#ffd0ce;font-size:12px;font-weight:700}
 .speed-bend-banner.open{display:block}
 .fav-row,.hazard-row,.emerg-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -263,22 +282,22 @@ body.navigating .dest-card{max-height:38%}
 .emerg-fab{position:fixed;z-index:41;left:max(14px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;border:1px solid #ff625c88;background:linear-gradient(180deg,#3a1818,#1a0f0f);color:#ffaaa6;font-weight:800;font-size:11px;box-shadow:0 10px 28px -8px #000c}
 .emerg-sheet{position:fixed;z-index:55;left:12px;right:12px;bottom:max(16px,env(safe-area-inset-bottom));display:none;flex-direction:column;gap:8px;padding:14px;border-radius:16px;background:#14191df5;border:1px solid #ff625c55;box-shadow:0 20px 50px -16px #000e}
 .emerg-sheet.open{display:flex}
-.install-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid #20c47744;background:#20c47712;font-size:12px}
+.install-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid rgb(var(--acc-rgb) / 0.267);background:rgb(var(--acc-rgb) / 0.071);font-size:12px}
 .install-bar.show{display:flex}
 
 
 
 /* Account / Apex / Profile preview */
-.account-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;border:1px solid #20c47766;background:#20c47714;color:#9be3bf;padding:0;cursor:pointer}
-.account-btn.signed-in{padding:0;border-color:#20c477aa}
-.account-avatar{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;font-size:11px;font-weight:800;background:linear-gradient(180deg,#27d083,#17a863);color:#06150d}
+.account-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;border:1px solid rgb(var(--acc-rgb) / 0.4);background:rgb(var(--acc-rgb) / 0.078);color:var(--acc-text);padding:0;cursor:pointer}
+.account-btn.signed-in{padding:0;border-color:rgb(var(--acc-rgb) / 0.667)}
+.account-avatar{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;font-size:11px;font-weight:800;background:linear-gradient(180deg,var(--acc-hi),var(--acc2));color:var(--acc-ink)}
 .account-avatar.lg{width:52px;height:52px;font-size:16px;flex:0 0 auto}
 .account-menu{position:fixed;z-index:80;right:max(12px,env(safe-area-inset-right));top:64px;width:min(300px,calc(100vw - 24px));background:#14191df7;border:1px solid var(--line2);border-radius:16px;padding:12px;box-shadow:0 20px 50px -16px #000e;display:none;flex-direction:column;gap:8px}
 .account-menu.open{display:flex}
 .acct-head{display:flex;gap:10px;align-items:center;margin-bottom:4px}
 .plan-badge{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase}
 .plan-badge.free{background:#ffffff12;color:#c9d1d6;border:1px solid #ffffff22}
-.plan-badge.premium{background:#20c47722;color:#9be3bf;border:1px solid #20c47766}
+.plan-badge.premium{background:rgb(var(--acc-rgb) / 0.133);color:var(--acc-text);border:1px solid rgb(var(--acc-rgb) / 0.4)}
 .cg-overlay{position:fixed;inset:0;z-index:90;display:none;align-items:flex-end;justify-content:center;padding:12px;background:#000a;backdrop-filter:blur(4px)}
 .cg-overlay.open{display:flex}
 .cg-sheet{width:min(520px,100%);max-height:min(92dvh,900px);overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:18px 18px 14px 14px;padding:16px;box-shadow:0 24px 60px -20px #000e;color:var(--text)}
@@ -286,15 +305,15 @@ body.navigating .dest-card{max-height:38%}
 .cg-sheet .sheet-sub{color:var(--muted);font-size:12.5px;margin-bottom:12px;line-height:1.45}
 .cg-sheet .sheet-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
 .cg-sheet .icon-close{border:0;background:#ffffff10;color:var(--text);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:16px}
-.why-apex{margin:4px 0 12px;padding:12px 0 10px;border-radius:16px;background:radial-gradient(120% 90% at 0% 0%,#20c47722,#20c47700 60%),linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line2);overflow:hidden}
+.why-apex{margin:4px 0 12px;padding:12px 0 10px;border-radius:16px;background:radial-gradient(120% 90% at 0% 0%,rgb(var(--acc-rgb) / 0.133),rgb(var(--acc-rgb) / 0) 60%),linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line2);overflow:hidden}
 .why-apex .why-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 12px 8px}
 .why-apex h3{margin:0;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--green)}
 .why-apex .why-hint{font-size:10.5px;color:var(--muted);white-space:nowrap}
 .why-track{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 12px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .why-track::-webkit-scrollbar{display:none}
 .why-card{flex:0 0 min(78%,260px);scroll-snap-align:start;display:flex;gap:9px;align-items:flex-start;padding:10px 11px;border-radius:13px;background:#0d1114a8;border:1px solid var(--line);font-size:12.5px;line-height:1.42;color:var(--text);min-height:74px}
-.why-card .why-ico{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:#20c4771c;border:1px solid #20c47744}
-.why-card strong{color:#9ff0c8;font-weight:700}
+.why-card .why-ico{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:rgb(var(--acc-rgb) / 0.11);border:1px solid rgb(var(--acc-rgb) / 0.267)}
+.why-card strong{color:var(--acc-text);font-weight:700}
 .why-card sup a,.why-src a{color:var(--green);text-decoration:none;font-weight:700}
 .why-card sup{font-size:9.5px;margin-left:2px}
 .why-src{margin:4px 12px 0;font-size:10px;line-height:1.5;color:var(--muted)}
@@ -317,7 +336,7 @@ body.theme-light .why-card strong{color:#0f7a48}
 .auth-fields{display:grid;gap:8px;margin:8px 0}
 .auth-fields input,.profile-grid input,.profile-grid select,textarea.cg-input{width:100%;border-radius:11px;border:1px solid var(--line2);background:#0f1418;color:var(--text);padding:10px 12px;font-size:13px}
 .auth-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.auth-links button{background:none;border:0;color:#9be3bf;font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
+.auth-links button{background:none;border:0;color:var(--acc-text);font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
 .benefit-list{margin:0;padding-left:18px;font-size:13px;line-height:1.55;color:var(--silver)}
 .benefit-list li{margin:4px 0}
 .compare{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
@@ -327,16 +346,16 @@ body.theme-light .why-card strong{color:#0f7a48}
 .plan-cards{display:grid;gap:8px;margin:10px 0}
 .plan-card{border:1px solid var(--line2);border-radius:14px;padding:12px;background:#12181c}
 .plan-card strong{display:block;font-size:14px}
-.plan-card .price{color:#9be3bf;font-weight:800;margin:4px 0 8px;font-size:13px}
-.save-badge{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.3px;background:#20c47733;color:#9be3bf;border:1px solid #20c47766;vertical-align:middle}
+.plan-card .price{color:var(--acc-text);font-weight:800;margin:4px 0 8px;font-size:13px}
+.save-badge{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.3px;background:rgb(var(--acc-rgb) / 0.2);color:var(--acc-text);border:1px solid rgb(var(--acc-rgb) / 0.4);vertical-align:middle}
 .price-strike{color:var(--muted);font-weight:600;text-decoration:line-through;margin-right:6px;font-size:12px}
 .currency-switch{display:inline-flex;gap:4px;margin:6px 0 10px}
-.currency-switch .btn.active{border-color:#20c477aa;color:#9be3bf;background:#20c47714}
+.currency-switch .btn.active{border-color:rgb(var(--acc-rgb) / 0.667);color:var(--acc-text);background:rgb(var(--acc-rgb) / 0.078)}
 .btn.sm{padding:7px 10px;font-size:11.5px}
 .btn.danger,.btn.danger-outline{border-color:#ff625c88;color:#ffaaa6}
 .btn.danger{background:#3a1818}
 .pro-badge{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:800;letter-spacing:.5px;background:#7aa2ff33;color:#a8c4ff;border:1px solid #7aa2ff55;vertical-align:middle}
-.preview-gate-bar{position:fixed;z-index:75;left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;background:#12181cf2;border:1px solid #20c47744;font-size:11px;color:#cfd8dd;max-width:calc(100vw - 20px);box-shadow:0 10px 28px -10px #000c}
+.preview-gate-bar{position:fixed;z-index:75;left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;background:#12181cf2;border:1px solid rgb(var(--acc-rgb) / 0.267);font-size:11px;color:#cfd8dd;max-width:calc(100vw - 20px);box-shadow:0 10px 28px -10px #000c}
 .preview-gate-bar label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
 body.focus-mode .preview-gate-bar,body.focus-mode .account-btn,body.focus-mode .account-menu{display:none!important}
 .profile-head{display:flex;gap:12px;align-items:center;margin-bottom:12px}
@@ -346,11 +365,11 @@ body.focus-mode .preview-gate-bar,body.focus-mode .account-btn,body.focus-mode .
 @media(min-width:520px){.profile-grid.two{grid-template-columns:1fr 1fr}}
 .car-icon-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .car-icon-opt{display:flex;flex-direction:column;align-items:center;gap:4px;width:68px;padding:8px 4px;border-radius:12px;border:1px solid var(--line2);background:#0f1418;color:var(--green);cursor:pointer;font-size:10px;text-transform:capitalize}
-.car-icon-opt.active{border-color:#20c477aa;background:#20c47714}
+.car-icon-opt.active{border-color:rgb(var(--acc-rgb) / 0.667);background:rgb(var(--acc-rgb) / 0.078)}
 .car-icon-opt span{color:var(--muted)}
 .profile-fav-row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #ffffff0d}
 .theme-opts{display:flex;flex-wrap:wrap;gap:6px}
-.theme-opts .btn.active{border-color:#20c477aa;color:#9be3bf;background:#20c47714}
+.theme-opts .btn.active{border-color:rgb(var(--acc-rgb) / 0.667);color:var(--acc-text);background:rgb(var(--acc-rgb) / 0.078)}
 .car-marker--svg{width:32px;height:32px;display:grid;place-items:center;filter:drop-shadow(0 2px 5px #0009)}
 .car-marker--svg:before,.car-marker--svg:after{display:none!important}
 .car-marker--svg svg{display:block}
@@ -361,14 +380,14 @@ body.theme-light{background:var(--bg);color:var(--text)}
 body.theme-light .cg-sheet,body.theme-light .account-menu{background:#fff;border-color:var(--line)}
 body.theme-light .auth-fields input,body.theme-light .profile-grid input,body.theme-light .profile-grid select,body.theme-light textarea.cg-input,body.theme-light .compare .col,body.theme-light .plan-card,body.theme-light .car-icon-opt{background:#f4f7fa;color:var(--text)}
 body.theme-light .btn{background:#eef3f6;color:var(--text)}
-body.theme-light .btn.primary{color:#06150d}
+body.theme-light .btn.primary{color:var(--acc-ink)}
 body.theme-light .preview-gate-bar{background:#ffffffef;color:var(--text)}
 body.theme-light .status-chip,body.theme-light .dest-search,body.theme-light .map-reset{color:#eef3f5}
 
 /* Reset view — free map control */
 .map-reset{position:absolute;z-index:4;left:12px;bottom:62px;display:none;align-items:center;gap:7px;border:0;border-radius:999px;padding:10px 12px;background:#12181cf2;color:#eef3f5;font-size:12px;font-weight:750;box-shadow:0 8px 28px -10px #000c;border:1px solid #ffffff24;pointer-events:auto;cursor:pointer}
 .map-reset.show{display:inline-flex}
-.map-reset.needs-reset{border-color:#20c47799;color:#9be3bf;box-shadow:0 8px 28px -10px #000c,0 0 0 3px #20c47722}
+.map-reset.needs-reset{border-color:rgb(var(--acc-rgb) / 0.6);color:var(--acc-text);box-shadow:0 8px 28px -10px #000c,0 0 0 3px rgb(var(--acc-rgb) / 0.133)}
 .map-reset svg{width:16px;height:16px;flex:0 0 auto}
 .map-reset .map-reset-label{display:none}
 @media(min-width:760px){
@@ -418,7 +437,7 @@ body.focus-mode .focus-hud{display:flex;position:fixed;z-index:56;left:12px;top:
 body.focus-mode .focus-exit{display:inline-flex;align-items:center;position:fixed;z-index:58;right:12px;top:12px;border:0;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:750;background:#12181cf2;color:#eef3f5;box-shadow:0 8px 28px -10px #000c;pointer-events:auto}
 /* Compact Ask Niyi in focus (header Niyi is hidden) */
 body.focus-mode .niyi-header-btn{display:none!important}
-body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index:58;right:12px;top:52px;border:0;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:750;background:#12181cf2;color:#9be3bf;box-shadow:0 8px 28px -10px #000c}
+body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index:58;right:12px;top:52px;border:0;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:750;background:#12181cf2;color:var(--acc-text);box-shadow:0 8px 28px -10px #000c}
 .focus-niyi{display:none}
 /* Lift SOS / Niyi above MapLibre attribution; keep 6.0 sizes on desktop */
 .emerg-fab{bottom:max(72px, calc(16px + env(safe-area-inset-bottom)))!important}
@@ -429,6 +448,228 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
   .map-controls{bottom:78px}
   .maplibregl-ctrl-bottom-right{margin-bottom:4px}
 }
+
+/* 7.2.5 accent colour themes (Profile > Appearance). Safety colours (--red, --orange, danger/bend warnings, emergency, GPS accuracy) stay fixed. */
+body[data-accent="blue"]{--acc:#3b8cff;--acc-rgb:59 140 255;--acc-hi:#5aa0ff;--acc2:#2a6fd6;--acc-text:#a8cbff;--acc-pale:#e3eeff;--acc-ink:#04122a;--acc-deep:#1d5bb8;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+body[data-accent="purple"]{--acc:#9b6bff;--acc-rgb:155 107 255;--acc-hi:#ad85ff;--acc2:#7c4ddb;--acc-text:#cdb8ff;--acc-pale:#efe8ff;--acc-ink:#14082e;--acc-deep:#6236c4;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+body[data-accent="orange"]{--acc:#ff8a3d;--acc-rgb:255 138 61;--acc-hi:#ff9f5f;--acc2:#e06f22;--acc-text:#ffc59e;--acc-pale:#fff0e5;--acc-ink:#2a1203;--acc-deep:#b85314;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+body[data-accent="pink"]{--acc:#ff5fa2;--acc-rgb:255 95 162;--acc-hi:#ff7db4;--acc2:#e04585;--acc-text:#ffb3d3;--acc-pale:#ffe8f2;--acc-ink:#2a0616;--acc-deep:#c02a6a;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+body[data-accent="gold"]{--acc:#f2c230;--acc-rgb:242 194 48;--acc-hi:#f7d055;--acc2:#d4a514;--acc-text:#f7dd8a;--acc-pale:#fff7dc;--acc-ink:#231a02;--acc-deep:#8a6a00;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc2:#c9353a;--acc-text:#ffb0b2;--acc-pale:#ffe6e7;--acc-ink:#2a0506;--acc-deep:#b02a2f;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+/* safety UI keeps its fixed colours whatever accent is chosen */
+.emerg-sheet,.emerg-fab,.status-box,#gpsChip,.bend-list,.speed-warning{--acc:#20c477;--acc-rgb:32 196 119;--acc-hi:#27d083;--acc2:#17a863;--acc-text:#9be3bf;--acc-pale:#dff6ea;--acc-ink:#06150d;--green:#20c477;--green2:#17a863}
+#premiumScreen.is-apex .pay-only{display:none!important}
+.apex-active-box{display:block;line-height:1.5}
+.apex-active-box[hidden]{display:none}
+.accent-opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.accent-opt{display:inline-flex;align-items:center;gap:7px;padding:7px 11px 7px 8px;border-radius:999px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);font-size:12px;font-weight:650;cursor:pointer}
+.accent-opt .sw{width:18px;height:18px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 2px #0003}
+.accent-opt.active{border-color:var(--acc);box-shadow:0 0 0 2px rgb(var(--acc-rgb) / .35)}
+.accent-opt:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(var(--acc-rgb) / .5)}
+
+/* 7.2.5 micro-animations: short (150-300 ms), transform/opacity only, accent-coloured.
+   Never on safety UI (nav banner, curve/bend warnings, emergency). prefers-reduced-motion turns them all off (rule above + JS checks). */
+.btn,.icon-btn,.niyi-chip,.niyi-action,.accent-opt,.car-icon-opt,.account-btn,.niyi-send,.niyi-header-btn,.dest-result{transition:background .18s,border-color .18s,color .18s,box-shadow .18s,transform .14s cubic-bezier(.2,.8,.3,1.4)}
+.btn:active,.icon-btn:active,.niyi-chip:active,.niyi-action:active,.accent-opt:active,.car-icon-opt:active,.account-btn:active,.niyi-send:active,.niyi-header-btn:active{transform:scale(.95)}
+.accent-opt.active .sw{animation:cgSwPop .26s cubic-bezier(.2,.8,.3,1.5)}
+@keyframes cgSwPop{0%{transform:scale(.7)}100%{transform:scale(1)}}
+.cg-ripple-wrap{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none}
+.cg-ripple{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:rgb(var(--acc-rgb) / .35);transform:scale(0);opacity:.9;animation:cgRipple .3s ease-out forwards;pointer-events:none}
+.btn.primary .cg-ripple,.niyi-send .cg-ripple{background:#ffffff59}
+@keyframes cgRipple{to{transform:scale(var(--cg-rs,18));opacity:0}}
+.cg-overlay.open{animation:cgFadeIn .2s ease-out}
+.cg-overlay.open .cg-sheet{animation:cgSheetIn .26s cubic-bezier(.2,.8,.25,1)}
+.cg-overlay.cg-closing,.account-menu.cg-closing{display:flex;pointer-events:none;animation:cgFadeOut .17s ease-in forwards}
+.cg-overlay.cg-closing .cg-sheet{animation:cgSheetOut .17s ease-in forwards}
+.account-menu.open{animation:cgMenuIn .18s cubic-bezier(.2,.8,.3,1.2);transform-origin:top right}
+.niyi-panel.open{animation:cgPanelIn .22s cubic-bezier(.2,.8,.25,1);transform-origin:bottom right}
+@keyframes cgFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes cgFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes cgSheetIn{from{opacity:0;transform:translateY(26px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes cgSheetOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(18px)}}
+@keyframes cgMenuIn{from{opacity:0;transform:translateY(-6px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes cgPanelIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.niyi-msg{animation:cgBubble .22s cubic-bezier(.2,.8,.3,1.25) both}
+.niyi-msg.user{transform-origin:bottom right}.niyi-msg.bot{transform-origin:bottom left}
+@keyframes cgBubble{from{opacity:0;transform:translateY(8px) scale(.94)}to{opacity:1;transform:none}}
+.niyi-msg.typing{font-style:normal;opacity:1}
+.cg-dots{display:inline-flex;gap:4px;align-items:center;height:14px}
+.cg-dots i{width:6px;height:6px;border-radius:50%;background:var(--acc-text);opacity:.35;animation:cgDot 1s infinite ease-in-out}
+.cg-dots i:nth-child(2){animation-delay:.15s}.cg-dots i:nth-child(3){animation-delay:.3s}
+@keyframes cgDot{0%,80%,100%{opacity:.35;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+.cg-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.cg-stagger .why-card,.cg-stagger .profile-fav-row,.cg-stagger .plan-card,.cg-stagger .accent-opt,.cg-stagger .car-icon-opt,.cg-stagger .benefit-list li,.cg-stagger .profile-section{animation:cgItemIn .26s cubic-bezier(.2,.8,.25,1) both}
+.cg-stagger :nth-child(2){animation-delay:.03s!important}.cg-stagger :nth-child(3){animation-delay:.06s!important}.cg-stagger :nth-child(4){animation-delay:.09s!important}.cg-stagger :nth-child(5){animation-delay:.12s!important}.cg-stagger :nth-child(n+6){animation-delay:.15s!important}
+@keyframes cgItemIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.welcome:not([hidden]) .welcome-card{animation:cgWelcomeIn .3s cubic-bezier(.2,.8,.25,1) both}
+.welcome:not([hidden]) .welcome-logo{animation:cgItemIn .3s .06s cubic-bezier(.2,.8,.25,1) both}
+@keyframes cgWelcomeIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.plan-badge.premium{transition:transform .2s}
+.cg-confetti{position:fixed;inset:0;pointer-events:none;z-index:1200;overflow:hidden}
+.cg-confetti i{position:absolute;left:50%;top:38%;width:8px;height:12px;border-radius:2px;opacity:0;will-change:transform,opacity;animation:cgConfetti var(--d,.9s) cubic-bezier(.15,.7,.35,1) forwards}
+@keyframes cgConfetti{0%{opacity:1;transform:translate(-50%,-50%) rotate(0) scale(.6)}70%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r)) scale(1)}}
+.cg-toast{position:fixed;left:50%;top:max(18px,env(safe-area-inset-top));z-index:1201;transform:translateX(-50%);padding:10px 16px;border-radius:999px;background:linear-gradient(180deg,var(--acc-hi),var(--acc2));color:var(--acc-ink);font-weight:800;font-size:13px;box-shadow:0 12px 30px -10px #000c;pointer-events:none;animation:cgToast 2.6s ease forwards}
+@keyframes cgToast{0%{opacity:0;transform:translate(-50%,-10px) scale(.95)}8%{opacity:1;transform:translate(-50%,0) scale(1)}85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-6px)}}
+@media(prefers-reduced-motion:reduce){.cg-confetti,.cg-ripple-wrap{display:none!important}.cg-toast{animation:none!important;opacity:1}}
+
+/* 7.2.5 Niyi mascot: original rounded bot face, inline SVG, accent coloured. States: idle | thinking | happy | error */
+.niyi-face{display:block;overflow:visible}
+.niyi-face .nf-head{fill:var(--acc)}
+.niyi-face .nf-shine{fill:#fff;opacity:.22}
+.niyi-face .nf-screen{fill:#0b1512}
+.niyi-face .nf-eye{fill:#f4fffa;transform-box:fill-box;transform-origin:center}
+.niyi-face .nf-ant{fill:none;stroke:var(--acc);stroke-width:2.4;stroke-linecap:round}
+.niyi-face .nf-ant-dot{fill:var(--acc-hi)}
+.niyi-face .nf-cheek{fill:var(--acc-hi);opacity:0;transition:opacity .2s}
+.niyi-face .nf-smile,.niyi-face .nf-wavy,.niyi-face .nf-happy{fill:none;stroke:#f4fffa;stroke-width:2;stroke-linecap:round;opacity:0;transition:opacity .18s}
+.niyi-face .nf-smile{opacity:.9}
+.niyi-face .nf-all{transform-box:fill-box;transform-origin:50% 60%}
+.niyi-face .nf-eyes{transform-box:fill-box;transform-origin:center}
+.niyi-face[data-state="idle"].live .nf-all{animation:nfFloat 3.2s ease-in-out infinite}
+.niyi-face[data-state="idle"] .nf-eye{animation:nfBlink 4.6s infinite}
+.niyi-face[data-state="thinking"] .nf-eyes{animation:nfLook 1.3s ease-in-out infinite}
+.niyi-face[data-state="thinking"] .nf-all{animation:nfBounce .6s ease-in-out infinite}
+.niyi-face[data-state="thinking"] .nf-smile{opacity:0}
+.niyi-face[data-state="happy"] .nf-eye{opacity:0}
+.niyi-face[data-state="happy"] .nf-happy,.niyi-face[data-state="happy"] .nf-cheek{opacity:.95}
+.niyi-face[data-state="happy"] .nf-all{animation:nfHop .34s cubic-bezier(.2,.8,.3,1.4)}
+.niyi-face[data-state="error"] .nf-eye.l{transform:scaleY(.5)}
+.niyi-face[data-state="error"] .nf-eye.r{transform:translateY(-1px) scale(.85)}
+.niyi-face[data-state="error"] .nf-smile{opacity:0}
+.niyi-face[data-state="error"] .nf-wavy{opacity:.9}
+.niyi-face[data-state="error"] .nf-all{animation:nfTilt .4s ease forwards}
+@keyframes nfFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.6px)}}
+@keyframes nfBlink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.12)}}
+@keyframes nfLook{0%,100%{transform:translateX(0)}25%{transform:translateX(-2.2px)}65%{transform:translateX(2.2px) translateY(-.6px)}}
+@keyframes nfBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes nfHop{0%{transform:translateY(0) scale(1)}45%{transform:translateY(-3px) scale(1.04)}100%{transform:none}}
+@keyframes nfTilt{to{transform:rotate(-8deg)}}
+.niyi-fab .niyi-face{width:34px;height:34px}
+.niyi-header-btn .niyi-face{width:20px;height:20px;margin:-2px 0}
+.niyi-head-face{flex:none;width:34px;height:34px;display:block}
+.niyi-head-face .niyi-face{width:34px;height:34px}
+.niyi-head{justify-content:flex-start}.niyi-head-title{flex:1}
+.niyi-msg.bot.has-face{display:flex;gap:7px;align-items:flex-start}
+.niyi-msg.bot.has-face>.niyi-bubble-face{flex:none;width:18px;height:18px;margin-top:1px}
+.niyi-msg.bot.has-face>.niyi-bubble-body{min-width:0;flex:1}
+.niyi-msg.typing .niyi-bubble-face{width:20px;height:20px}
+.niyi-msg.typing{display:flex;align-items:center;gap:8px}
+
+/* 8.0 SOS contacts (safety colours fixed) */
+.emerg-sheet{max-height:calc(100dvh - 32px);overflow:auto;max-width:480px;margin:0 auto;gap:10px}
+.emerg-sheet .emerg-call{min-height:48px;font-size:14px}
+.emerg-loc{font-size:12.5px;color:var(--silver);padding:8px 10px;border-radius:10px;background:#ffffff08;border:1px solid var(--line)}
+.emerg-send{display:flex;flex-direction:column;gap:8px}
+.emerg-send .btn{min-height:44px}
+.emerg-contact{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)}
+.emerg-contact span{font-size:12.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.emerg-contact .acts{display:flex;gap:6px;flex:none}
+.emerg-contact .btn{min-height:40px;padding:8px 11px}
+.emerg-note{margin:0;font-size:11.5px;color:var(--muted);line-height:1.45}
+.emerg-row{display:flex;gap:8px;justify-content:space-between}
+.emerg-row .btn{flex:1;min-height:44px}
+.sos-list{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.sos-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
+.sos-item .small{display:block}
+
+/* 8.0 what's new */
+.whats-new{margin:0 0 14px;border:1px solid rgb(var(--acc-rgb) / .3);background:rgb(var(--acc-rgb) / .07);border-radius:12px;padding:0 14px}
+.whats-new summary{cursor:pointer;list-style:none;padding:12px 0;font-weight:750;font-size:13.5px;color:var(--acc-text);min-height:44px;display:flex;align-items:center}
+.whats-new summary::-webkit-details-marker{display:none}
+.whats-new summary::after{content:"＋";margin-left:auto;opacity:.7}
+.whats-new[open] summary::after{content:"－"}
+.whats-new ul{margin:0 0 12px;padding-left:18px;font-size:12.8px;line-height:1.6;color:var(--silver)}
+
+/* ===== 8.0 layout & spacing polish =====
+   Spacing scale: --s1 4 · --s2 8 · --s3 12 · --s4 16 · --s5 24 · (--s6 32). Radii: cards 18, sheets 20, controls 12.
+   Tap targets >= 44px on touch screens. Safety UI keeps its own sizes/colours. */
+:root{--s6:32px;--r-card:18px;--r-ctl:12px}
+.app{gap:var(--s4);padding:var(--s4)}
+@media(min-width:760px){.app{gap:var(--s5);padding:var(--s5)}}
+.content{padding:var(--s4) var(--s4) var(--s5)}
+@media(min-width:760px){.content{padding:var(--s5)}}
+.panel{border-radius:var(--r-card)}
+.metric{padding:var(--s3) var(--s4);border-radius:var(--r-card)}
+.metrics{gap:var(--s3)}
+.actions{gap:var(--s2);margin-top:var(--s4)}
+.row{gap:var(--s3)}
+.small{line-height:1.5}
+.btn{border-radius:var(--r-ctl);padding:10px 16px}
+.header-actions{gap:var(--s2)}
+@media(pointer:coarse){
+  .btn,.btn.sm,.icon-btn,.niyi-chip,.niyi-action,.accent-opt,.theme-opts .btn,.currency-switch .btn,.tip-arrow{min-height:44px}
+  .icon-btn,.account-btn,.tip-arrow{min-width:44px}
+  .account-btn{width:44px;height:44px}
+  .niyi-icon{min-width:44px;min-height:44px}
+  .cg-sheet .icon-close{width:44px;height:44px}
+  .btn.sm{padding:9px 14px}
+}
+/* sheets: more air, clear hierarchy */
+.cg-sheet{padding:var(--s5) var(--s4) var(--s5);border-radius:20px 20px 16px 16px}
+@media(min-width:760px){.cg-overlay{align-items:center;padding:var(--s5)}.cg-sheet{padding:var(--s5) 28px 28px;border-radius:20px}}
+.cg-sheet .sheet-head{margin-bottom:var(--s3);gap:var(--s3)}
+.cg-sheet h2{font-size:1.3rem;letter-spacing:-.2px}
+.cg-sheet .sheet-sub{margin-bottom:var(--s4);line-height:1.55}
+.profile-section{padding:var(--s5) 0 var(--s4)}
+.profile-section:first-of-type{border-top:0}
+.profile-section h3{font-size:15px;font-weight:750;letter-spacing:-.1px;margin:0 0 var(--s2)}
+.profile-section>.small:first-of-type{margin:0 0 var(--s3)}
+.profile-grid{gap:var(--s3)}
+.profile-grid input,.profile-grid select,textarea.cg-input,.cg-input{min-height:46px;border-radius:var(--r-ctl)}
+.car-icon-row{gap:var(--s2)}
+.profile-head{gap:var(--s4)}
+.benefit-list{line-height:1.6}.benefit-list li{margin:6px 0}
+.compare{gap:var(--s3);margin:var(--s4) 0}.compare .col{padding:var(--s3) var(--s4);border-radius:14px}
+.plan-cards{gap:var(--s3);margin:var(--s4) 0}.plan-card{padding:var(--s4);border-radius:16px}
+@media(min-width:600px){.plan-cards{grid-template-columns:1fr 1fr}}
+.why-apex{margin:var(--s2) 0 var(--s4)}
+.account-menu{padding:var(--s4);gap:var(--s2)}
+/* Niyi panel */
+.niyi-msgs{padding:var(--s4);gap:var(--s3)}
+.niyi-msg{padding:10px 14px;line-height:1.55}
+.niyi-chips{gap:var(--s2);padding:0 var(--s4) var(--s3)}
+.niyi-head{padding:var(--s3) var(--s4);gap:var(--s3)}
+/* welcome */
+.welcome-card{padding:24px 22px 20px}
+@media(min-width:760px){.welcome-card{padding:30px 34px 24px}}
+.welcome-intro{line-height:1.6}
+.welcome-account{gap:var(--s3)}
+/* header balance */
+@media(min-width:760px){header{gap:var(--s4)}}
+@media(max-width:759px){.header-actions{gap:6px}}
+
+.emerg-sheet{background:#14191d;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.profile-grid select{-webkit-appearance:none;appearance:none;background:#0f1418 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2393a3ad' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 14px center;color:var(--text);border:1px solid var(--line2);padding:0 36px 0 14px;font-size:14px}
+body.theme-light .profile-grid select{background-color:#f4f7fa}
+.profile-head .plan-badge{vertical-align:middle;margin-right:6px}
+
+/* 8.0 light theme: darker accent text where the background is light (readable contrast) */
+body.theme-light .cg-sheet,body.theme-light .account-menu,body.theme-light .panel,body.theme-light header,body.theme-light .hero,body.theme-light .install-bar,body.theme-light .metric{--acc-text:var(--acc-deep);--acc-pale:var(--acc-deep)}
+
+/* 8.0.1 Start-GPS intro: car on a curvy road. Never blocks input (pointer-events:none); taps pass through and skip it. */
+.gps-intro{position:fixed;left:50%;top:50%;z-index:60;transform:translate(-50%,-50%);width:min(340px,90vw);padding:14px 12px 12px;border-radius:20px;background:#0d1114e6;border:1px solid rgb(var(--acc-rgb) / .35);box-shadow:0 24px 60px -20px #000e,0 0 0 6px rgb(var(--acc-rgb) / .08);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:none;opacity:0;transition:opacity .22s ease;text-align:center}
+.gps-intro.show{opacity:1}
+.gps-intro.leave{opacity:0;transition:opacity .3s ease .12s}
+.gps-intro .gi-road{position:relative;width:320px;height:84px;margin:0 auto;max-width:100%}
+.gps-intro .gi-road svg{position:absolute;inset:0;width:320px;height:84px}
+.gps-intro .gi-asphalt{fill:none;stroke:#2b353d;stroke-width:22;stroke-linecap:round}
+.gps-intro .gi-edge{fill:none;stroke:#3d4a54;stroke-width:24;stroke-linecap:round;opacity:.6}
+.gps-intro .gi-dash{fill:none;stroke:var(--acc);stroke-width:2.4;stroke-dasharray:9 9;stroke-linecap:round;animation:giDash .6s linear infinite}
+@keyframes giDash{to{stroke-dashoffset:-18}}
+.gps-intro .gi-car{position:absolute;left:0;top:0;width:34px;height:34px;display:grid;place-items:center;filter:drop-shadow(0 3px 4px #000a);
+  offset-path:path("M -10 58 C 40 12, 95 12, 140 42 S 235 78, 340 28");offset-distance:0%;offset-rotate:0deg;transition:offset-distance 1.8s cubic-bezier(.3,.6,.35,1)}
+.gps-intro .gi-car.arrow{offset-rotate:auto 90deg}
+.gps-intro .gi-car svg{width:30px;height:30px}
+.gps-intro.go .gi-car{offset-distance:62%}
+.gps-intro.leave .gi-car{offset-distance:108%;transition:offset-distance .36s cubic-bezier(.5,0,.9,.5)}
+@supports not (offset-path:path("M0 0 L1 1")){
+  .gps-intro .gi-car{top:25px;transform:translateX(-30px);transition:transform 1.8s cubic-bezier(.3,.6,.35,1)}
+  .gps-intro.go .gi-car{transform:translateX(180px)}
+  .gps-intro.leave .gi-car{transform:translateX(360px);transition:transform .36s ease-in}
+}
+.gps-intro .gi-text{margin-top:6px;font-size:13.5px;font-weight:700;color:var(--text)}
+.gps-intro .gi-sub{margin-top:2px;font-size:11px;color:var(--muted)}
+@media(prefers-reduced-motion:reduce){.gps-intro .gi-road{display:none}.gps-intro{padding:16px}}
 </style>
 </head>
 <body class="welcome-open">
@@ -438,6 +679,15 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
     <video class="welcome-video" id="welcomeVideo" autoplay muted loop playsinline preload="auto" poster="assets/welcome-poster.jpg" aria-label="Curve Guide — Safer turns. Smarter drives." disablepictureinpicture><source src="assets/welcome.mp4" type="video/mp4"></video>
     <h2 id="welcomeTitle">Welcome to Curve Guide</h2>
     <p class="welcome-intro" id="welcomeIntro">Curve Guide is a product of the Automotive Division of <strong>Adeniyi Investments &amp; Property Ltd.</strong>, built to help prevent road accidents on dangerous bends and curves. By giving drivers early awareness of sharp turns ahead, it supports safer, more confident driving on Nigerian roads. Curve Guide is currently a prototype: it is designed to supplement, never replace, careful and attentive driving.</p>
+    <details class="whats-new" id="whatsNew"><summary>✨ What’s new in 8.0</summary><ul>
+      <li><strong>Smart Niyi</strong> answers everyday questions too, now with its own animated face</li>
+      <li><strong>Apex</strong> plan: voice navigation, bends-ahead list, synced favourites, unlimited Niyi</li>
+      <li><strong>Sign in</strong> right here on the welcome screen</li>
+      <li><strong>SOS contacts</strong>: text or WhatsApp your location in one tap</li>
+      <li><strong>App colours</strong>, smooth animations and a cleaner layout</li>
+      <li><strong>Car picker</strong> for make, model and year</li>
+      <li><strong>Google Maps links</strong>: paste any link into search</li>
+    </ul></details>
     <p class="welcome-quote" id="welcomeQuote" aria-live="off">“Prevention is better than cure.”</p>
     <h3 class="terms-title">Terms &amp; Conditions</h3>
     <ol class="terms-box" tabindex="0" aria-label="Terms and Conditions">
@@ -445,13 +695,25 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <li><strong>Not a certified safety system.</strong> It is not an approved driver-assistance or navigation device, and its warnings may be missing, late, or wrong.</li>
       <li><strong>You remain responsible.</strong> Always obey traffic laws, road signs, speed limits, and actual road conditions.</li>
       <li><strong>Do not operate while driving.</strong> Set it up before your trip, or have a passenger operate it.</li>
-      <li><strong>Location privacy.</strong> Your location is processed only on your device, in your browser. Curve Guide does not store or send it anywhere.</li>
+      <li><strong>Location privacy.</strong> Your exact GPS location is processed only on your device, in your browser. Curve Guide does not store it. When you search, your search text and a rough area (about 10 km) are sent to free OpenStreetMap search services to find nearby places.</li>
+      <li><strong>Smart Niyi.</strong> When you are signed in, messages you send to Niyi are processed on Curve Guide's server (Cloudflare AI) to write a reply. Don't share passwords or card details with Niyi.</li>
       <li><strong>Map data.</strong> Maps come from OpenStreetMap contributors and may be incomplete or inaccurate.</li>
       <li><strong>No liability.</strong> Adeniyi Investments &amp; Property Ltd. accepts no liability for any accident, injury, loss, or damage arising from use of Curve Guide. You use it at your own risk.</li>
       <li><strong>Changes.</strong> These terms may be updated at any time; continued use means you accept the current terms.</li>
     </ol>
     <label class="accept"><input type="checkbox" id="acceptTerms"> I have read and accept the Terms &amp; Conditions</label>
-    <button class="btn primary" id="welcomeContinue" disabled>Continue</button>
+    <div class="welcome-account" id="welcomeAccount">
+      <p class="welcome-why" id="welcomeWhy">✨ <strong>Sign in</strong> to use smart Niyi (20 free chats a day), keep your account, and unlock Apex.</p>
+      <div class="welcome-signed" id="welcomeSigned" hidden>
+        <span class="welcome-avatar" id="welcomeAvatar" aria-hidden="true">D</span>
+        <div><div class="welcome-signed-name" id="welcomeSignedName"></div><div class="welcome-signed-email" id="welcomeSignedEmail"></div></div>
+      </div>
+      <button class="btn primary" id="welcomeSignIn" disabled>Sign in / Create account</button>
+      <button class="btn primary" id="welcomeContinue" disabled hidden>Continue</button>
+      <button class="btn welcome-guest" id="welcomeGuest" disabled>Continue as guest</button>
+      <p class="welcome-hint" id="welcomeHint">Tick the box above to continue.</p>
+      <p class="welcome-authnote" id="welcomeAuthNote" role="status" hidden></p>
+    </div>
     <div class="welcome-credit"><span>An Automotive Division of</span><a class="credit-card" href="https://adeniyiltd.com/" target="_blank" rel="noopener" title="Visit Adeniyi Investments &amp; Property Ltd." style="display:inline-block"><img src="assets/adeniyi-logo.png" alt="Adeniyi Investments &amp; Property Ltd."></a></div>
     <div class="contact-line welcome-contact">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
   </div>
@@ -463,7 +725,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <div>
         <h1>Curve Guide</h1>
         <div class="tagline">Safer turns. Smarter drives.</div>
-        <div class="subtitle">Intelligent Road Safety System · Development prototype v7.1</div>
+        <div class="subtitle">Intelligent Road Safety System · Development prototype v8.0</div>
       </div>
     </div>
     <div class="header-actions">
@@ -475,7 +737,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <button type="button" class="account-btn" id="accountBtn" title="Sign in" aria-label="Sign in" aria-haspopup="true" aria-controls="accountMenu">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
       </button>
-      <div class="pill">PROTOTYPE · v7.1</div>
+      <div class="pill">PROTOTYPE · v8.0</div>
     </div>
   </header>
   <div class="install-bar" id="installBar"><span id="installText">Install Curve Guide on your phone for quicker access.</span><button type="button" class="btn primary" id="installBtn">Install</button></div>
@@ -514,7 +776,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
 <div class="map-search" id="mapSearchWrap">
           <div class="dest-search-wrap">
             <svg class="dest-search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-            <input class="dest-search" id="destSearch" type="search" placeholder="Search destination" autocomplete="off" aria-label="Search destination" aria-autocomplete="list" aria-controls="destResults">
+            <input class="dest-search" id="destSearch" type="search" placeholder="Search or paste a Google Maps link" autocomplete="off" aria-label="Search destination or paste a Google Maps link" aria-autocomplete="list" aria-controls="destResults">
           </div>
           <div class="dest-results" id="destResults" role="listbox" hidden></div>
         </div>
@@ -537,7 +799,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
           <p class="dest-meta" id="destMeta"></p>
           <div class="dest-actions">
             <button type="button" class="btn primary" id="destRoute">Route</button>
-            <button type="button" class="btn primary" id="destNavStart" data-pro-feature="voice navigation">Start navigation</button>
+            <button type="button" class="btn primary" id="destNavStart">Start navigation</button>
             <button type="button" class="btn" id="destNavStop" hidden>Stop navigation</button>
             <button type="button" class="btn" id="destClear">Clear</button>
           </div>
@@ -547,9 +809,9 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
           </details>
           <div class="bend-list" id="bendList" hidden></div>
           <div class="speed-bend-banner" id="speedBendBanner" role="alert">Slow down — sharp bend ahead</div>
-          <div class="small" id="favHint" style="margin-top:8px">Favourites (Home/School/Work) are saved on this phone only.</div><div class="fav-row" id="favRow" data-pro-feature="favourites"></div>
+          <div class="small" id="favHint" style="margin-top:8px">Favourites (Home/School/Work) are saved on this phone.</div><div class="fav-row" id="favRow"></div>
           <div class="hazard-row">
-            <button type="button" class="btn" id="reportHazard" data-pro-feature="danger reports">Report danger spot</button>
+            <button type="button" class="btn" id="reportHazard">Report danger spot</button>
           </div>
           <p class="dest-note">Routing by OpenStreetMap/OSRM demo — free test service, may be slow or unavailable. Voice uses your browser speechSynthesis (prototype guidance, not a certified navigation system).</p>
         </div>
@@ -588,7 +850,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
             <div class="section-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h8"/></svg>Route &amp; map data</div>
             <span class="small" id="routeState">No route yet</span>
           </div>
-          <div class="small" style="line-height:1.6;margin-top:9px">The map uses community map data. Destination search uses Nominatim; driving routes use the public OSRM demo. Road geometry, routes, and curve estimates may be incomplete or inaccurate.</div>
+          <div class="small" style="line-height:1.6;margin-top:9px">The map uses community map data. Destination search uses Nominatim and Photon (OpenStreetMap data); driving routes use the public OSRM demo. Road geometry, routes, and curve estimates may be incomplete or inaccurate.</div>
           <div class="actions">
             <button class="btn" id="recenter">Reset view</button>
             <button class="btn" id="clearRoute">Clear route</button>
@@ -615,25 +877,29 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
     <div class="credit-copy">&copy; 2026 Curve Guide — Automotive Division of <a href="https://adeniyiltd.com/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Adeniyi Investments &amp; Property Ltd.</a> All rights reserved.</div>
     <div class="contact-line">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
   </div>
-  <footer>Curve Guide 7.1 · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
+  <footer>Curve Guide 8.0 · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
   </div>
 </div>
 
 
 <button type="button" class="emerg-fab" id="emergFab" title="Emergency">SOS</button>
-<div class="emerg-sheet" id="emergSheet" hidden>
-  <strong style="font-size:14px">Emergency options</strong>
-  <span class="small">Confirm before calling. Location share uses WhatsApp with a Google Maps link from your GPS (when available).</span>
-  <button type="button" class="btn primary" id="emergCall">Call 112 (Nigeria emergency)</button>
+<div class="emerg-sheet" id="emergSheet" hidden role="dialog" aria-label="Emergency options">
+  <strong style="font-size:15px">Emergency options</strong>
+  <button type="button" class="btn primary emerg-call" id="emergCall">📞 Call 112 (Nigeria emergency)</button>
+  <div class="emerg-loc" id="emergLoc" role="status">📍 Getting your location…</div>
+  <div class="emerg-send" id="emergSend"></div>
   <button type="button" class="btn" id="emergWhatsApp">Share my location on WhatsApp</button>
-  <button type="button" class="btn" id="emergClose">Close</button>
+  <button type="button" class="btn" id="emergShare" hidden>Share my location…</button>
+  <p class="emerg-note">Curve Guide can’t send texts by itself in the background. Your messages app opens with the text ready — <strong>you tap Send</strong>.</p>
+  <div class="emerg-row"><button type="button" class="btn sm" id="emergManage">Emergency contacts</button><button type="button" class="btn sm" id="emergClose">Close</button></div>
 </div>
-<button type="button" class="niyi-fab" id="niyiFab" aria-expanded="false" aria-controls="niyiPanel" title="Ask Niyi">Niyi</button>
+<button type="button" class="niyi-fab" id="niyiFab" aria-expanded="false" aria-controls="niyiPanel" title="Ask Niyi" aria-label="Ask Niyi"><span class="niyi-fab-label">Niyi</span></button>
 <div class="niyi-panel" id="niyiPanel" role="dialog" aria-modal="false" aria-labelledby="niyiTitle" hidden>
   <div class="niyi-head">
+    <span class="niyi-head-face" id="niyiHeadFace" aria-hidden="true"></span>
     <div class="niyi-head-title">
       <strong id="niyiTitle">Niyi · Curve Guide helper</strong>
-      <span>Simple prototype helper — keyword answers, not a smart AI.</span>
+      <span id="niyiSubtitle">Ask me anything when you're signed in · simple keyword helper offline.</span>
     </div>
     <div class="niyi-head-actions">
       <button type="button" class="niyi-icon" id="niyiSpeak" aria-pressed="false" title="Read answers aloud" aria-label="Read answers aloud">🔊</button>
@@ -645,10 +911,11 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
   <div class="niyi-chips" id="niyiChips"></div>
   <form class="niyi-input-row" id="niyiForm" autocomplete="off">
     <button type="button" class="niyi-mic" id="niyiMic" title="Voice input" aria-label="Voice input" aria-pressed="false" hidden>🎤</button>
-    <input class="niyi-input" id="niyiInput" type="text" maxlength="240" placeholder="Ask about Curve Guide…" aria-label="Message to Niyi">
+    <input class="niyi-input" id="niyiInput" type="text" maxlength="240" placeholder="Ask Niyi anything…" aria-label="Message to Niyi">
     <button class="niyi-send" id="niyiSend" type="submit">Send</button>
   </form>
-  <p class="niyi-mic-note" id="niyiMicNote" hidden>Mic turns speech into text for Niyi's keyword helper — not a smart AI. Nothing is uploaded by Curve Guide.</p>
+  <div class="niyi-limit" id="niyiLimit" hidden></div>
+  <p class="niyi-mic-note" id="niyiMicNote" hidden>Mic turns your speech into text using your browser. When you're signed in, Niyi's smart answers are made on Curve Guide's server (Cloudflare AI), so don't share passwords or card details.</p>
 </div>
 
 <!-- Account menu -->
@@ -712,27 +979,28 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <button type="button" class="icon-close" data-close-overlay="premiumScreen" aria-label="Close">✕</button>
     </div>
     <p class="auth-msg" id="premiumGateTip" hidden></p>
-    <ul class="benefit-list">
+    <div class="pay-msg good apex-active-box" id="premiumActiveBox" hidden></div>
+    <ul class="benefit-list pay-only">
       <li>Voice turn-by-turn navigation</li>
       <li>Bend warnings with speed alerts</li>
       <li>Smarter Niyi with no limits</li>
       <li>Favourites and danger reports synced across phones</li>
     </ul>
-    <section class="why-apex" id="whyApex" aria-labelledby="whyApexTitle">
+    <section class="why-apex pay-only" id="whyApex" aria-labelledby="whyApexTitle">
       <div class="why-head"><h3 id="whyApexTitle">Why Apex?</h3><span class="why-hint">Swipe →</span></div>
       <div class="why-track" id="whyApexTrack" role="list"></div>
       <p class="why-src" id="whyApexSources"></p>
       <div class="why-brand"><img src="assets/adeniyi-logo.png" alt="" loading="lazy"><span>Curve Guide Apex · Automotive Division of Adeniyi Investments &amp; Property Ltd.</span></div>
       <p class="why-disclaimer">Curve Guide is a driving aid in early development. It can't prevent crashes. Always obey road signs and drive at a safe speed.</p>
     </section>
-    <div class="compare">
-      <div class="col"><h3>Free</h3><ul><li>Map &amp; GPS curve awareness</li><li>Search &amp; basic routing</li><li>Local favourites on this device</li><li>Niyi keyword helper (limits in future)</li></ul></div>
-      <div class="col"><h3>Apex</h3><ul><li>Everything in Free</li><li>Voice guidance</li><li>Bend speed alerts</li><li>Synced favourites &amp; hazards</li><li>Priority Niyi</li></ul></div>
+    <div class="compare pay-only">
+      <div class="col"><h3>Free</h3><ul><li>Map &amp; live GPS curve alert</li><li>Bend dots + on-screen slow-down alert</li><li>Search, routing &amp; on-screen directions</li><li>Favourites &amp; reports on this phone</li><li>Niyi: 20 chats a day</li></ul></div>
+      <div class="col"><h3>Apex</h3><ul><li>Everything in Free</li><li>Spoken turn-by-turn voice</li><li>Bends-ahead list, safe-speed tips &amp; spoken bend warnings</li><li>Favourites &amp; reports synced across phones</li><li>Unlimited smart Niyi</li></ul></div>
     </div>
-    <div class="currency-switch" role="group" aria-label="Currency">
+    <div class="currency-switch pay-only" role="group" aria-label="Currency">
       <span class="ngn-only-note">Prices in Naira (₦). Visa/Mastercard cards from outside Nigeria can still pay in ₦; your bank converts the amount.</span>
     </div>
-    <div class="plan-cards">
+    <div class="plan-cards pay-only">
       <div class="plan-card">
         <strong>Monthly</strong>
         <div class="price" id="priceMonthly">₦450 / month</div>
@@ -745,7 +1013,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       </div>
     </div>
     <p class="pay-msg" id="paystackMsg" hidden aria-live="polite"></p>
-    <p class="sheet-sub">Secure payment by Paystack. <strong>One-time payment, no auto-renew:</strong> Monthly gives 1 month of Apex, Yearly gives 1 year. Pay again any time to add more time. Sign in first so Apex is saved to your account. Curve Guide remains a prototype — never a substitute for careful driving.</p>
+    <p class="sheet-sub pay-only">Secure payment by Paystack. <strong>One-time payment, no auto-renew:</strong> Monthly gives 1 month of Apex, Yearly gives 1 year. Pay again any time to add more time. Sign in first so Apex is saved to your account. Curve Guide remains a prototype — never a substitute for careful driving.</p>
   </div>
 </div>
 
@@ -763,14 +1031,28 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <div class="car-icon-row" id="carIconRow"></div>
       <label class="small">Colour <input type="color" id="carColorPick" value="#20c477" aria-label="Car colour"></label>
       <div class="profile-grid two" style="margin-top:10px">
-        <input id="carField_make" placeholder="Make" aria-label="Make">
-        <input id="carField_model" placeholder="Model" aria-label="Model">
-        <input id="carField_year" placeholder="Year" aria-label="Year" inputmode="numeric">
+        <input id="carField_make" placeholder="Make — search (e.g. Toyota)" aria-label="Make" list="carMakeList" autocomplete="off" autocapitalize="words">
+        <input id="carField_model" placeholder="Model — search" aria-label="Model" list="carModelList" autocomplete="off" autocapitalize="words">
+        <select id="carField_year" aria-label="Year"></select>
         <input id="carField_colour" placeholder="Colour" aria-label="Colour">
         <input id="carField_plate" placeholder="Plate (optional)" aria-label="Plate number">
       </div>
+      <datalist id="carMakeList"></datalist><datalist id="carModelList"></datalist>
+      <p class="small car-pick-hint" id="carPickHint">Start typing to search. Not listed? Choose “Other — type it” or just type it.</p>
       <button type="button" class="btn primary sm" id="saveCarDetails" style="margin-top:8px">Save car details</button>
       <p class="small auth-msg good" id="carSaveMsg" hidden></p>
+    </section>
+
+    <section class="profile-section" data-profile-section="sos">
+      <h3>Emergency contacts (SOS)</h3>
+      <p class="small">Up to 5 people. From the SOS button you can text or WhatsApp them your location in one tap (you still tap Send). Free for everyone.</p>
+      <div id="sosContactList" class="sos-list"></div>
+      <div class="profile-grid two sos-add" id="sosAddRow">
+        <input id="sosName" placeholder="Name (e.g. Mum)" aria-label="Contact name" autocomplete="off" maxlength="40">
+        <input id="sosPhone" placeholder="Phone (e.g. 0803 123 4567)" aria-label="Contact phone" inputmode="tel" autocomplete="off" maxlength="24">
+      </div>
+      <button type="button" class="btn sm" id="sosAddBtn" style="margin-top:8px">Add contact</button>
+      <p class="small auth-msg" id="sosMsg" hidden></p>
     </section>
 
     <section class="profile-section" data-profile-section="saved">
@@ -785,6 +1067,8 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
         <button type="button" class="btn sm" data-theme-opt="light">Light</button>
         <button type="button" class="btn sm" data-theme-opt="auto">Auto</button>
       </div>
+      <p class="small" style="margin:12px 0 0">App colour <span class="small" style="opacity:.8">(free for everyone)</span></p>
+      <div class="accent-opts" id="accentOpts" role="group" aria-label="App colour"></div>
       <div class="actions" style="margin-top:8px">
         <button type="button" class="btn sm" id="profileNight">Night map</button>
         <button type="button" class="btn sm" id="profileUnits">Units</button>
@@ -795,6 +1079,19 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <h3>Apex</h3>
       <div id="profilePlanLine" class="small"></div>
       <button type="button" class="btn sm danger-outline" id="profileCancelPremium" hidden style="margin-top:8px">Cancel Apex</button>
+    </section>
+
+    <section class="profile-section" data-profile-section="about">
+      <h3>About Curve Guide 8.0</h3>
+      <details class="whats-new" id="whatsNewProfile"><summary>✨ What’s new in 8.0</summary><ul>
+      <li><strong>Smart Niyi</strong> answers everyday questions too, now with its own animated face</li>
+      <li><strong>Apex</strong> plan: voice navigation, bends-ahead list, synced favourites, unlimited Niyi</li>
+      <li><strong>Sign in</strong> right here on the welcome screen</li>
+      <li><strong>SOS contacts</strong>: text or WhatsApp your location in one tap</li>
+      <li><strong>App colours</strong>, smooth animations and a cleaner layout</li>
+      <li><strong>Car picker</strong> for make, model and year</li>
+      <li><strong>Google Maps links</strong>: paste any link into search</li>
+    </ul></details>
     </section>
 
     <section class="profile-section" data-profile-section="support">
@@ -832,6 +1129,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="auth.js"></script>
+<script src="vehicles.js"></script>
 <script src="premium-ui.js"></script>
 
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
@@ -1002,7 +1300,7 @@ function initMap(){
     map.on('load',function(){
       try{
         map.addSource('route',{type:'geojson',data:EMPTY});
-        map.addLayer({id:'curve-guide-route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#20c477','line-width':6,'line-opacity':0.9}});
+        map.addLayer({id:'curve-guide-route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':cgTrailColor(),'line-width':6,'line-opacity':0.9}});
         map.addSource('curve',{type:'geojson',data:EMPTY});
         map.addLayer({id:'curve-guide-curve',type:'circle',source:'curve',paint:{'circle-radius':9,'circle-color':'#ff625c','circle-stroke-color':'#ffffff','circle-stroke-width':2}});
         map.addSource('directions',{type:'geojson',data:EMPTY});
@@ -1083,7 +1381,9 @@ function maybeEstimateCurve(pos){
 }
 var lastCamAt=0, lastBendUiAt=0, lastStatusAt=0, lastDestMetaAt=0;
 function onPosition(pos){
+  try{cgGpsIntro.fix()}catch(e){}
   previous=current;current=pos;
+  try{if(pos&&pos.coords)localStorage.setItem('curveGuide.lastFix',JSON.stringify({lat:pos.coords.latitude,lng:pos.coords.longitude,acc:pos.coords.accuracy,t:pos.timestamp||Date.now()}))}catch(e){}
   var coord=[pos.coords.longitude,pos.coords.latitude];
   if(!Number.isFinite(coord[0])||!Number.isFinite(coord[1]))return;
   if(!(pos.coords.accuracy>50)&&(route.length===0||distance(route[route.length-1],coord)>4)){route.push(coord);if(route.length>800)route.shift();updateRoute()}
@@ -1111,6 +1411,7 @@ function onPosition(pos){
   }
 }
 function onGpsError(err){
+  try{cgGpsIntro.done()}catch(e){}
   var msg='GPS unavailable. Check location permission and device settings.';
   if(err&&err.code===1)msg='Location permission was denied. Allow location access for this website to use GPS.';
   else if(err&&err.code===3)msg='GPS request timed out. Try again where the sky is more visible.';
@@ -1120,14 +1421,49 @@ function onGpsError(err){
   watchId=null;$('gps').disabled=false;$('stopGps').disabled=true;
   var chip=$('gpsChip');if(chip)chip.classList.remove('acc-good','acc-fair','acc-poor');
 }
+/* 8.0.1 Start-GPS intro animation (cosmetic only: GPS starts immediately, nothing waits for it). */
+var cgGpsIntro=(function(){
+  var el=null,timer=null,hideT=null,KEY='cgGpsIntroDone';
+  function vehicle(){
+    try{var UI=window.__cgPremiumUI,p=UI&&UI.loadProfile?UI.loadProfile():{},icons=(UI&&UI.CAR_ICONS)||{};
+      var k=icons[p.carIcon]?p.carIcon:'sedan';return {key:k,svg:icons[k]||'',color:p.carColor||'#20c477'}}catch(e){return {key:'sedan',svg:'',color:'#20c477'}}
+  }
+  function skip(){done(false)}
+  function done(){
+    clearTimeout(timer);if(!el)return;
+    var e=el;el=null;
+    document.removeEventListener('pointerdown',skip,true);
+    e.classList.add('leave');
+    hideT=setTimeout(function(){e.remove()},460);
+  }
+  function show(){
+    try{if(sessionStorage.getItem(KEY)==='1')return}catch(e){}
+    if(el)return;
+    var v=vehicle();
+    el=document.createElement('div');el.className='gps-intro';el.setAttribute('role','status');el.setAttribute('aria-live','polite');
+    var P='M -10 58 C 40 12, 95 12, 140 42 S 235 78, 340 28';
+    el.innerHTML='<div class="gi-road" aria-hidden="true"><svg viewBox="0 0 320 84"><path class="gi-edge" d="'+P+'"/><path class="gi-asphalt" d="'+P+'"/><path class="gi-dash" d="'+P+'"/></svg>'+
+      '<div class="gi-car '+(v.key==='arrow'?'arrow':'')+'" style="color:'+String(v.color).replace(/[^#a-zA-Z0-9(),.\s]/g,'')+'">'+v.svg+'</div></div>'+
+      '<div class="gi-text">Finding your location…</div><div class="gi-sub">Tap anywhere to skip</div>';
+    document.body.appendChild(el);
+    void el.offsetWidth;el.classList.add('show');
+    requestAnimationFrame(function(){if(el)el.classList.add('go')});
+    timer=setTimeout(done,2500);
+    setTimeout(function(){document.addEventListener('pointerdown',skip,true)},50); // passive: the tap still reaches the map/buttons
+  }
+  function fix(){try{sessionStorage.setItem(KEY,'1')}catch(e){}done()}
+  return {show:show,fix:fix,done:done};
+})();
 function startGps(){
   if(!navigator.geolocation){setWarning('This browser does not support geolocation.','warn');return}
   if(watchId!==null)return;
   setStatus('Requesting GPS','warn');setWarning('Waiting for your device to provide a GPS position…','warn');
   watchId=navigator.geolocation.watchPosition(onPosition,onGpsError,{enableHighAccuracy:true,maximumAge:1500,timeout:15000});
+  try{cgGpsIntro.show()}catch(e){}
   $('gps').disabled=true;$('stopGps').disabled=false;setText('analysisState','Waiting for GPS');
 }
 function stopGps(){
+  try{cgGpsIntro.done()}catch(e){}
   if(navigating)stopNavigation();
   if(watchId!==null)navigator.geolocation.clearWatch(watchId);
   watchId=null;$('gps').disabled=false;$('stopGps').disabled=true;
@@ -1150,6 +1486,19 @@ syncResetBtn();
 $('mapType').addEventListener('click',function(){setSatellite(!satellite)});
 $('clearRoute').addEventListener('click',clearRoute);
 window.addEventListener('beforeunload',function(){if(watchId!==null)navigator.geolocation.clearWatch(watchId)});
+/* 7.2 Apex helpers: Apex comes only from the server-written premium field (auth.js). */
+var CG_TRAIL={green:'#20c477',blue:'#2fd0e0',purple:'#9b6bff',orange:'#ff8a3d',pink:'#ff5fa2',gold:'#f2c230',red:'#e5484d'};
+function cgTrailColor(){var a=document.body&&document.body.getAttribute('data-accent');return CG_TRAIL[a]||CG_TRAIL.green}
+document.addEventListener('cg:accent-changed',function(){try{if(map&&map.getLayer&&map.getLayer('curve-guide-route'))map.setPaintProperty('curve-guide-route','line-color',cgTrailColor())}catch(e){}});
+function cgApex(){try{return !!(window.__cgAuth&&window.__cgAuth.isPremium())}catch(e){return false}}
+function cgApexPrompt(f,m){try{if(window.__cgPremiumUI&&window.__cgPremiumUI.apexPrompt)window.__cgPremiumUI.apexPrompt(f,m)}catch(e){}}
+function cgApexLink(label,feature){
+  var b=document.createElement('button');b.type='button';b.className='btn sm apex-upsell';b.textContent='✨ '+label;
+  b.addEventListener('click',function(){cgApexPrompt(feature)});return b;
+}
+window.__cgGeoSearch=function(q){return geoSearch(q)};
+window.__cgParseCoords=function(q){return parseCoordQuery(q)};
+window.__cgParseMapLink=function(q){return parseMapLink(q)};
 window.__cgIsDriving=function(){
   if(watchId===null||!current)return false;
   var s=current.coords.speed;
@@ -1166,7 +1515,7 @@ window.__cgApi={
   startNavigation:startNavigation,stopNavigation:stopNavigation,
   isNavigating:function(){return navigating},
   setNavVoice:setNavVoice,getNavVoice:function(){return navVoiceOn},
-  searchNominatim:searchNominatim,showResults:showResults,
+  searchNominatim:searchNominatim,showResults:showResults,geoSearch:function(q){return geoSearch(q)},
   getDestination:function(){return destination},
   injectPos:function(lon,lat,o){
     o=o||{};
@@ -1228,31 +1577,151 @@ function showResults(items){
   });
   box.hidden=false;
 }
+/* 7.2 search: Nominatim (Nigeria + near-you bias) → Photon → simplified street → worldwide.
+   Also accepts pasted coordinates or a Google Maps link with coordinates.
+   All free, no API key. Google results are NOT used inside the app (Google's terms
+   don't allow Google place data on a non-Google map); we only link out to Google Maps. */
+var lastNomAt=0;
+function nomFetch(url){
+  var wait=Math.max(0,lastNomAt+1100-Date.now()); // Nominatim policy: max 1 request/second
+  lastNomAt=Date.now()+wait;
+  return new Promise(function(r){setTimeout(r,wait)}).then(function(){
+    return fetch(url,{headers:{'Accept':'application/json'}});
+  }).then(function(res){
+    if(res.status===429)throw new Error('rate');
+    if(!res.ok)throw new Error('http');
+    return res.json();
+  });
+}
+function inNigeria(c){return c&&c[1]>3.8&&c[1]<14.2&&c[0]>2.4&&c[0]<15}
+/* 8.0: coordinates and map links (Google Maps: @lat,lng, !3d..!4d.., ?q=/query=/ll=/daddr=, /place/NAME, /search/NAME;
+   Apple Maps: ll=, q=, address=; geo: URIs). Short share links (maps.app.goo.gl, goo.gl/maps) are resolved by the Worker. */
+function pinItem(lat,lon,name,sub){
+  return {name:name||('Pinned spot '+lat.toFixed(5)+', '+lon.toFixed(5)),subtitle:sub||'From the coordinates you pasted',coord:[lon,lat]};
+}
+function okLL(lat,lon){return isFinite(lat)&&isFinite(lon)&&Math.abs(lat)<=90&&Math.abs(lon)<=180&&!(lat===0&&lon===0)}
+function parseMapLink(q){
+  var s=String(q||'').trim(), m;
+  var um=s.match(/(?:https?:\/\/|\b)(?:[a-z0-9-]+\.)*(?:google\.[a-z.]{2,6}|goo\.gl|apple\.com)\/[^\s]*/i);
+  if(/^geo:/i.test(s)){m=s.match(/^geo:\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);if(m&&okLL(+m[1],+m[2]))return {coords:{lat:+m[1],lng:+m[2]},name:(s.match(/[?&]q=[^(]*\(([^)]+)\)/)||[])[1]||''}}
+  if(!um)return null;
+  var raw=um[0]; if(!/^https?:/i.test(raw))raw='https://'+raw;
+  var u; try{u=new URL(raw)}catch(e){return null}
+  var host=u.hostname.toLowerCase();
+  if(/(^|\.)maps\.app\.goo\.gl$/.test(host)||(host==='goo.gl'&&/^\/maps/.test(u.pathname)))return {short:raw};
+  var isApple=/(^|\.)maps\.apple\.com$/.test(host);
+  if(!isApple&&!/google\./.test(host))return null;
+  var path=u.pathname; try{path=decodeURIComponent(path)}catch(e){}
+  var LL=/^\s*(?:loc:)?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/, c=null;
+  m=path.match(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/); if(m&&okLL(+m[1],+m[2]))c={lat:+m[1],lng:+m[2]};
+  if(!c)['q','query','ll','daddr','destination','center','sll','coordinate'].some(function(k){var v=u.searchParams.get(k);var mm=v&&v.match(LL);if(mm&&okLL(+mm[1],+mm[2])){c={lat:+mm[1],lng:+mm[2]};return true}return false});
+  if(!c){m=path.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);if(m&&okLL(+m[1],+m[2]))c={lat:+m[1],lng:+m[2]}}
+  m=path.match(/\/maps\/place\/([^/@]+)/)||path.match(/\/maps\/search\/([^/@]+)/);
+  var nm=m?m[1]:(u.searchParams.get('q')||u.searchParams.get('query')||u.searchParams.get('name')||u.searchParams.get('address')||u.searchParams.get('daddr')||u.searchParams.get('destination')||'');
+  nm=String(nm).replace(/\+/g,' ').trim(); if(LL.test(nm))nm='';
+  return {coords:c,name:nm.slice(0,140),apple:isApple};
+}
+function parseCoordQuery(q){
+  var s=String(q||'');
+  var link=parseMapLink(s);
+  if(link&&link.coords)return pinItem(link.coords.lat,link.coords.lng,link.name||'',link.name?'From the map link you pasted':'From the map link you pasted');
+  if(link)return null;
+  var m=s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||s.match(/(-?\d{1,2}\.\d{3,})\s*[, ]\s*(-?\d{1,3}\.\d{3,})/);
+  if(!m)return null;
+  var lat=parseFloat(m[1]),lon=parseFloat(m[2]);
+  if(!(Math.abs(lat)<=90&&Math.abs(lon)<=180))return null;
+  return pinItem(lat,lon);
+}
+function simplifyPlaceQuery(q){
+  var s=String(q||'').toLowerCase();
+  var parts=s.split(',').map(function(x){return x.trim()}).filter(Boolean);
+  var streetRe=/\b(street|st|road|rd|avenue|ave|close|crescent|way|drive|lane)\b/;
+  var pick=parts.filter(function(x){return streetRe.test(x)})[0]||s;
+  pick=pick.replace(/\b(plot|no\.?|number|house|block|flat|apartment)\s*\d+[a-z]?\b/g,' ')
+           .replace(/^\s*\d+[a-z]?\s+/,' ')
+           .replace(/\b[a-z]+\s+estate\b/g,' ').replace(/\bestate\b/g,' ')
+           .replace(/\s+/g,' ').trim();
+  return pick&&pick!==s.trim()?pick:null;
+}
+function nomParse(list,tag){
+  return (list||[]).map(function(r){
+    var name=r.namedetails&&r.namedetails.name?r.namedetails.name:(r.display_name||'').split(',')[0];
+    return {name:name||r.display_name, subtitle:(tag?tag+' · ':'')+r.display_name, coord:[parseFloat(r.lon),parseFloat(r.lat)]};
+  }).filter(function(x){return Number.isFinite(x.coord[0])&&Number.isFinite(x.coord[1])});
+}
+function photonParse(data,preferNg){
+  var feats=(data&&data.features)||[];
+  if(preferNg)feats=feats.filter(function(f){return (f.properties||{}).countrycode==='NG'});
+  return feats.map(function(f){
+    var p=f.properties||{},c=f.geometry&&f.geometry.coordinates;
+    var sub=[p.street,p.district||p.locality,p.city||p.county,p.state,p.country].filter(Boolean).join(', ');
+    return {name:p.name||p.street||'Place',subtitle:sub,coord:c?[c[0],c[1]]:[NaN,NaN]};
+  }).filter(function(x){return Number.isFinite(x.coord[0])&&Number.isFinite(x.coord[1])}).slice(0,5);
+}
+function geoSearch(q){
+  var pinned=parseCoordQuery(q);
+  if(pinned)return Promise.resolve({items:[pinned],source:'coords'});
+  var link=parseMapLink(q);
+  if(link&&link.short){
+    var A=window.__cgAuth;
+    if(!A||!A.resolveMapLink)return Promise.resolve({items:[],source:'link-failed'});
+    return A.resolveMapLink(link.short).then(function(r){
+      if(r&&r.coords&&okLL(r.coords.lat,r.coords.lng))return {items:[pinItem(r.coords.lat,r.coords.lng,r.name||'',r.name?'From your Google Maps link':'From your Google Maps link')],source:'link'};
+      if(r&&r.name)return geoSearch(r.name).then(function(res){res.fromLink=r.name;return res});
+      return {items:[],source:'link-failed'};
+    }).catch(function(){return {items:[],source:'link-failed'}});
+  }
+  if(link&&link.name)return geoSearch(link.name).then(function(res){res.fromLink=link.name;return res});
+  var o0=originLonLat(), ng=inNigeria(o0);
+  // Only a rough area (~10 km, 1 decimal place) is sent to the search services, never exact GPS.
+  var o=[Math.round(o0[0]*10)/10, Math.round(o0[1]*10)/10];
+  var base='https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=0&limit=5&accept-language=en&q=';
+  var bias='&viewbox='+(o[0]-0.6).toFixed(3)+','+(o[1]+0.6).toFixed(3)+','+(o[0]+0.6).toFixed(3)+','+(o[1]-0.6).toFixed(3);
+  var simple=simplifyPlaceQuery(q);
+  return nomFetch(base+encodeURIComponent(q)+'&countrycodes=ng'+bias).then(function(d){
+    var items=nomParse(d);
+    if(items.length)return {items:items,source:'nominatim'};
+    return fetch('https://photon.komoot.io/api/?limit=8&lang=en&lat='+o[1].toFixed(1)+'&lon='+o[0].toFixed(1)+'&q='+encodeURIComponent(q))
+      .then(function(r){if(!r.ok)throw new Error('http');return r.json()})
+      .then(function(pd){return photonParse(pd,ng)}).catch(function(){return []})
+      .then(function(pi){
+        if(pi.length)return {items:pi,source:'photon'};
+        if(!simple)return null;
+        return nomFetch(base+encodeURIComponent(simple)+'&countrycodes=ng'+bias).then(function(sd){
+          var si=nomParse(sd,'Close match: street').sort(function(x,y){return distance(o0,x.coord)-distance(o0,y.coord)});
+          return si.length?{items:si,source:'simplified',simple:simple}:null;
+        });
+      }).then(function(res){
+        if(res)return res;
+        return nomFetch(base+encodeURIComponent(q)+bias).then(function(gd){return {items:nomParse(gd),source:'world'}});
+      });
+  });
+}
+function googleMapsLink(q){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)}
+function showNoResults(q,box){
+  box.textContent='';
+  var d=document.createElement('div');d.className='dest-result';d.style.cursor='default';
+  d.appendChild(document.createTextNode('Not on our free map yet. '));
+  var tip=document.createElement('small');
+  tip.textContent='Tip: in Google Maps, long-press the exact spot, copy the numbers (like 6.5982, 3.2765) and paste them here. Or long-press our map to drop a pin.';
+  var a=document.createElement('a');a.href=googleMapsLink(q);a.target='_blank';a.rel='noopener';a.className='linkish';a.textContent='Find it in Google Maps ↗';
+  d.appendChild(a);d.appendChild(tip);box.appendChild(d);box.hidden=false;
+}
 function searchNominatim(q){
   var seq=++searchSeq;
-  var base='https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=0&limit=5&accept-language=en&q=';
-  function parse(list){
-    return (list||[]).map(function(r){
-      var name=r.namedetails&&r.namedetails.name?r.namedetails.name:(r.display_name||'').split(',')[0];
-      return {name:name||r.display_name, subtitle:r.display_name, coord:[parseFloat(r.lon),parseFloat(r.lat)]};
-    }).filter(function(x){return Number.isFinite(x.coord[0])&&Number.isFinite(x.coord[1])});
-  }
-  function fetchUrl(url,isFallback){
-    return fetch(url,{headers:{'Accept':'application/json'}}).then(function(res){
-      if(res.status===429)throw new Error('rate');
-      if(!res.ok)throw new Error('http');
-      return res.json();
-    }).then(function(data){
-      if(seq!==searchSeq)return;
-      var items=parse(data);
-      if(!items.length&&!isFallback){
-        return fetchUrl(base+encodeURIComponent(q),true);
-      }
-      showResults(items);
-    });
-  }
-  var ngUrl=base+encodeURIComponent(q)+'&countrycodes=ng';
-  fetchUrl(ngUrl,false).catch(function(err){
+  geoSearch(q).then(function(res){
+    if(seq!==searchSeq)return;
+    if(res.source==='link-failed'){var bx=$('destResults');if(bx){bx.textContent='';var dl=document.createElement('div');dl.className='dest-result';dl.style.cursor='default';
+      dl.textContent='Couldn\u2019t read that map link. Open it in Google Maps, long-press the exact spot, copy the numbers (like 6.5982, 3.2765) and paste them here.';bx.appendChild(dl);bx.hidden=false}return}
+    if(!res.items.length){var box=$('destResults');if(box)showNoResults(res.fromLink||q,box);return}
+    showResults(res.items);
+    if(res.source==='simplified'){
+      var box2=$('destResults');
+      if(box2){var n=document.createElement('div');n.className='dest-result';n.style.cursor='default';
+        var sm=document.createElement('small');sm.textContent='The exact estate/house isn\u2019t on the free map yet, so these are streets called “'+res.simple+'”. Pick the one in your area, then long-press the map to fine-tune.';
+        n.appendChild(sm);box2.insertBefore(n,box2.firstChild)}
+    }
+  }).catch(function(err){
     if(seq!==searchSeq)return;
     var box=$('destResults');if(!box)return;
     box.textContent='';
@@ -1385,7 +1854,7 @@ function restoreMapOverlays(){
   try{
     if(!map.getSource('route')){
       map.addSource('route',{type:'geojson',data:EMPTY});
-      map.addLayer({id:'curve-guide-route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#20c477','line-width':6,'line-opacity':0.9}});
+      map.addLayer({id:'curve-guide-route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':cgTrailColor(),'line-width':6,'line-opacity':0.9}});
     }
     if(!map.getSource('curve')){
       map.addSource('curve',{type:'geojson',data:EMPTY});
@@ -1451,6 +1920,10 @@ function loadHazards(){
 }
 function saveHazards(list){
   try{localStorage.setItem(HAZARD_KEY,JSON.stringify(list.slice(-100)))}catch(e){}
+  cgCloudSync();
+}
+function cgCloudSync(){ // Apex only: sync favourites + reports across phones
+  try{if(cgApex()&&window.__cgAuth&&window.__cgAuth.syncNow)window.__cgAuth.syncNow()}catch(e){}
 }
 function paintHazards(){
   if(!ready||!map||!map.getSource('hazards'))return;
@@ -1464,8 +1937,13 @@ function reportHazardAt(coord,type){
   var list=loadHazards();
   list.push({coord:coord,type:type||'danger',note:'',at:Date.now()});
   saveHazards(list);paintHazards();
-  setWarning('Danger spot saved on this phone only — sharing with other drivers coming later.','warn');
-  setStatus('Danger spot saved (this device)','good');
+  if(cgApex()){
+    setWarning('Danger spot saved and synced to your account (Apex). Sharing with other drivers is coming later.','warn');
+    setStatus('Danger spot saved · synced','good');
+  }else{
+    setWarning('Danger spot saved on this phone. Apex syncs your reports across phones.','warn');
+    setStatus('Danger spot saved (this phone)','good');
+  }
 }
 function bindHazardUi(){
   var btn=$('reportHazard');
@@ -1492,7 +1970,16 @@ var FAV_KEY='curveGuide.favourites';
 function loadFavs(){
   try{var raw=localStorage.getItem(FAV_KEY);var o=raw?JSON.parse(raw):{};return o&&typeof o==='object'?o:{}}catch(e){return {}}
 }
-function saveFavs(o){try{localStorage.setItem(FAV_KEY,JSON.stringify(o))}catch(e){}}
+function saveFavs(o){try{localStorage.setItem(FAV_KEY,JSON.stringify(o))}catch(e){}cgCloudSync()}
+function renderFavHint(){
+  var h=$('favHint');if(!h)return;
+  h.textContent='';
+  if(cgApex()){h.textContent='☁️ Favourites sync across your phones (Apex).';return}
+  h.appendChild(document.createTextNode('Favourites are saved on this phone. '));
+  var a=document.createElement('button');a.type='button';a.className='linkish';a.textContent='Sync across phones with Apex';
+  a.addEventListener('click',function(){cgApexPrompt('cloud sync')});
+  h.appendChild(a);
+}
 function renderFavRow(){window.__cgRefreshFavs=renderFavRow;
   var row=$('favRow'); if(!row)return;
   row.textContent='';
@@ -1508,7 +1995,7 @@ function renderFavRow(){window.__cgRefreshFavs=renderFavRow;
       favs=loadFavs();
       favs[key]={name:destination.name,coord:destination.coord};
       saveFavs(favs); renderFavRow();
-      setStatus(label+' saved on this phone','good');
+      setStatus(label+(cgApex()?' saved · synced':' saved on this phone'),'good');
     });
     row.appendChild(b);
   });
@@ -1597,9 +2084,21 @@ function paintBends(){
   });
   map.getSource('bends').setData({type:'FeatureCollection',features:feats});
 }
+function bendTeaser(el){
+  el.hidden=false; el.textContent='';
+  var sharp=routeBends.filter(function(b){return b.sharpness!=='mild'}).length;
+  var t=document.createElement('strong');
+  t.textContent=routeBends.length+' bend'+(routeBends.length===1?'':'s')+' marked on the map'+(sharp?' ('+sharp+' sharp or moderate)':'');
+  el.appendChild(t);
+  var d=document.createElement('div');d.className='small';
+  d.textContent='You still get the on-screen slow-down alert. Apex adds the bends-ahead list with distances, suggested safe speeds and spoken bend warnings.';
+  el.appendChild(d);
+  el.appendChild(cgApexLink('Unlock bend alerts with Apex','bend alerts'));
+}
 function renderBendList(){
   var el=$('bendList'); if(!el)return;
   if(!routeBends.length){el.hidden=true;el.textContent='';return}
+  if(!cgApex()){bendTeaser(el);return}
   el.hidden=false; el.textContent='';
   var title=document.createElement('strong');
   title.textContent='Upcoming bends on route (from geometry · estimate)';
@@ -1624,6 +2123,7 @@ function safeSpeedKmh(radius){
 }
 function updateBendListFromPos(coord){
   var el=$('bendList'); if(!el||!routeBends.length)return;
+  if(!cgApex()){if(el.hidden||!el.querySelector('.apex-upsell'))bendTeaser(el);return}
   // rewrite with distance from current
   el.hidden=false; el.textContent='';
   var title=document.createElement('strong');
@@ -1664,7 +2164,10 @@ function checkBendSpeedWarning(pos){
   if(!hit){if(banner)banner.classList.remove('open');return}
   if(banner){
     banner.classList.add('open');
-    banner.textContent='Slow down, sharp bend in '+fmtNearDist(hit.d)+' (suggest ≤'+Math.round(hit.lim)+' km/h · estimate)';
+    // Free: basic visual alert (core safety). Apex: adds the suggested safe speed.
+    banner.textContent=cgApex()
+      ?'Slow down, sharp bend in '+fmtNearDist(hit.d)+' (suggest ≤'+Math.round(hit.lim)+' km/h · estimate)'
+      :'Slow down, sharp bend in '+fmtNearDist(hit.d)+' (estimate)';
   }
   var key=Math.round(hit.bend.along)+':'+hit.bend.sharpness;
   var now=Date.now();
@@ -1715,6 +2218,7 @@ function pickVoice(){
 }
 function navSpeak(text){
   if(!navigating||!navVoiceOn||!window.speechSynthesis||!text)return;
+  if(!cgApex())return; // spoken guidance is Apex; on-screen banner stays free
   try{
     speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(text);
@@ -1727,6 +2231,7 @@ function updateMuteUi(){
   var b=$('navMuteBtn'),d=$('destMute');
   var label=navVoiceOn?'Mute voice':'Unmute voice';
   var icon=navVoiceOn?'🔊':'🔇';
+  if(!cgApex()){label='Voice guidance is an Apex feature';icon='🔇'}
   if(b){b.textContent=icon;b.setAttribute('aria-pressed',navVoiceOn?'false':'true');b.title=label}
 }
 function setNavVoice(on){
@@ -1989,7 +2494,7 @@ function onNavPosition(pos){
 function startNavigation(){
   if(!destination){setWarning('Pick a destination first.','warn');return}
   unlockSpeech();
-  setNavVoice(true); // voice on by default when navigation starts
+  if(cgApex())setNavVoice(true); // voice on by default when navigation starts (Apex)
   function begin(){
     if(!destination.steps||!destination.steps.length){
       setWarning('Getting a route before navigation…','warn');
@@ -2011,7 +2516,7 @@ function startNavigation(){
     var step=destination.steps[0];
     updateNavBanner(destination.steps[0]&&destination.steps[0].distance||0, step);
     setStatus('Navigation started','good');
-    setWarning('Prototype guidance. Always obey road signs and drive carefully. Curve warnings remain estimates only.','warn');
+    setWarning(cgApex()?'Prototype guidance. Always obey road signs and drive carefully. Curve warnings remain estimates only.':'On-screen directions are on. Spoken voice directions are an Apex feature (tap 🔇 to upgrade). Prototype guidance: always obey road signs.','warn');
     navSpeak('Starting navigation to '+(destination.name||'your destination'));
     if(current)onNavPosition(current);
   }
@@ -2100,6 +2605,19 @@ function bindMapDestinationGestures(){
 }
 bindDestinationUi();
 document.addEventListener('cg:favs-changed',function(){try{renderFavRow()}catch(e){}});
+document.addEventListener('cg:hazards-changed',function(){try{paintHazards()}catch(e){}});
+(function bindApexState(){
+  function refresh(){
+    try{renderFavHint()}catch(e){}
+    try{updateMuteUi()}catch(e){}
+    try{if(routeBends.length)renderBendList()}catch(e){}
+  }
+  function attach(){
+    if(window.__cgAuth&&window.__cgAuth.onChange){window.__cgAuth.onChange(refresh);refresh();return true}
+    return false;
+  }
+  if(!attach())setTimeout(attach,800);
+})();
 bindFocusUi();
 
 setText('unit','Units: '+(useMph?'mph':'km/h'));
@@ -2111,8 +2629,39 @@ initMap();
 (function(){
   var w=document.getElementById('welcome'),c=document.getElementById('acceptTerms'),b=document.getElementById('welcomeContinue'),card=document.getElementById('welcomeCard');
   var last=null;
-  c.addEventListener('change',function(){b.disabled=!c.checked});
-  b.addEventListener('click',function(){if(!c.checked)return;w.hidden=true;var wv=document.getElementById('welcomeVideo');if(wv)wv.pause();document.body.classList.remove('welcome-open');var g=document.getElementById('gps');if(g)g.focus();if(typeof window.__cgPulseNiyi==='function')window.__cgPulseNiyi()});
+  var si=document.getElementById('welcomeSignIn'),gu=document.getElementById('welcomeGuest'),hint=document.getElementById('welcomeHint');
+  function closeWelcome(focusApp){w.hidden=true;var wv=document.getElementById('welcomeVideo');if(wv)wv.pause();document.body.classList.remove('welcome-open');if(focusApp){var g=document.getElementById('gps');if(g)g.focus()}if(typeof window.__cgPulseNiyi==='function')window.__cgPulseNiyi()}
+  function snap(){try{var A=window.__cgAuth;return (A&&A.snapshot&&A.snapshot())||{}}catch(e){return {}}}
+  function signedUser(){var s=snap();return s.signedIn?s.user:null}
+  var pendingRedirect=false;try{pendingRedirect=localStorage.getItem('curveGuide.authRedirect')==='1'}catch(e){}
+  function syncAccount(){
+    var u=signedUser(),S=snap(),note=document.getElementById('welcomeAuthNote');
+    if(note){
+      if(!u&&S.redirectFailed){note.hidden=false;note.textContent='Google sign-in didn\u2019t finish on this browser. Tap Sign in again (it opens a Google window), or use email and password.'}
+      else if(!u&&pendingRedirect&&!S.authResolved){note.hidden=false;note.textContent='Checking your sign-in…'}
+      else note.hidden=true;
+    }
+    document.getElementById('welcomeSigned').hidden=!u;
+    document.getElementById('welcomeWhy').hidden=!!u;
+    si.hidden=!!u; gu.hidden=!!u; b.hidden=!u;
+    if(u){
+      var nm=u.displayName||'Driver';
+      document.getElementById('welcomeSignedName').textContent='Signed in as '+nm;
+      document.getElementById('welcomeSignedEmail').textContent=u.email||'';
+      document.getElementById('welcomeAvatar').textContent=(nm.trim().charAt(0)||'D').toUpperCase();
+    }
+    [b,si,gu].forEach(function(x){x.disabled=!c.checked});
+    hint.hidden=c.checked;
+  }
+  c.addEventListener('change',syncAccount);
+  b.addEventListener('click',function(){if(!c.checked)return;closeWelcome(true)});
+  gu.addEventListener('click',function(){if(!c.checked)return;closeWelcome(true)});
+  si.addEventListener('click',function(){
+    if(!c.checked)return;closeWelcome(false);
+    if(window.__cgPremiumUI&&window.__cgPremiumUI.showAuth)window.__cgPremiumUI.showAuth('signin');
+  });
+  syncAccount();
+  (function attach(n){var A=window.__cgAuth;if(A&&A.onChange){A.onChange(syncAccount);syncAccount()}else if(n<20)setTimeout(function(){attach(n+1)},300)})(0);
   w.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var f=[].slice.call(w.querySelectorAll('input,button:not([disabled]),[tabindex="0"]'));if(!f.length)return;var a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}});
   card.focus();
 })();
@@ -2169,10 +2718,48 @@ var chips=['How does it work?','Set destination','Take me home','Navigation','Co
 function api(){return window.__cgApi||null}
 
 function escText(s){return String(s==null?'':s)}
+/* 7.2.5 Niyi mascot (original design: rounded bot head, curve-shaped antenna). */
+function niyiFaceSvg(live){
+  return '<svg class="niyi-face'+(live?' live':'')+'" data-state="idle" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><g class="nf-all">'+
+    '<path class="nf-ant" d="M20 9c0-3 2-4.6 4.4-5.2"/><circle class="nf-ant-dot" cx="26" cy="3.4" r="2.3"/>'+
+    '<rect class="nf-head" x="4" y="9" width="32" height="28" rx="11"/><ellipse class="nf-shine" cx="12" cy="13.5" rx="5" ry="2.2"/>'+
+    '<rect class="nf-screen" x="8" y="14.5" width="24" height="17" rx="7.5"/>'+
+    '<g class="nf-eyes"><rect class="nf-eye l" x="13.2" y="18.6" width="4" height="6" rx="2"/><rect class="nf-eye r" x="22.8" y="18.6" width="4" height="6" rx="2"/></g>'+
+    '<path class="nf-happy" d="M12.8 22.6q2.4-3 4.8 0M22.4 22.6q2.4-3 4.8 0"/>'+
+    '<circle class="nf-cheek" cx="11.6" cy="27" r="1.5"/><circle class="nf-cheek" cx="28.4" cy="27" r="1.5"/>'+
+    '<path class="nf-smile" d="M17.2 27.2q2.8 2 5.6 0"/><path class="nf-wavy" d="M16.4 28q1.2-1.2 2.4 0t2.4 0t2.4 0"/>'+
+  '</g></svg>';
+}
+var niyiMoodT=null;
+function niyiMood(state,ms){
+  clearTimeout(niyiMoodT);
+  document.querySelectorAll('.niyi-face.live').forEach(function(f){
+    if(state==='happy'&&f.getAttribute('data-state')==='happy'){f.setAttribute('data-state','idle');void f.getBoundingClientRect()}
+    f.setAttribute('data-state',state||'idle');
+  });
+  if(ms)niyiMoodT=setTimeout(function(){niyiMood('idle')},ms);
+}
+(function mountNiyiFaces(){
+  var f=document.getElementById('niyiFab');
+  if(f&&!f.querySelector('.niyi-face')){f.insertAdjacentHTML('afterbegin',niyiFaceSvg(true));var l=f.querySelector('.niyi-fab-label');if(l)l.className='cg-sr'}
+  var h=document.getElementById('niyiHeaderBtn');
+  if(h){var old=h.querySelector('svg');if(old&&!old.classList.contains('niyi-face'))old.outerHTML=niyiFaceSvg(true)}
+  var hf=document.getElementById('niyiHeadFace');if(hf&&!hf.firstChild)hf.innerHTML=niyiFaceSvg(true);
+})();
+function addFace(d,state){
+  if(!d||d.classList.contains('has-face'))return d;
+  var body=document.createElement('div');body.className='niyi-bubble-body';
+  while(d.firstChild)body.appendChild(d.firstChild);
+  var face=document.createElement('span');face.className='niyi-bubble-face';face.innerHTML=niyiFaceSvg(false);
+  if(state)face.firstChild.setAttribute('data-state',state);
+  d.appendChild(face);d.appendChild(body);d.classList.add('has-face');
+  return d;
+}
 function addMsg(text,who){
   var d=document.createElement('div');
   d.className='niyi-msg '+(who==='user'?'user':'bot');
   d.textContent=escText(text);
+  if(who!=='user'&&text)addFace(d);
   msgs.appendChild(d);
   msgs.scrollTop=msgs.scrollHeight;
   return d;
@@ -2205,6 +2792,7 @@ function addBotRich(text,actions){
     });
     d.appendChild(row);
   }
+  addFace(d);
   msgs.appendChild(d);
   msgs.scrollTop=msgs.scrollHeight;
   return d;
@@ -2244,7 +2832,7 @@ function extractPlace(q){
   var m=s.match(/^(?:take me to|go to|directions to|navigate to|find|search for|search)\s+(.+)$/i);
   return m?m[1].replace(/[?.!]+$/,'').trim():null;
 }
-function confirm(msg){addBotRich(msg);speak(msg);return msg}
+function confirm(msg){addBotRich(msg);speak(msg);niyiMood('happy',2000);return msg}
 function doPageAction(t){
   var A=api();
   if(!A)return null;
@@ -2288,6 +2876,10 @@ function doPageAction(t){
     A.setNavVoice(true);return confirm('Navigation voice unmuted.');
   }
 
+  if(/\b(premium|apex|upgrade|paystack|subscription|pro plan|apex plan|price|pricing)\b/.test(t)&&isApexNow()){
+    if(window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
+    return confirm('You\u2019re on '+apexLabel()+'. Everything in Apex is unlocked — nothing to pay.');
+  }
   if(/\b(premium|apex|upgrade|paystack|subscription|pro plan|apex plan)\b/.test(t)){
     if(window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
     return confirm('Curve Guide Apex: ₦450 for 1 month, or ₦3,780 for 1 year (save 30%). One-time Paystack payment, no auto-renew.');
@@ -2352,7 +2944,7 @@ function doPageAction(t){
   if(/\b(report|danger spot|pothole|hazard)\b/.test(t)){
     var coord=null;
     // use report via API with GPS if any — prompt type
-    return confirm('Use Report danger spot on the destination card. Spots are saved on this phone only — sharing with other drivers coming later.');
+    return confirm('Use Report danger spot on the destination card. Spots save on this phone; Apex syncs them across your phones. Sharing with other drivers is coming later.');
   }
   if(/\b(offline|install|pwa|home screen)\b/.test(t)){
     return 'Curve Guide can cache its shell for offline use (map tiles still need network). On supported browsers tap Install; on iPhone use Share → Add to Home Screen.';
@@ -2381,13 +2973,13 @@ function explainButton(t){
     'clear':'Clear removes the destination pin and driving route.',
     'clear route':'Clear route removes the green GPS trail you have driven.',
     'premium':'Apex: ₦450 for 1 month or ₦3,780 for 1 year (save 30%). One-time Paystack payment, no auto-renew.',
-    'apex':'Apex is the paid Curve Guide plan: voice nav, bend alerts, synced favourites/hazards, and priority Niyi.',
+    'apex':'Apex is the paid Curve Guide plan: spoken voice navigation, advanced bend alerts, favourites/reports synced across phones, and unlimited smart Niyi.',
     'sign in':'Sign in opens the account screen. Firebase Auth is configured for Google and email/password.',
     'profile':'Profile stores your car icon, theme, car details and saved places, synced to your account when signed in.',
     'recenter':'Reset view (or say reset map) turns follow back on and flies to your GPS position, or Lagos if GPS is off.',
     'reset map':'Reset view turns follow back on and restores the camera (GPS or default start view).',
-    'ask niyi':'Ask Niyi opens this helper. I match keywords and can tap a few page controls — I am not a smart AI.',
-    'niyi':'Ask Niyi opens this helper. I match keywords and can tap a few page controls — I am not a smart AI.'
+    'ask niyi':'Ask Niyi opens this helper. Signed in, I answer with smart AI and can control the map; offline I use simple keywords.',
+    'niyi':'Ask Niyi opens this helper. Signed in, I answer with smart AI and can control the map; offline I use simple keywords.'
   };
   for(var k in map){if(x.indexOf(k)>=0)return map[k]}
   return 'I am not sure about “'+m[1]+'”. Try asking about Start GPS, Units, Sat, 3D, Route, or Start navigation.';
@@ -2396,29 +2988,19 @@ function searchPlaceInChat(place){
   var A=api();
   if(!A){addMsg('Map tools are not ready yet.','bot');return}
   addMsg('Searching for “'+place+'”…','bot');
-  var base='https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=0&limit=5&accept-language=en&q=';
-  function parse(list){
-    return (list||[]).map(function(r){
-      var name=(r.display_name||'').split(',')[0];
-      return {name:name||r.display_name, subtitle:r.display_name, coord:[parseFloat(r.lon),parseFloat(r.lat)]};
-    }).filter(function(x){return Number.isFinite(x.coord[0])&&Number.isFinite(x.coord[1])});
-  }
-  function show(items){
-    if(!items.length){addMsg('No places found for “'+place+'”. Try a clearer name.','bot');return}
-    var actions=items.map(function(it){
-      return {label:it.name, onClick:function(){pickPlace(it)}};
-    });
-    addBotRich('Pick a place (top Nominatim results):', actions);
-  }
-  fetch(base+encodeURIComponent(place)+'&countrycodes=ng',{headers:{'Accept':'application/json'}})
-    .then(function(r){if(!r.ok)throw new Error('http');return r.json()})
-    .then(function(data){
-      var items=parse(data);
-      if(items.length)return show(items);
-      return fetch(base+encodeURIComponent(place),{headers:{'Accept':'application/json'}})
-        .then(function(r2){return r2.json()}).then(function(d2){show(parse(d2))});
-    })
-    .catch(function(){addMsg('Search failed. Check your connection and try again.','bot')});
+  var gs=window.__cgGeoSearch;
+  if(!gs){addMsg('Search is not ready yet.','bot');return}
+  gs(place).then(function(res){
+    var items=res.items||[];
+    if(!items.length){
+      addBotRich('“'+place+'” isn\u2019t on our free map yet. You can find it in Google Maps, long-press the spot, copy the numbers (like 6.5982, 3.2765) and send them to me.',[
+        {label:'Open Google Maps',href:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place),external:true}
+      ]);
+      return;
+    }
+    var actions=items.map(function(it){return {label:it.name+(it.subtitle?' — '+String(it.subtitle).split(',').slice(1,3).join(',').trim():''), onClick:function(){pickPlace(it)}}});
+    addBotRich(res.source==='simplified'?('The exact place isn\u2019t on the free map yet. Closest streets called “'+res.simple+'”:'):'Pick a place:', actions);
+  }).catch(function(){addMsg('Search failed. Check your connection and try again.','bot')});
 }
 function pickPlace(it){
   var A=api();if(!A)return;
@@ -2434,7 +3016,7 @@ function pickPlace(it){
 }
 function answer(q){
   var t=String(q||'').toLowerCase().trim();
-  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 7.1.";
+  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 8.0.";
   var explained=explainButton(t);
   if(explained)return explained;
   if(/voice|speak|mute|unmute|speech|talk|announce|mic|microphone/.test(t))
@@ -2444,7 +3026,7 @@ function answer(q){
   if(/destin|search|route|how do i (set|find)|directions?/.test(t)&&!extractPlace(q))
     return 'Say “go to …” or “take me to …”, or type in Search destination on the map. Then Route and Start navigation.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
-    return 'Curve Guide 7.1 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
+    return 'Curve Guide 8.0 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
   if(/disclaim|liabilit|certified|safe to use|replace|prototype/.test(t))
     return 'Curve Guide is an experimental prototype, not a certified safety or navigation system. Warnings and routes can be wrong. Always obey the road.';
   if(/gps|accur|±|plus.?minus|poor|fair|green|yellow|red chip/.test(t))
@@ -2454,14 +3036,14 @@ function answer(q){
   if(/satellit|3d|2d|map type|aerial|street/.test(t))
     return 'Say “satellite”, “street map”, “3D on”, or “3D off” — or use the map buttons. Views do not change curve estimates.';
   if(/how (does|do)|work|estimat|curve|heading|detect|what is curve guide/.test(t))
-    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Version 7.1 adds free search, OSRM routing, voice navigation, bend estimates, favourites, and more — still a prototype aid only.';
+    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Curve Guide adds free search, OSRM routing, voice navigation, bend estimates, favourites, and more — still a prototype aid only.';
   if(/tip|advice|safe|prevent|brake|tyre|tire|seatbelt|distance|headlight|fatigue/.test(t)){
     var tip=tips[tipI%tips.length];
     tipI++;
     return tip+' (Ask for another safety tip anytime.)';
   }
   if(/hello|hi\b|hey|good (morning|afternoon|evening)/.test(t))
-    return "Hi! I'm Niyi for Curve Guide 7.1 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
+    return "Hi! I'm Niyi for Curve Guide. Try a chip, say “go to …”, or “start GPS”.";
   return "I'm still learning — I match simple keywords and a few page actions. Try: go to …, start GPS, satellite, Contact us, or Navigation.";
 }
 function refreshDriveNote(){
@@ -2479,10 +3061,11 @@ function openPanel(){
   if(headerBtn)headerBtn.setAttribute('aria-expanded','true');
   if(!greeted){
     greeted=true;
-    addMsg("Hi, I'm Niyi! Ask how Curve Guide works, say “go to …”, or tap Contact us.",'bot');
+    addMsg(aiAvailable()?"Hi, I'm Niyi! Ask me anything — Curve Guide, the road, or everyday questions — or say “go to …”.":"Hi, I'm Niyi! Ask how Curve Guide works, say “go to …”, or tap Contact us. Sign in for smart Niyi.",'bot');
     renderChips();
   }
   refreshDriveNote();
+  updateNiyiLimit();
   if(!input.disabled)input.focus();
 }
 function closePanel(){
@@ -2507,25 +3090,156 @@ function ask(text){
   ask._fromVoice=false;
   addMsg(q,'user');
   var t=q.toLowerCase().trim();
-  if(/contact|phone|email|call|whatsapp|reach|help me contact|contact us/.test(t)){
+  if(/\b(contact|whatsapp)\b|\b(your|the|company|adeniyi)('s)? (phone|email|number)\b|\b(call|reach|email) (you|adeniyi|curve guide|the company|support)\b/.test(t)){
     var msg='You can reach Adeniyi Investments & Property Ltd. Tap a button below.';
     addBotRich(msg, contactActions());
     speak(msg);
     renderChips();
     return;
   }
+  if((window.__cgParseCoords&&window.__cgParseCoords(q))||(window.__cgParseMapLink&&window.__cgParseMapLink(q))){searchPlaceInChat(q);renderChips();return}
   var place=extractPlace(q);
   if(place&&place.length>=2){
     searchPlaceInChat(place);
     renderChips();
     return;
   }
-  var acted=doPageAction(t);
-  if(acted){renderChips();return}
-  var a=answer(q);
-  addMsg(a,'bot');
-  speak(a);
-  renderChips();
+  // App commands (map views, units, GPS, navigation, emergency…) are instant and never count.
+  // Longer sentences go to smart Niyi first (it can do several actions at once); urgent ones stay local.
+  var urgent=/\b(emergency|sos|112|crash|accident|stop nav(igation)?|end navigation|mute)\b/.test(t);
+  if(!aiAvailable()||urgent||isAppCommand(t)){
+    var acted=doPageAction(t);
+    if(acted){renderChips();return}
+  }
+  chatAnswer(q);
+}
+/* 7.2.5: when smart Niyi is available, only short command-style phrases ("satellite", "turn on night mode",
+   "start gps", "take me home") run locally. Questions and everything else ("what is a tomato?") go to the AI. */
+function isAppCommand(t){
+  t=String(t||'').toLowerCase().trim();
+  if(!t||t.split(/\s+/).length>6)return false;
+  if(/\?$/.test(t))return false;
+  if(/^(what|whats|what's|who|whom|whose|why|how|when|where|which|is|are|was|were|can|could|should|would|will|do|does|did|tell|explain|describe|define|wetin|wey|abeg tell|i want to know)\b/.test(t))return false;
+  return true;
+}
+function aiAvailable(){var Au=window.__cgAuth;return !!(Au&&Au.niyiChat&&Au.isSignedIn&&Au.isSignedIn()&&navigator.onLine!==false)}
+
+/* 7.2 Smart Niyi: Cloudflare Workers AI via the Curve Guide Worker (no AI key in the browser).
+   Free: NIYI_FREE_LIMIT chats per day (counted here + enforced on the server). Apex: unlimited (fair use). */
+var NIYI_FREE_LIMIT=20, NIYI_USAGE_KEY='curveGuide.niyiUsage', aiHistory=[], aiBusy=false, aiSigninHinted=false;
+function apexLabel(){try{var i=window.__cgPremiumUI&&window.__cgPremiumUI.apexInfo&&window.__cgPremiumUI.apexInfo();return (i&&i.label)||'Apex'}catch(e){return 'Apex'}}
+function isApexNow(){try{return !!(window.__cgAuth&&window.__cgAuth.isPremium())}catch(e){return false}}
+function todayKey(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function niyiUsed(){try{var u=JSON.parse(localStorage.getItem(NIYI_USAGE_KEY)||'{}');return u.day===todayKey()?(u.n||0):0}catch(e){return 0}}
+function niyiCount(n){try{localStorage.setItem(NIYI_USAGE_KEY,JSON.stringify({day:todayKey(),n:typeof n==='number'?n:niyiUsed()+1}))}catch(e){}updateNiyiLimit()}
+function updateNiyiLimit(){
+  var el=document.getElementById('niyiLimit');if(!el)return;
+  if(isApexNow()){el.hidden=false;el.textContent=apexLabel()+' · unlimited Niyi';return}
+  var left=Math.max(0,NIYI_FREE_LIMIT-niyiUsed());
+  el.hidden=false;el.textContent='Free plan · '+left+' of '+NIYI_FREE_LIMIT+' Niyi chats left today';
+}
+function showNiyiLimit(){
+  if(isApexNow()){var m2='Niyi has had a lot of chats today. Please try again tomorrow. App commands like “go to …”, “satellite” or “stop navigation” still work.';addMsg(m2,'bot');speak(m2);renderChips();return}
+  var msg='You\u2019ve used your '+NIYI_FREE_LIMIT+' free Niyi chats for today. They reset tomorrow, or get unlimited smart Niyi with Apex. App commands like “go to …”, “satellite” or “stop navigation” still work.';
+  addBotRich(msg,[{label:'✨ Upgrade to Apex',onClick:function(){if(window.__cgPremiumUI&&window.__cgPremiumUI.apexPrompt)window.__cgPremiumUI.apexPrompt('niyi')}}]);
+  speak(msg);renderChips();
+}
+function appContext(){
+  var A=api()||{};var d=A.getDestination&&A.getDestination();
+  return {
+    driving:!!(typeof window.__cgIsDriving==='function'&&window.__cgIsDriving()),
+    navigating:!!(A.isNavigating&&A.isNavigating()),
+    destination:d?String(d.name||'').slice(0,80):'',
+    units:A.getUseMph&&A.getUseMph()?'mph':'kmh',
+    satellite:!!(A.getSatellite&&A.getSatellite()),
+    night:!!(A.getNightMode&&A.getNightMode()),
+    favourites:Object.keys((A.loadFavs&&A.loadFavs())||{}).filter(function(k){return k!=='custom'})
+  };
+}
+function runAiActions(actions){
+  var A=api();if(!A||!Array.isArray(actions))return;
+  actions.slice(0,3).forEach(function(a){
+    if(!a||typeof a!=='object')return;
+    try{
+      switch(a.type){
+        case 'set_destination': if(a.query)searchPlaceInChat(String(a.query).slice(0,120)); break;
+        case 'go_favourite': if(/^(home|school|work)$/.test(a.name))A.goFavourite(a.name).catch(function(){addMsg('No '+a.name+' saved yet. Set a destination, then tap Save '+a.name+'.','bot')}); break;
+        case 'map_view': if(a.view==='satellite')A.setSatellite(true); else if(a.view==='street')A.setSatellite(false); break;
+        case 'night_mode': A.setNightMode(!!a.on); break;
+        case 'tilt_3d': A.setTilt3d(!!a.on); break;
+        case 'units': A.setUnitsMph(a.units==='mph'); break;
+        case 'start_nav': A.startNavigation(); break;
+        case 'stop_nav': A.stopNavigation(); break;
+        case 'start_gps': A.startGps(); break;
+        case 'stop_gps': A.stopGps(); break;
+        case 'voice': A.setNavVoice(!!a.on); break;
+        case 'focus_mode': A.setFocusMode(!!a.on); break;
+        case 'reset_view': if(A.resetMapView)A.resetMapView(); break;
+        case 'clear_destination': A.clearDestination(); break;
+        case 'open':
+          if(a.screen==='apex'&&window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
+          else if(a.screen==='profile'&&window.__cgPremiumUI)window.__cgPremiumUI.showProfile();
+          else if(a.screen==='signin'&&window.__cgPremiumUI)window.__cgPremiumUI.showAuth('signin');
+          else if(a.screen==='emergency'&&typeof window.__cgOpenEmergency==='function')window.__cgOpenEmergency();
+          else if(a.screen==='contact')addBotRich('Contact Adeniyi Investments & Property Ltd.:',contactActions());
+          break;
+      }
+    }catch(e){}
+  });
+}
+document.addEventListener('cg:premium-changed',function(){try{updateNiyiLimit()}catch(e){}});
+(function hookNiyiPlan(n){var A=window.__cgAuth;if(A&&A.onChange){A.onChange(function(){try{updateNiyiLimit()}catch(e){}})}else if(n<20)setTimeout(function(){hookNiyiPlan(n+1)},300)})(0);
+function keywordAnswer(q){var a=answer(q);addMsg(a,'bot');speak(a);niyiMood('happy',2200);renderChips()}
+function chatAnswer(q){
+  var apex=isApexNow();
+  var t=String(q).toLowerCase().trim();
+  if(!apex&&niyiUsed()>=NIYI_FREE_LIMIT){if(doPageAction(t)){renderChips();return}showNiyiLimit();return}
+  var Au=window.__cgAuth;
+  var canAi=aiAvailable();
+  if(canAi&&aiBusy){addMsg('One moment — I\u2019m still answering your last message.','bot');return}
+  if(!canAi){
+    if(doPageAction(t)){renderChips();return}
+    if(!apex)niyiCount();
+    keywordAnswer(q);
+    if(!aiSigninHinted&&Au&&Au.isSignedIn&&!Au.isSignedIn()){
+      aiSigninHinted=true;
+      addBotRich('Sign in to chat with smart Niyi (AI). Right now I\u2019m using simple keyword answers.',[{label:'Sign in',onClick:function(){if(window.__cgPremiumUI)window.__cgPremiumUI.showAuth('signin')}}]);
+    }
+    return;
+  }
+  aiBusy=true;
+  var typing=addMsg('','bot');typing.classList.add('typing');typing.innerHTML='<span class="cg-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="cg-sr">Niyi is thinking…</span>';addFace(typing,'thinking');niyiMood('thinking');
+  aiHistory.push({role:'user',content:q.slice(0,500)});
+  aiHistory=aiHistory.slice(-8);
+  function callAi(tries){
+    return Au.niyiChat(aiHistory,appContext()).catch(function(err){
+      // "slow" = two messages within 2 s; network blips: wait a moment and try once more
+      if(tries<1&&err&&(err.code==='slow'||err.status===429&&err.code!=='limit'||!err.status&&err.name!=='AbortError'&&err.code!=='signin')){
+        return new Promise(function(r){setTimeout(r,2300)}).then(function(){return callAi(tries+1)});
+      }
+      throw err;
+    });
+  }
+  callAi(0).then(function(res){
+    typing.remove();
+    var reply=String(res.reply||'').trim()||'Okay.';
+    aiHistory.push({role:'assistant',content:reply.slice(0,600)});
+    addMsg(reply,'bot');speak(reply);niyiMood('happy',2600);
+    runAiActions(res.actions);
+    if(!apex)niyiCount(typeof res.used==='number'?res.used:undefined);
+    renderChips();
+  }).catch(function(err){
+    typing.remove();
+    aiHistory.pop();
+    niyiMood('error',3200);
+    if(err&&err.code==='limit'){if(!apex)niyiCount(NIYI_FREE_LIMIT);if(doPageAction(t)){renderChips();return}showNiyiLimit();return}
+    if(doPageAction(t)){renderChips();return}
+    // Say so honestly instead of silently switching to keyword answers.
+    var why=err&&err.code==='signin'?'Please sign in again to chat with smart Niyi.':(err&&err.name==='AbortError'?'It took too long to answer.':'Smart Niyi couldn\u2019t answer just now.');
+    addBotRich(why+' Please try again in a moment.',[{label:'Try again',onClick:function(){ask(q)}}]);
+    console.warn('[Niyi]',err);
+    renderChips();
+  }).then(function(){aiBusy=false});
 }
 var micBtn=document.getElementById('niyiMic');
 var micNote=document.getElementById('niyiMicNote');
@@ -2548,9 +3262,9 @@ function setupMic(){
   recog.lang='en-NG';
   recog.interimResults=false;
   recog.maxAlternatives=1;
-  recog.onstart=function(){listening=true;micBtn.setAttribute('aria-pressed','true');micBtn.title='Listening… tap to stop'};
-  recog.onend=function(){listening=false;micBtn.setAttribute('aria-pressed','false');micBtn.title='Voice input'};
-  recog.onerror=function(){stopMic();addMsg('Could not hear clearly. Try again or type.','bot')};
+  recog.onstart=function(){niyiMood('thinking');listening=true;micBtn.setAttribute('aria-pressed','true');micBtn.title='Listening… tap to stop'};
+  recog.onend=function(){if(!aiBusy)niyiMood('idle');listening=false;micBtn.setAttribute('aria-pressed','false');micBtn.title='Voice input'};
+  recog.onerror=function(){niyiMood('error',2500);stopMic();addMsg('Could not hear clearly. Try again or type.','bot')};
   recog.onresult=function(ev){
     var said=(ev.results&&ev.results[0]&&ev.results[0][0]&&ev.results[0][0].transcript)||'';
     said=String(said).trim();
@@ -2654,43 +3368,87 @@ setInterval(refreshDriveNote,1500);
 </script>
 
 <script>
+/* 8.0 SOS: call 112 first; then one-tap "send my location" to saved contacts via SMS / WhatsApp / Share.
+   The app cannot send messages silently — the user's own messages app opens with the text ready. */
 (function(){
   var fab=document.getElementById('emergFab');
   var sheet=document.getElementById('emergSheet');
   var callBtn=document.getElementById('emergCall');
   var waBtn=document.getElementById('emergWhatsApp');
+  var shareBtn=document.getElementById('emergShare');
   var closeBtn=document.getElementById('emergClose');
-  function open(){ if(sheet){sheet.hidden=false; sheet.classList.add('open')} }
+  var manageBtn=document.getElementById('emergManage');
+  var locEl=document.getElementById('emergLoc');
+  var sendEl=document.getElementById('emergSend');
+  var fix=null;
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  function contacts(){try{var p=JSON.parse(localStorage.getItem('curveGuide.profile')||'{}');return Array.isArray(p.sosContacts)?p.sosContacts.slice(0,5):[]}catch(e){return []}}
+  function myName(){try{var u=window.__cgAuth&&window.__cgAuth.currentUser();return u&&u.displayName?u.displayName:''}catch(e){return ''}}
+  function hhmm(t){try{return new Date(t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}catch(e){return ''}}
+  function message(){
+    var who=myName();
+    var head='SOS'+(who?' from '+who:'')+' via Curve Guide. I need help.';
+    if(!fix)return head+' (My phone could not get a GPS location.)';
+    return head+' My location: https://maps.google.com/?q='+fix.lat.toFixed(6)+','+fix.lng.toFixed(6)+
+      ' (accuracy ~'+Math.max(1,Math.round(fix.acc||0))+'m, '+hhmm(fix.t)+(fix.old?', last known':'')+')';
+  }
+  function smsHref(nums){var body=encodeURIComponent(message());return 'sms:'+nums.join(',')+(isIOS?'&body=':'?body=')+body}
+  function waHref(num){return 'https://wa.me/'+String(num||'').replace(/\D/g,'')+'?text='+encodeURIComponent(message())}
+  function setLoc(){
+    if(!locEl)return;
+    if(!fix){locEl.textContent='📍 No GPS location yet — messages will say so. Move to open sky if you can.';return}
+    locEl.textContent='📍 '+(fix.old?'Last known location ('+hhmm(fix.t)+')':'Location ready')+' · accuracy ~'+Math.max(1,Math.round(fix.acc||0))+' m';
+  }
+  function render(){
+    if(!sendEl)return;
+    sendEl.textContent='';
+    var list=contacts();
+    if(!list.length){
+      var add=document.createElement('button');add.type='button';add.className='btn';add.textContent='➕ Add emergency contacts (to text your location)';
+      add.onclick=manage;sendEl.appendChild(add);return;
+    }
+    var all=document.createElement('a');all.className='btn emerg-sms-all';
+    all.textContent='📩 Text my location to '+(list.length===1?list[0].name:list.length+' contacts');
+    all.href=smsHref(list.map(function(c){return c.phone}));
+    all.onclick=function(){all.href=smsHref(list.map(function(c){return c.phone}))};
+    sendEl.appendChild(all);
+    list.forEach(function(c){
+      var row=document.createElement('div');row.className='emerg-contact';
+      var nm=document.createElement('span');nm.textContent=c.name+' · '+String(c.phone).replace(/^\+234(\d{3})(\d{3})(\d{4})$/,'+234 $1 $2 $3');row.appendChild(nm);
+      var acts=document.createElement('div');acts.className='acts';
+      var sms=document.createElement('a');sms.className='btn sm';sms.textContent='SMS';sms.setAttribute('aria-label','Text '+c.name);
+      sms.href=smsHref([c.phone]);sms.onclick=function(){sms.href=smsHref([c.phone])};
+      var wa=document.createElement('a');wa.className='btn sm';wa.textContent='WhatsApp';wa.target='_blank';wa.rel='noopener';wa.setAttribute('aria-label','WhatsApp '+c.name);
+      wa.href=waHref(c.phone);wa.onclick=function(){wa.href=waHref(c.phone)};
+      acts.appendChild(sms);acts.appendChild(wa);row.appendChild(acts);sendEl.appendChild(row);
+    });
+  }
+  function locate(){
+    try{var lf=JSON.parse(localStorage.getItem('curveGuide.lastFix')||'null');if(lf&&isFinite(lf.lat)&&!fix)fix={lat:lf.lat,lng:lf.lng,acc:lf.acc,t:lf.t,old:true}}catch(e){}
+    setLoc();render();
+    if(!navigator.geolocation)return;
+    if(locEl&&!fix)locEl.textContent='📍 Getting your location…';
+    navigator.geolocation.getCurrentPosition(function(p){
+      fix={lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy,t:p.timestamp||Date.now(),old:false};
+      try{localStorage.setItem('curveGuide.lastFix',JSON.stringify(fix))}catch(e){}
+      setLoc();render();
+    },function(){setLoc()},{enableHighAccuracy:true,timeout:7000,maximumAge:15000});
+  }
+  function open(){ if(sheet){sheet.hidden=false; sheet.classList.add('open'); locate()} }
   function close(){ if(sheet){sheet.classList.remove('open'); sheet.hidden=true} }
+  function manage(){close();if(window.__cgPremiumUI&&window.__cgPremiumUI.showProfile)window.__cgPremiumUI.showProfile('sos')}
   if(fab)fab.addEventListener('click', open);
   if(closeBtn)closeBtn.addEventListener('click', close);
+  if(manageBtn)manageBtn.addEventListener('click', manage);
   if(callBtn)callBtn.addEventListener('click', function(){
     if(window.confirm('Call 112 now? (Nigeria emergency number)')){
       window.location.href='tel:112';
     }
   });
-  if(waBtn)waBtn.addEventListener('click', function(){
-    var api=window.__cgApi;
-    var lat=null, lon=null;
-    // read from last GPS via inject-less: use geolocation once if needed
-    function share(la, lo){
-      var maps=Number.isFinite(la)&&Number.isFinite(lo)
-        ? ('https://maps.google.com/?q='+la+','+lo)
-        : '';
-      var msg=maps
-        ? ('Emergency — my location from Curve Guide: '+maps)
-        : 'Emergency — I need help. (Curve Guide did not have a GPS fix yet.)';
-      var url='https://wa.me/?text='+encodeURIComponent(msg);
-      window.open(url, '_blank', 'noopener');
-    }
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(
-        function(p){ share(p.coords.latitude, p.coords.longitude) },
-        function(){ share(null,null) },
-        {enableHighAccuracy:true, timeout:8000, maximumAge:10000}
-      );
-    }else share(null,null);
-  });
+  if(waBtn)waBtn.addEventListener('click', function(){ window.open('https://wa.me/?text='+encodeURIComponent(message()), '_blank', 'noopener') });
+  if(shareBtn&&navigator.share){shareBtn.hidden=false;shareBtn.addEventListener('click',function(){navigator.share({title:'SOS — my location',text:message()}).catch(function(){})})}
+  document.addEventListener('cg:sos-changed',render);
+  window.__cgSosMessage=message;
   window.__cgOpenEmergency=open;
 })();
 </script>

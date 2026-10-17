@@ -92,3 +92,18 @@ Both are blocked for the app by `firestore.rules`; only this server writes them.
 * `npx wrangler deploy` — deploy from a computer (needs Node 22+), then
   `npx wrangler secret put PAYSTACK_SECRET_KEY` and `npx wrangler secret put FIREBASE_SERVICE_ACCOUNT`.
 * Routes: `POST /verify {reference}` (Bearer Firebase ID token), `POST /webhook`, `GET /health`.
+
+## Smart Niyi (`POST /niyi`)
+
+* Uses **Cloudflare Workers AI** through the `AI` binding (see `wrangler.toml`), so no AI key is
+  ever in the browser. Model: `@cf/meta/llama-3.3-70b-instruct-fp8-fast` (falls back to
+  `@cf/meta/llama-3.1-8b-instruct-fp8`). Typical chat ≈ 15–50 neurons; the free allowance is
+  10,000 neurons/day per account.
+* Needs a Firebase sign-in token. Apex is read from `users/{uid}.premium` (active + `expiresAt` in the
+  future; plan `creator` with a far-future date counts).
+* Limits: Free 20 chats/day, Apex 150/day (fair use), 1 request / 2 s per user. Counts live in
+  Firestore `niyiUsage/{uid}_{YYYYMMDD}` (server only; clients can't read/write it).
+* Returns `{ ok, reply, actions[], apex, used, limit }`. Actions are whitelisted
+  (set_destination, map_view, units, start_nav, stop_nav, …) and run by the app.
+* When deploying through the API instead of wrangler, keep secrets with `"keep_bindings": ["secret_text"]`
+  and include the `{ "type": "ai", "name": "AI" }` binding.

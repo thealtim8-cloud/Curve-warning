@@ -34,6 +34,9 @@
   // Empty = server step not deployed. If the Worker's secrets are missing it answers
   // 503 notConfigured and the app shows an error (never a local grant).
   var VERIFY_URL = 'https://curveguide-verify.thealtim8.workers.dev/verify';
+  // Smart Niyi (Cloudflare Workers AI behind the same Worker; no AI key in the browser).
+  var NIYI_URL = 'https://curveguide-verify.thealtim8.workers.dev/niyi';
+  var RESOLVE_URL = 'https://curveguide-verify.thealtim8.workers.dev/resolve-link'; // 8.0: Google Maps short links
 
   // Prices in the smallest unit (kobo / cents). Must match server/verify-payment PRICES.
   var APEX_PRICES = {
@@ -49,10 +52,12 @@
   var CURRENCY_KEY = 'curveGuide.previewCurrency';
   var PROFILE_KEY = 'curveGuide.profile';
   var FAV_KEY = 'curveGuide.favourites';
+  var HAZARD_KEY = 'curveGuide.hazards';
   var PENDING_REDIRECT = 'curveGuide.authRedirect';
 
   var listeners = [];
-  var fb = { app: null, auth: null, db: null, ready: false, firestoreOk: false, lastFsError: null };
+  var fb = { app: null, auth: null, db: null, ready: false, firestoreOk: false, lastFsError: null,
+    authResolved: false, redirectFailed: false };
   var serverPremium = null; // from Firestore read-only field when available
   var serverPremiumInfo = null; // { active, plan, expiresAt, reference, ... } set by server
 
@@ -67,6 +72,57 @@
       : (typeof exp === 'number' ? exp : (exp ? Date.parse(exp) : NaN));
     if (!isNaN(ms) && ms < Date.now()) return false;
     return true;
+  }
+
+  /* 7.2.5: remember the last server Apex state for this user, so Apex shows instantly on reload
+     instead of "Free / pay" until Firestore answers. Display only: it is re-checked against Firestore
+     on every load, and the Worker always checks Firestore itself (Niyi limits, payments). */
+  var PREMIUM_CACHE_KEY = 'curveGuide.premiumCache';
+  function plainPremium(v) {
+    if (typeof v === 'boolean') return { active: v };
+    if (!v || typeof v !== 'object') return null;
+    var exp = v.expiresAt;
+    var ms = exp && typeof exp.toMillis === 'function' ? exp.toMillis() : (typeof exp === 'number' ? exp : (exp ? Date.parse(exp) : null));
+    return { active: v.active === true, plan: v.plan ? String(v.plan) : '', expiresAt: (ms == null || isNaN(ms)) ? null : ms,
+      test: v.test === true, currency: v.currency || '' };
+  }
+  function setServerPremium(uid, raw) {
+    var before = JSON.stringify([serverPremium, plainPremium(serverPremiumInfo)]);
+    serverPremium = parseServerPremium(raw);
+    serverPremiumInfo = plainPremium(raw);
+    try {
+      if (uid && serverPremiumInfo) localStorage.setItem(PREMIUM_CACHE_KEY, JSON.stringify({ uid: uid, premium: serverPremiumInfo }));
+      else localStorage.removeItem(PREMIUM_CACHE_KEY);
+    } catch (e) {}
+    return before !== JSON.stringify([serverPremium, serverPremiumInfo]);
+  }
+  function clearPremium() {
+    serverPremium = null;
+    serverPremiumInfo = null;
+    try { localStorage.removeItem(PREMIUM_CACHE_KEY); } catch (e) {}
+    if (fb.unsubUserDoc) { try { fb.unsubUserDoc(); } catch (e) {} fb.unsubUserDoc = null; }
+  }
+  function restoreCachedPremium() {
+    try {
+      var c = JSON.parse(localStorage.getItem(PREMIUM_CACHE_KEY) || 'null');
+      var u = JSON.parse(localStorage.getItem(AUTH_KEY) || 'null');
+      if (c && u && c.uid === u.uid && c.premium) {
+        serverPremium = parseServerPremium(c.premium);
+        serverPremiumInfo = c.premium;
+      }
+    } catch (e) {}
+  }
+  // Live updates: if Apex is granted/renewed while the app is open, show it without a reload.
+  function watchUserDoc(uid) {
+    if (!fb.db || !uid || typeof userDoc(uid).onSnapshot !== 'function') return;
+    if (fb.unsubUserDoc && fb.watchUid === uid) return;
+    if (fb.unsubUserDoc) { try { fb.unsubUserDoc(); } catch (e) {} }
+    fb.watchUid = uid;
+    fb.unsubUserDoc = userDoc(uid).onSnapshot(function (snap) {
+      if (!snap.exists) return;
+      var d = snap.data() || {};
+      if (setServerPremium(uid, d.premium)) emit();
+    }, function (err) { console.warn('[Curve Guide] live plan updates off', err && err.code); });
   }
 
   function loadJson(key, fallback) {
@@ -137,8 +193,9 @@
   }
 
   function isPremium() { return plan() === 'premium'; }
-  function gatingOn() { return loadJson(GATE_KEY, false) === true; }
-  function setGating(on) { saveJson(GATE_KEY, !!on); emit(); }
+  // 7.2: Apex locks are always on. Apex = server-written premium (active + expiresAt in future).
+  function gatingOn() { return true; }
+  function setGating() { emit(); }
   function currency() { return USD_ENABLED && loadJson(CURRENCY_KEY, 'NGN') === 'USD' ? 'USD' : 'NGN'; }
   function setCurrency(c) { saveJson(CURRENCY_KEY, USD_ENABLED && c === 'USD' ? 'USD' : 'NGN'); emit(); }
 
@@ -160,6 +217,8 @@
       serverPremium: serverPremium,
       serverPremiumInfo: serverPremiumInfo,
       testApex: null,
+      authResolved: fb.authResolved || !FIREBASE_CONFIG,
+      redirectFailed: fb.redirectFailed,
       usdEnabled: USD_ENABLED,
       pendingPayment: pendingApexPayment()
     };
@@ -185,9 +244,19 @@
       }
       fb.ready = true;
 
-      // Complete redirect sign-in if pending (mobile Google)
-      return fb.auth.getRedirectResult().then(function (result) {
+      // Keep the session on this device (IndexedDB/localStorage), not just this tab.
+      var persist = Promise.resolve();
+      try { persist = fb.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function () {}); } catch (e) {}
+      var hadPendingRedirect = false;
+      try { hadPendingRedirect = localStorage.getItem(PENDING_REDIRECT) === '1'; } catch (e) {}
+      // Complete redirect sign-in if one was started (fallback path only since 7.2.3)
+      return persist.then(function () { return fb.auth.getRedirectResult(); }).then(function (result) {
         try { localStorage.removeItem(PENDING_REDIRECT); } catch (e) {}
+        if (hadPendingRedirect && !(result && result.user) && !fb.auth.currentUser) {
+          // Typical on iPhone/iPad (Safari & Chrome use WebKit storage partitioning):
+          // the redirect came back but the result was lost. Tell the user instead of looping.
+          fb.redirectFailed = true;
+        }
         if (result && result.user) {
           cacheUser(mapUser(result.user));
           return pullUserCloud(result.user.uid).then(function () { emit(); return true; });
@@ -198,12 +267,15 @@
         return true;
       }).then(function () {
         fb.auth.onAuthStateChanged(function (user) {
+          fb.authResolved = true;
           if (user) {
+            fb.redirectFailed = false;
             cacheUser(mapUser(user));
+            if (fb.watchUid && fb.watchUid !== user.uid) clearPremium();
             pullUserCloud(user.uid).finally(function () { emit(); });
           } else {
             cacheUser(null);
-            serverPremium = null;
+            clearPremium();
             emit();
           }
         });
@@ -231,8 +303,8 @@
         return pushUserCloud(uid, { seed: true });
       }
       var data = snap.data() || {};
-      serverPremium = parseServerPremium(data.premium);
-      serverPremiumInfo = (data.premium && typeof data.premium === 'object') ? data.premium : null;
+      setServerPremium(uid, data.premium);
+      watchUserDoc(uid);
       if (data.profile && typeof data.profile === 'object') {
         try {
           var local = loadJson(PROFILE_KEY, {});
@@ -242,9 +314,40 @@
           if (window.__cgPremiumUI && window.__cgPremiumUI.applyTheme) window.__cgPremiumUI.applyTheme();
         } catch (e) {}
       }
-      if (data.favourites && typeof data.favourites === 'object') {
-        saveJson(FAV_KEY, data.favourites);
-        document.dispatchEvent(new CustomEvent('cg:favs-changed'));
+      // Cloud sync of favourites + danger reports is an Apex feature.
+      // Free users keep everything on this phone (local still works).
+      if (serverPremium === true) {
+        var changed = false;
+        if (data.favourites && typeof data.favourites === 'object') {
+          var localF = loadJson(FAV_KEY, {}) || {};
+          var mergedF = Object.assign({}, localF, data.favourites);
+          var cust = [].concat(localF.custom || [], data.favourites.custom || []);
+          var seen = {};
+          mergedF.custom = cust.filter(function (c) {
+            var k = c && c.name + '|' + (c.coord || []).join(',');
+            if (!c || seen[k]) return false; seen[k] = true; return true;
+          }).slice(-8);
+          if (!mergedF.custom.length) delete mergedF.custom;
+          saveJson(FAV_KEY, mergedF);
+          changed = true;
+        }
+        if (Array.isArray(data.hazards)) {
+          var localH = loadJson(HAZARD_KEY, []) || [];
+          var byKey = {};
+          localH.concat(data.hazards).forEach(function (h) {
+            if (h && h.coord) byKey[(h.at || 0) + '|' + h.coord.join(',')] = h;
+          });
+          var mergedH = Object.keys(byKey).map(function (k) { return byKey[k]; })
+            .sort(function (a, b) { return (a.at || 0) - (b.at || 0); }).slice(-100);
+          saveJson(HAZARD_KEY, mergedH);
+          changed = true;
+        }
+        if (changed) {
+          document.dispatchEvent(new CustomEvent('cg:favs-changed'));
+          document.dispatchEvent(new CustomEvent('cg:hazards-changed'));
+        }
+        // upload anything that only existed on this phone
+        pushUserCloud(uid);
       }
       return data;
     }).catch(function (err) {
@@ -260,16 +363,19 @@
     if (!fb.db || !uid) return Promise.resolve(null);
     var u = currentUser() || {};
     var profile = loadJson(PROFILE_KEY, {});
-    var favs = loadJson(FAV_KEY, {});
     // Never send `premium` from the client — rules reject changes to it.
     var payload = {
       displayName: u.displayName || '',
       email: u.email || '',
       photoURL: u.photoURL || null,
       profile: profile,
-      favourites: favs,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
+    // Favourites + danger reports sync across phones only for Apex.
+    if (isPremium()) {
+      payload.favourites = loadJson(FAV_KEY, {}) || {};
+      payload.hazards = (loadJson(HAZARD_KEY, []) || []).slice(-100);
+    }
     var ref = userDoc(uid);
     return ref.set(payload, { merge: true }).then(function () {
       fb.firestoreOk = true;
@@ -300,10 +406,11 @@
       return localFakeSignIn('google', 'Google Preview', 'google.preview@curveguide.local');
     }
     var provider = googleProvider();
-    if (isMobileLike()) {
-      try { localStorage.setItem(PENDING_REDIRECT, '1'); } catch (e) {}
-      return fb.auth.signInWithRedirect(provider);
-    }
+    fb.redirectFailed = false;
+    // 7.2.3: always use a pop-up first, opened directly from the tap.
+    // signInWithRedirect with authDomain *.firebaseapp.com loses the result on iOS/iPadOS
+    // (Safari and Chrome both use WebKit, which partitions third-party storage), which sent
+    // users straight back to the sign-in screen. Redirect is only a fallback now.
     return fb.auth.signInWithPopup(provider).then(function (cred) {
       cacheUser(mapUser(cred.user));
       return pullUserCloud(cred.user.uid).then(function () {
@@ -315,9 +422,12 @@
         console.warn('[Curve Guide] Google auth not enabled yet — local preview account.', err);
         return localFakeSignIn('google', 'Google Preview', 'google.preview@curveguide.local');
       }
-      // Popup blocked / unsupported → redirect
-      if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user' ||
-          err.code === 'auth/cancelled-popup-request' || /popup/i.test(err.message || ''))) {
+      var code = (err && err.code) || '';
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request' || code === 'auth/user-cancelled') {
+        return Promise.reject(Object.assign(new Error('The Google window was closed before sign-in finished. Tap Continue with Google to try again.'), { code: code }));
+      }
+      // Pop-up blocked or not supported (e.g. some in-app browsers) → fall back to redirect.
+      if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') {
         try { localStorage.setItem(PENDING_REDIRECT, '1'); } catch (e) {}
         return fb.auth.signInWithRedirect(provider);
       }
@@ -403,7 +513,7 @@
     if (fb.auth && fb.auth.currentUser) {
       return fb.auth.signOut().then(function () {
         cacheUser(null);
-        serverPremium = null;
+        clearPremium();
         emit();
         return null;
       });
@@ -417,8 +527,7 @@
     var p = (fb.auth) ? fb.auth.signOut() : Promise.resolve();
     return p.catch(function () {}).then(function () {
       cacheUser(null);
-      serverPremium = null;
-      serverPremiumInfo = null;
+      clearPremium();
       emit();
     });
   }
@@ -602,9 +711,34 @@
   }
 
   function requiresPremium() {
-    if (!gatingOn()) return false;
-    if (isPremium()) return false;
-    return true;
+    return !isPremium();
+  }
+
+  // Smart Niyi: ask the Worker (Workers AI). Needs sign-in; the server also
+  // enforces the daily limit (free) and checks Apex from Firestore itself.
+  function niyiChat(messages, context) {
+    if (!NIYI_URL) return Promise.reject(new Error('Niyi AI not configured'));
+    if (!(fb.auth && fb.auth.currentUser)) return Promise.reject(Object.assign(new Error('signin'), { code: 'signin' }));
+    return getIdToken().then(function (token) {
+      var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var to = ctl ? setTimeout(function () { ctl.abort(); }, 15000) : null;
+      return fetch(NIYI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ messages: messages, context: context || {} }),
+        signal: ctl ? ctl.signal : undefined
+      }).then(function (res) {
+        if (to) clearTimeout(to);
+        return res.json().catch(function () { return {}; }).then(function (body) {
+          if (!res.ok || !body.ok) {
+            var e = new Error(body.error || ('Niyi server ' + res.status));
+            e.status = res.status; e.code = body.code || ''; e.body = body;
+            throw e;
+          }
+          return body;
+        });
+      });
+    });
   }
 
   function saveProfileLocalAndCloud(profileObj) {
@@ -622,7 +756,7 @@
   function deleteAccount() {
     if (!fb.auth || !fb.auth.currentUser) {
       cacheUser(null);
-      serverPremium = null;
+      clearPremium();
       try { localStorage.removeItem(AUTH_KEY); localStorage.removeItem(PROFILE_KEY); } catch (e) {}
       emit();
       return Promise.resolve({ localOnly: true });
@@ -642,7 +776,7 @@
       return user.delete();
     }).then(function () {
       cacheUser(null);
-      serverPremium = null;
+      clearPremium();
       try {
         localStorage.removeItem(AUTH_KEY);
         localStorage.removeItem(PLAN_KEY);
@@ -670,6 +804,7 @@
 
   // Boot: remove legacy preview-only local Apex switches (Apex is server-only now).
   try { localStorage.removeItem(TEST_REF_KEY); localStorage.removeItem(PLAN_KEY); } catch (e) {}
+  restoreCachedPremium();
   var boot = initFirebase();
   // After sign-in is known, retry any paid-but-unverified Apex payment.
   var autoRetried = {}; // at most one automatic retry per reference per page load
@@ -719,6 +854,15 @@
     },
     saveProfileLocalAndCloud: saveProfileLocalAndCloud,
     saveFavouritesLocalAndCloud: saveFavouritesLocalAndCloud,
+    NIYI_URL: NIYI_URL,
+    niyiChat: niyiChat,
+    resolveMapLink: function (url) {
+      var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var to = ctl ? setTimeout(function () { ctl.abort(); }, 9000) : null;
+      return fetch(RESOLVE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: url }), signal: ctl ? ctl.signal : undefined })
+        .then(function (r) { if (to) clearTimeout(to); return r.json().catch(function () { return { ok: false }; }); });
+    },
+    isSignedIn: function () { return !!(fb.auth && fb.auth.currentUser); },
     getFirebase: function () { return fb; },
     deleteAccount: deleteAccount,
     tryWritePremiumField: tryWritePremiumField
