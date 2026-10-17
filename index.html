@@ -17,19 +17,19 @@
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--bg:#0d1114;--bg2:#13191d;--panel:#161d22;--panel2:#1c252b;--line:#263139;--line2:#33414b;--text:#eef3f5;--muted:#93a3ad;--silver:#c9d1d6;--lime:#20c477;--green:#20c477;--green2:#17a863;--orange:#ffb347;--red:#ff625c;--radius:18px;--shadow:0 1px 0 #ffffff08 inset,0 10px 30px -12px #000a}
+:root{color-scheme:dark;--bg:#0d1114;--bg2:#13191d;--panel:#161d22;--panel2:#1c252b;--line:#263139;--line2:#33414b;--text:#eef3f5;--muted:#93a3ad;--silver:#c9d1d6;--acc:#20c477;--acc-rgb:32 196 119;--acc-hi:#27d083;--acc2:#17a863;--acc-text:#9be3bf;--acc-pale:#dff6ea;--acc-ink:#06150d;--acc-deep:#0f7a47;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2);--orange:#ffb347;--red:#ff625c;--radius:18px;--shadow:0 1px 0 #ffffff08 inset,0 10px 30px -12px #000a}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);background:radial-gradient(900px 420px at 15% -10%,#20c47714,transparent 60%),radial-gradient(800px 400px at 100% 0,#c9d1d60d,transparent 60%),var(--bg);background-attachment:fixed}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);background:radial-gradient(900px 420px at 15% -10%,rgb(var(--acc-rgb) / 0.078),transparent 60%),radial-gradient(800px 400px at 100% 0,#c9d1d60d,transparent 60%),var(--bg);background-attachment:fixed}
 button{font:inherit;cursor:pointer}
 .app{width:min(100%,1160px);margin:0 auto;padding:16px;display:grid;gap:14px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 2px 4px}
 .brand{display:flex;align-items:center;gap:13px;min-width:0}
-.logo-img{width:52px;height:52px;border-radius:14px;object-fit:cover;flex:none;background:#1a1d20;display:block;border:1px solid var(--line2);box-shadow:0 6px 18px -6px #000c,0 0 0 4px #20c4770d}
+.logo-img{width:52px;height:52px;border-radius:14px;object-fit:cover;flex:none;background:#1a1d20;display:block;border:1px solid var(--line2);box-shadow:0 6px 18px -6px #000c,0 0 0 4px rgb(var(--acc-rgb) / 0.051)}
 h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;color:#f4f7f8}
 .tagline{font-size:10.5px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--green);margin-top:5px}
 .subtitle{font-size:12px;color:var(--muted);margin-top:3px}
-.pill{border:1px solid #20c47740;background:#20c47712;border-radius:999px;padding:7px 11px;font-size:10.5px;font-weight:600;letter-spacing:.4px;color:#9be3bf;white-space:nowrap}
+.pill{border:1px solid rgb(var(--acc-rgb) / 0.251);background:rgb(var(--acc-rgb) / 0.071);border-radius:999px;padding:7px 11px;font-size:10.5px;font-weight:600;letter-spacing:.4px;color:var(--acc-text);white-space:nowrap}
 .panel{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px 12px;border-bottom:1px solid var(--line)}
 .panel-head h2{font-size:14px;font-weight:700;margin:0;letter-spacing:-.1px}
@@ -42,7 +42,7 @@ h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;
 .map-controls{position:absolute;z-index:3;right:12px;bottom:62px;display:grid;gap:7px}
 .icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid #ffffff26;background:#0d1114e8;color:#fff;font-size:17px;font-weight:600;display:grid;place-items:center;box-shadow:0 4px 14px #0005;backdrop-filter:blur(8px);transition:background .15s,border-color .15s,transform .1s}
 .icon-btn.map-type{font-size:11.5px;letter-spacing:.2px}
-.icon-btn:hover{background:#1c252b;border-color:#20c47780}
+.icon-btn:hover{background:#1c252b;border-color:rgb(var(--acc-rgb) / 0.502)}
 .icon-btn:active{transform:scale(.96)}
 .maplibregl-ctrl-bottom-left,.maplibregl-ctrl-bottom-right{z-index:2}
 .maplibregl-ctrl-group{background:#161d22!important;border:1px solid #ffffff24!important}
@@ -53,7 +53,7 @@ h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;
 .car-marker:after{content:"";position:absolute;left:8px;top:7px;width:7px;height:9px;border-radius:3px;background:#1c252b}
 .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .metric{position:relative;padding:13px 13px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;min-width:0;box-shadow:var(--shadow);overflow:hidden}
-.metric:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--green),#20c47700)}
+.metric:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--green),rgb(var(--acc-rgb) / 0))}
 .metric-label{font-size:10.5px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .metric-value{font-size:clamp(19px,4.4vw,26px);font-weight:750;letter-spacing:-.6px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .metric-unit{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0}
@@ -61,17 +61,17 @@ h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;
 .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .section-title{font-size:14px;font-weight:700;letter-spacing:-.1px}
 .status-box{margin-top:12px;padding:12px 14px;border-radius:12px;background:#0d1114a0;border:1px solid var(--line);border-left-width:3px;font-size:13px;line-height:1.55;color:#dbe3e7}
-.status-box.good{border-color:#20c47766;border-left-color:var(--green)}
+.status-box.good{border-color:#20c47766;border-left-color:#20c477}
 .status-box.warn{border-color:#ffb34755;border-left-color:var(--orange)}
 .status-box.danger{border-color:#ff625c66;border-left-color:var(--red)}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .btn{border:1px solid var(--line2);background:#222c33;color:var(--text);border-radius:11px;padding:10px 14px;font-size:12.5px;font-weight:600;transition:background .15s,border-color .15s,color .15s,box-shadow .15s,transform .1s}
 .btn:hover:not(:disabled){background:#2a363e;border-color:#4a5a65}
 .btn:active:not(:disabled){transform:translateY(1px)}
-.btn:focus-visible,.icon-btn:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766}
-.btn.primary{background:linear-gradient(180deg,#27d083,var(--green2));border-color:#20c477;color:#06150d;box-shadow:0 6px 16px -6px #20c477aa}
+.btn:focus-visible,.icon-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.4)}
+.btn.primary{background:linear-gradient(180deg,var(--acc-hi),var(--green2));border-color:var(--acc);color:var(--acc-ink);box-shadow:0 6px 16px -6px rgb(var(--acc-rgb) / 0.667)}
 .btn.primary:hover:not(:disabled){background:linear-gradient(180deg,#34dc8f,#1bb46b);border-color:#34dc8f}
-.btn.active{border-color:#20c477aa;color:#5fe0a3;background:#20c47714}
+.btn.active{border-color:rgb(var(--acc-rgb) / 0.667);color:var(--acc-text);background:rgb(var(--acc-rgb) / 0.078)}
 .btn:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}
 .notice{font-size:11.5px;line-height:1.6;color:var(--muted);padding:14px 16px 14px 18px;position:relative;background:linear-gradient(180deg,#1f1a12,#18160f);border-color:#ffb34730}
 .notice:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--orange)}
@@ -85,7 +85,7 @@ h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.5px;font-weight:800;
 footer{text-align:center;color:#6f7f89;font-size:10.5px;line-height:1.5;padding:0}
 @media(min-width:760px){.app{padding:24px;gap:16px}.dashboard{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr);gap:16px;align-items:start}.map-panel{grid-row:span 2}.map-wrap{height:600px}.side-stack{display:grid;gap:16px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}.metric-label{margin:0}.metric-value{font-size:23px}h1{font-size:24px}.logo-img{width:56px;height:56px}}
 @media(max-width:390px){.app{padding:12px}.pill{font-size:9.5px;padding:6px 9px}.map-wrap{min-height:290px}.btn{padding:9px 12px}.subtitle{display:none}.tagline{letter-spacing:.8px;font-size:9.5px;white-space:nowrap}.brand{gap:10px}.logo-img{width:46px;height:46px}}
-.welcome{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:16px;background:radial-gradient(700px 400px at 50% 0,#20c4771f,transparent 70%),#07090bdd;backdrop-filter:blur(8px)}
+.welcome{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:16px;background:radial-gradient(700px 400px at 50% 0,rgb(var(--acc-rgb) / 0.122),transparent 70%),#07090bdd;backdrop-filter:blur(8px)}
 .welcome[hidden]{display:none}
 body.welcome-open{overflow:hidden}
 .welcome-card{width:min(100%,560px);max-height:calc(100dvh - 32px);overflow:auto;background:linear-gradient(180deg,#1c1f22,#14181b);border:1px solid var(--line2);border-radius:22px;box-shadow:0 30px 80px -20px #000e,0 0 0 1px #ffffff08 inset;padding:22px 22px 18px;outline:none}
@@ -105,20 +105,20 @@ body.welcome-open{overflow:hidden}
 .welcome-credit .credit-card{padding:5px 10px;border-radius:9px}
 .welcome-credit .credit-card img{height:30px}
 @media(max-width:420px){.welcome{padding:10px}.welcome-card{padding:18px 16px 14px;max-height:calc(100dvh - 20px)}.welcome-logo{width:220px}.welcome-card h2{font-size:20px}.welcome-intro{font-size:13px}.terms-box{max-height:150px}}
-.contact-line{font-size:11.5px;color:var(--muted);text-align:center}.contact{color:#5fe0a3;text-decoration:none;font-weight:600;white-space:nowrap}.contact:hover{text-decoration:underline}.contact:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766;border-radius:4px}.contact-line .sep{color:#4a5a65}
+.contact-line{font-size:11.5px;color:var(--muted);text-align:center}.contact{color:var(--acc-text);text-decoration:none;font-weight:600;white-space:nowrap}.contact:hover{text-decoration:underline}.contact:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.4);border-radius:4px}.contact-line .sep{color:#4a5a65}
 .welcome-contact{margin-top:8px}
 .welcome-account{display:grid;gap:9px;margin-top:4px}
 .welcome-account [hidden]{display:none!important}
-.welcome-why{margin:0 0 2px;padding:10px 12px;border-radius:12px;background:linear-gradient(90deg,#20c47718,#ffb3471a);border:1px solid #20c47740;font-size:12.8px;line-height:1.5;color:#dff6ea;text-align:center}
+.welcome-why{margin:0 0 2px;padding:10px 12px;border-radius:12px;background:linear-gradient(90deg,rgb(var(--acc-rgb) / 0.094),#ffb3471a);border:1px solid rgb(var(--acc-rgb) / 0.251);font-size:12.8px;line-height:1.5;color:var(--acc-pale);text-align:center}
 .welcome-why strong{color:#fff}
 .welcome .btn.welcome-guest{width:100%;padding:12px;font-size:13.5px;font-weight:600;background:transparent;border:1px solid var(--line2);color:var(--silver)}
-.welcome .btn.welcome-guest:not([disabled]):hover{border-color:#20c47788;color:var(--text)}
+.welcome .btn.welcome-guest:not([disabled]):hover{border-color:rgb(var(--acc-rgb) / 0.533);color:var(--text)}
 .welcome .btn[disabled]{opacity:.5;cursor:not-allowed}
 .welcome-authnote{grid-column:1/-1;margin:0;padding:9px 11px;border-radius:10px;background:#ffb34714;border:1px solid #ffb34755;color:#ffe2b8;font-size:12px;line-height:1.45;text-align:center}
 .welcome-hint{margin:0;font-size:11.5px;color:var(--muted);text-align:center}
-.welcome-signed{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:#20c47712;border:1px solid #20c47744}
+.welcome-signed{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:rgb(var(--acc-rgb) / 0.071);border:1px solid rgb(var(--acc-rgb) / 0.267)}
 .welcome-signed[hidden]{display:none}
-.welcome-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:#20c47733;color:#bff2d8;font-weight:800;font-size:15px}
+.welcome-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:rgb(var(--acc-rgb) / 0.2);color:var(--acc-pale);font-weight:800;font-size:15px}
 .welcome-signed-name{font-weight:700;font-size:14px;color:var(--text)}
 .welcome-signed-email{font-size:12px;color:var(--muted);word-break:break-all}
 @media(min-width:760px){.welcome-card{width:min(100%,600px);padding:26px 30px 20px}.welcome-account{grid-template-columns:1fr 1fr}.welcome-why,.welcome-signed,.welcome-hint{grid-column:1/-1}}
@@ -128,7 +128,7 @@ body.welcome-open{overflow:hidden}
 .panel-head h2,.section-title{display:flex;align-items:center;gap:8px}
 .metric-label{display:flex;align-items:center;gap:7px}.metric-label .ico{width:14px;height:14px}
 .panel{transition:border-color .2s,box-shadow .2s}.panel:hover{border-color:var(--line2)}
-.hero{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);padding:var(--s3) var(--s4);border-radius:14px;border:1px solid #20c47733;background:linear-gradient(90deg,#20c47718,#20c47705 60%,transparent);font-size:12.5px;color:var(--silver)}
+.hero{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);padding:var(--s3) var(--s4);border-radius:14px;border:1px solid rgb(var(--acc-rgb) / 0.2);background:linear-gradient(90deg,rgb(var(--acc-rgb) / 0.094),rgb(var(--acc-rgb) / 0.02) 60%,transparent);font-size:12.5px;color:var(--silver)}
 .hero b{color:#fff;font-weight:700}.hero-items{display:flex;gap:var(--s4);flex-wrap:wrap}
 .hero-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);white-space:nowrap}
 .tips{position:relative}
@@ -142,8 +142,8 @@ body.welcome-open{overflow:hidden}
 .tip-dot[aria-current="true"]{width:18px;background:var(--green)}
 .tip-arrows{display:flex;gap:6px}
 .tip-arrow{width:30px;height:30px;border-radius:9px;border:1px solid var(--line2);background:#1c252b;color:var(--text);display:grid;place-items:center;font-size:14px}
-.tip-arrow:hover{border-color:#20c47780}.tip-arrow:focus-visible,.tip-dot:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766}
-.welcome-quote{margin:-4px 0 14px;padding:9px 12px;border-radius:10px;background:#20c47710;border:1px solid #20c47730;text-align:center;font-size:12.5px;font-style:italic;color:#bfeed6;transition:opacity .45s;min-height:38px;display:flex;align-items:center;justify-content:center}
+.tip-arrow:hover{border-color:rgb(var(--acc-rgb) / 0.502)}.tip-arrow:focus-visible,.tip-dot:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.4)}
+.welcome-quote{margin:-4px 0 14px;padding:9px 12px;border-radius:10px;background:rgb(var(--acc-rgb) / 0.063);border:1px solid rgb(var(--acc-rgb) / 0.188);text-align:center;font-size:12.5px;font-style:italic;color:var(--acc-pale);transition:opacity .45s;min-height:38px;display:flex;align-items:center;justify-content:center}
 .welcome-quote.fade{opacity:0}
 .notice{display:flex;gap:10px}.notice .ico{color:var(--orange);margin-top:2px}
 @media(max-width:600px){.hero-items{display:none}.hero{font-size:12px}}
@@ -157,9 +157,9 @@ body.welcome-open{overflow:hidden}
 #gpsChip.acc-good{border-color:#20c47799;color:#9be3bf}#gpsChip.acc-fair{border-color:#ffb34799;color:#ffd08a}#gpsChip.acc-poor{border-color:#ff625c99;color:#ffaaa6}
 
 /* Niyi helper */
-.niyi-fab{position:fixed;z-index:40;right:max(14px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;border:1px solid #20c47766;background:linear-gradient(180deg,#1c252b,#13191d);color:#9be3bf;font-weight:800;font-size:13px;letter-spacing:-.2px;box-shadow:0 10px 28px -8px #000c,0 0 0 4px #20c47714;display:grid;place-items:center;padding:0}
-.niyi-fab:hover{border-color:#20c477;color:#fff;background:linear-gradient(180deg,#243038,#1a2228)}
-.niyi-fab:focus-visible{outline:none;box-shadow:0 0 0 3px #20c47766,0 10px 28px -8px #000c}
+.niyi-fab{position:fixed;z-index:40;right:max(14px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;border:1px solid rgb(var(--acc-rgb) / 0.4);background:linear-gradient(180deg,#1c252b,#13191d);color:var(--acc-text);font-weight:800;font-size:13px;letter-spacing:-.2px;box-shadow:0 10px 28px -8px #000c,0 0 0 4px rgb(var(--acc-rgb) / 0.078);display:grid;place-items:center;padding:0}
+.niyi-fab:hover{border-color:var(--acc);color:#fff;background:linear-gradient(180deg,#243038,#1a2228)}
+.niyi-fab:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.4),0 10px 28px -8px #000c}
 .niyi-fab[aria-expanded="true"]{display:none}
 .niyi-panel{position:fixed;z-index:45;right:max(12px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:min(360px,calc(100vw - 24px));height:min(520px,calc(100dvh - 32px));display:none;flex-direction:column;background:linear-gradient(180deg,#1c252b,#14191d);border:1px solid var(--line2);border-radius:18px;box-shadow:0 24px 60px -16px #000e,0 0 0 1px #ffffff08 inset;overflow:hidden}
 .niyi-panel.open{display:flex}
@@ -169,22 +169,22 @@ body.welcome-open{overflow:hidden}
 .niyi-head-title span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}
 .niyi-head-actions{display:flex;gap:6px;flex:none}
 .niyi-icon{width:34px;height:34px;border-radius:10px;border:1px solid var(--line2);background:#222c33;color:var(--text);display:grid;place-items:center;font-size:14px;padding:0}
-.niyi-icon:hover{border-color:#20c47780}
-.niyi-icon[aria-pressed="true"]{border-color:#20c477aa;color:#5fe0a3;background:#20c47714}
+.niyi-icon:hover{border-color:rgb(var(--acc-rgb) / 0.502)}
+.niyi-icon[aria-pressed="true"]{border-color:rgb(var(--acc-rgb) / 0.667);color:var(--acc-text);background:rgb(var(--acc-rgb) / 0.078)}
 .niyi-icon[hidden]{display:none}
 .niyi-drive{display:none;margin:0;padding:8px 12px;font-size:11.5px;line-height:1.4;color:#ffd08a;background:#ffb34718;border-bottom:1px solid #ffb34733}
 .niyi-drive.show{display:block}
 .niyi-msgs{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
 .niyi-msg{max-width:92%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .niyi-msg.bot{align-self:flex-start;background:#0d1114;border:1px solid var(--line);color:#e6eef1;border-bottom-left-radius:5px}
-.niyi-msg.user{align-self:flex-end;background:#20c47722;border:1px solid #20c47744;color:#eef8f2;border-bottom-right-radius:5px}
+.niyi-msg.user{align-self:flex-end;background:rgb(var(--acc-rgb) / 0.133);border:1px solid rgb(var(--acc-rgb) / 0.267);color:var(--acc-pale);border-bottom-right-radius:5px}
 .niyi-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
 .niyi-chip{border:1px solid var(--line2);background:#222c33;color:var(--text);border-radius:999px;padding:7px 11px;font-size:11.5px;font-weight:600}
-.niyi-chip:hover{border-color:#20c47780;color:#9be3bf}
+.niyi-chip:hover{border-color:rgb(var(--acc-rgb) / 0.502);color:var(--acc-text)}
 .niyi-input-row{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px solid var(--line);background:#0d1114a8}
 .niyi-input{flex:1;min-width:0;border:1px solid var(--line2);background:#0d1114;color:var(--text);border-radius:11px;padding:10px 12px;font:inherit;font-size:13px}
-.niyi-input:focus{outline:none;border-color:#20c47799;box-shadow:0 0 0 3px #20c47733}
-.niyi-send{border:1px solid #20c477;background:linear-gradient(180deg,#27d083,var(--green2));color:#06150d;border-radius:11px;padding:10px 14px;font-size:12.5px;font-weight:700;flex:none}
+.niyi-input:focus{outline:none;border-color:rgb(var(--acc-rgb) / 0.6);box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.2)}
+.niyi-send{border:1px solid var(--acc);background:linear-gradient(180deg,var(--acc-hi),var(--green2));color:var(--acc-ink);border-radius:11px;padding:10px 14px;font-size:12.5px;font-weight:700;flex:none}
 .niyi-send:disabled{opacity:.42;cursor:not-allowed}
 @media(max-width:390px){
   .niyi-fab{width:50px;height:50px;font-size:12px;right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom))}
@@ -193,24 +193,24 @@ body.welcome-open{overflow:hidden}
 
 /* Header Ask Niyi */
 .header-actions{display:flex;align-items:center;gap:8px;flex:none}
-.niyi-header-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border-radius:999px;border:1px solid #20c47766;background:#20c47718;color:#9be3bf;font-size:12.5px;font-weight:700;white-space:nowrap}
-.niyi-header-btn:hover{border-color:#20c477;background:#20c47728;color:#fff}
+.niyi-header-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border-radius:999px;border:1px solid rgb(var(--acc-rgb) / 0.4);background:rgb(var(--acc-rgb) / 0.094);color:var(--acc-text);font-size:12.5px;font-weight:700;white-space:nowrap}
+.niyi-header-btn:hover{border-color:var(--acc);background:rgb(var(--acc-rgb) / 0.157);color:#fff}
 .niyi-header-btn svg{width:16px;height:16px;flex:none}
-@keyframes niyiPulse{0%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 #20c47766}70%{box-shadow:0 10px 28px -8px #000c,0 0 0 14px #20c47700}100%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 #20c47700}}
+@keyframes niyiPulse{0%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 rgb(var(--acc-rgb) / 0.4)}70%{box-shadow:0 10px 28px -8px #000c,0 0 0 14px rgb(var(--acc-rgb) / 0)}100%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 rgb(var(--acc-rgb) / 0)}}
 .niyi-fab.niyi-pulse{animation:niyiPulse 1.2s ease-out 2}
 @media(max-width:420px){.pill{display:none}.niyi-header-btn{padding:8px 10px;font-size:12px;gap:5px}.niyi-header-btn svg{width:15px;height:15px}.header-actions{gap:6px;flex:none}.night-toggle{padding:8px 10px}.account-btn{width:36px;height:36px}header{gap:8px}.brand{flex:1 1 auto;gap:9px}.brand h1{font-size:19px}.brand .tagline{white-space:normal;letter-spacing:.6px;font-size:9px;line-height:1.3}.logo-img{width:42px;height:42px}}
 /* Destination search */
 .map-search{position:absolute;z-index:5;left:12px;right:12px;top:52px;pointer-events:none}
 .map-search>*{pointer-events:auto}
 .dest-search{width:100%;border:1px solid #ffffff26;background:#0d1114f0;color:var(--text);border-radius:12px;padding:11px 14px 11px 38px;font:inherit;font-size:13.5px;font-weight:500;box-shadow:0 8px 24px -10px #000c;backdrop-filter:blur(10px)}
-.dest-search:focus{outline:none;border-color:#20c47799;box-shadow:0 0 0 3px #20c47733,0 8px 24px -10px #000c}
+.dest-search:focus{outline:none;border-color:rgb(var(--acc-rgb) / 0.6);box-shadow:0 0 0 3px rgb(var(--acc-rgb) / 0.2),0 8px 24px -10px #000c}
 .dest-search-wrap{position:relative}
 .dest-search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
 .dest-results{margin-top:6px;background:#0d1114f5;border:1px solid var(--line2);border-radius:12px;overflow:hidden;box-shadow:0 14px 36px -12px #000d;max-height:220px;overflow-y:auto}
 .dest-results[hidden]{display:none}
 .dest-result{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--text);padding:10px 12px;font:inherit;font-size:12.5px;line-height:1.4;cursor:pointer}
 .dest-result:last-child{border-bottom:0}
-.dest-result:hover,.dest-result:focus{background:#20c47718;outline:none}
+.dest-result:hover,.dest-result:focus{background:rgb(var(--acc-rgb) / 0.094);outline:none}
 .dest-result small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 .dest-card{position:absolute;z-index:5;left:12px;right:58px;bottom:12px;background:#0d1114f2;border:1px solid var(--line2);border-radius:14px;padding:12px 12px 10px;box-shadow:0 14px 36px -12px #000d;backdrop-filter:blur(10px);max-height:46%;overflow:auto}
 .dest-card[hidden]{display:none}
@@ -220,7 +220,7 @@ body.welcome-open{overflow:hidden}
 .dest-actions .btn{padding:8px 12px;font-size:12px}
 .dest-note{margin:0;font-size:10.5px;line-height:1.45;color:#6f7f89}
 .dest-steps{margin:8px 0;border:1px solid var(--line);border-radius:10px;background:#13191d;overflow:hidden}
-.dest-steps summary{cursor:pointer;padding:8px 10px;font-size:11.5px;font-weight:600;color:#9be3bf;list-style:none}
+.dest-steps summary{cursor:pointer;padding:8px 10px;font-size:11.5px;font-weight:600;color:var(--acc-text);list-style:none}
 .dest-steps summary::-webkit-details-marker{display:none}
 .dest-steps ol{margin:0;padding:0 12px 10px 28px;font-size:11.5px;line-height:1.45;color:#cfd8dd}
 .dest-steps li{margin:5px 0}
@@ -233,15 +233,15 @@ body.welcome-open{overflow:hidden}
 /* Voice navigation */
 .nav-banner{position:absolute;z-index:7;left:10px;right:10px;top:10px;display:none;flex-direction:column;gap:6px;pointer-events:none}
 .nav-banner.open{display:flex}
-.nav-banner-main{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:12px 12px;border-radius:16px;background:linear-gradient(180deg,#122018f5,#0d1114f2);border:1px solid #20c47755;box-shadow:0 16px 40px -14px #000e;backdrop-filter:blur(12px)}
-.nav-arrow{width:52px;height:52px;border-radius:14px;background:#20c47722;border:1px solid #20c47755;color:#9be3bf;display:grid;place-items:center;font-size:28px;font-weight:800;flex:none}
+.nav-banner-main{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:12px 12px;border-radius:16px;background:linear-gradient(180deg,#122018f5,#0d1114f2);border:1px solid rgb(var(--acc-rgb) / 0.333);box-shadow:0 16px 40px -14px #000e;backdrop-filter:blur(12px)}
+.nav-arrow{width:52px;height:52px;border-radius:14px;background:rgb(var(--acc-rgb) / 0.133);border:1px solid rgb(var(--acc-rgb) / 0.333);color:var(--acc-text);display:grid;place-items:center;font-size:28px;font-weight:800;flex:none}
 .nav-instr{min-width:0;flex:1}
 .nav-dist{font-size:20px;font-weight:800;letter-spacing:-.4px;color:#fff;line-height:1.1}
 .nav-text{font-size:13px;line-height:1.35;color:#d5e7dd;margin-top:3px;font-weight:600}
 .nav-mute{width:40px;height:40px;border-radius:12px;border:1px solid var(--line2);background:#222c33;color:var(--text);flex:none;font-size:16px;padding:0}
 .nav-mute[aria-pressed="true"]{border-color:#ffb34766;color:#ffd08a}
 .nav-banner-sub{pointer-events:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;padding:7px 10px;border-radius:11px;background:#0d1114e8;border:1px solid #ffffff14;font-size:11px;color:#cfd8dd}
-.nav-remain{font-weight:700;color:#9be3bf}
+.nav-remain{font-weight:700;color:var(--acc-text)}
 .nav-safety{color:#ffd08a;font-weight:600}
 body.navigating .map-search{top:128px}
 body.navigating .map-status{opacity:.0;pointer-events:none}
@@ -254,8 +254,8 @@ body.navigating .dest-card{max-height:38%}
 }
 
 .niyi-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.niyi-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #20c47766;background:#20c47718;color:#9be3bf;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;text-decoration:none;cursor:pointer}
-.niyi-action:hover{border-color:#20c477;background:#20c47728;color:#fff}
+.niyi-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgb(var(--acc-rgb) / 0.4);background:rgb(var(--acc-rgb) / 0.094);color:var(--acc-text);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;text-decoration:none;cursor:pointer}
+.niyi-action:hover{border-color:var(--acc);background:rgb(var(--acc-rgb) / 0.157);color:#fff}
 .niyi-action.btnish{font:inherit}
 .niyi-mic{width:40px;height:40px;border-radius:11px;border:1px solid var(--line2);background:#222c33;color:var(--text);flex:none;font-size:16px;padding:0}
 .niyi-mic[aria-pressed="true"]{border-color:#ff625c99;color:#ffaaa6;background:#ff625c18}
@@ -264,12 +264,12 @@ body.navigating .dest-card{max-height:38%}
 
 /* Route bends + hazards + favs + night + offline + emergency */
 .bend-list{margin:8px 0;padding:8px 10px;border-radius:10px;background:#13191d;border:1px solid var(--line);font-size:11.5px;line-height:1.45;color:#cfd8dd}
-.bend-list strong{color:#9be3bf}
+.bend-list strong{color:var(--acc-text)}
 .bend-item{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid #ffffff0d}
 .bend-item:last-child{border-bottom:0}
 .bend-tag{font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px}
 .bend-tag.mild{color:#ffd08a}.bend-tag.moderate{color:#ffb347}.bend-tag.sharp{color:#ff625c}
-.apex-upsell{margin-top:8px;background:linear-gradient(90deg,#20c47733,#ffb34733);border-color:#20c47788;color:#eafff3}
+.apex-upsell{margin-top:8px;background:linear-gradient(90deg,rgb(var(--acc-rgb) / 0.2),#ffb34733);border-color:rgb(var(--acc-rgb) / 0.533);color:var(--acc-pale)}
 .linkish{background:none;border:0;padding:0;color:#7fe0b0;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
 .niyi-msg.typing{opacity:.7;font-style:italic}
 .niyi-limit{font-size:11px;color:var(--muted);padding:2px 12px 6px;text-align:right}
@@ -282,22 +282,22 @@ body.navigating .dest-card{max-height:38%}
 .emerg-fab{position:fixed;z-index:41;left:max(14px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;border:1px solid #ff625c88;background:linear-gradient(180deg,#3a1818,#1a0f0f);color:#ffaaa6;font-weight:800;font-size:11px;box-shadow:0 10px 28px -8px #000c}
 .emerg-sheet{position:fixed;z-index:55;left:12px;right:12px;bottom:max(16px,env(safe-area-inset-bottom));display:none;flex-direction:column;gap:8px;padding:14px;border-radius:16px;background:#14191df5;border:1px solid #ff625c55;box-shadow:0 20px 50px -16px #000e}
 .emerg-sheet.open{display:flex}
-.install-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid #20c47744;background:#20c47712;font-size:12px}
+.install-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid rgb(var(--acc-rgb) / 0.267);background:rgb(var(--acc-rgb) / 0.071);font-size:12px}
 .install-bar.show{display:flex}
 
 
 
 /* Account / Apex / Profile preview */
-.account-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;border:1px solid #20c47766;background:#20c47714;color:#9be3bf;padding:0;cursor:pointer}
-.account-btn.signed-in{padding:0;border-color:#20c477aa}
-.account-avatar{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;font-size:11px;font-weight:800;background:linear-gradient(180deg,#27d083,#17a863);color:#06150d}
+.account-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;border:1px solid rgb(var(--acc-rgb) / 0.4);background:rgb(var(--acc-rgb) / 0.078);color:var(--acc-text);padding:0;cursor:pointer}
+.account-btn.signed-in{padding:0;border-color:rgb(var(--acc-rgb) / 0.667)}
+.account-avatar{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;font-size:11px;font-weight:800;background:linear-gradient(180deg,var(--acc-hi),var(--acc2));color:var(--acc-ink)}
 .account-avatar.lg{width:52px;height:52px;font-size:16px;flex:0 0 auto}
 .account-menu{position:fixed;z-index:80;right:max(12px,env(safe-area-inset-right));top:64px;width:min(300px,calc(100vw - 24px));background:#14191df7;border:1px solid var(--line2);border-radius:16px;padding:12px;box-shadow:0 20px 50px -16px #000e;display:none;flex-direction:column;gap:8px}
 .account-menu.open{display:flex}
 .acct-head{display:flex;gap:10px;align-items:center;margin-bottom:4px}
 .plan-badge{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase}
 .plan-badge.free{background:#ffffff12;color:#c9d1d6;border:1px solid #ffffff22}
-.plan-badge.premium{background:#20c47722;color:#9be3bf;border:1px solid #20c47766}
+.plan-badge.premium{background:rgb(var(--acc-rgb) / 0.133);color:var(--acc-text);border:1px solid rgb(var(--acc-rgb) / 0.4)}
 .cg-overlay{position:fixed;inset:0;z-index:90;display:none;align-items:flex-end;justify-content:center;padding:12px;background:#000a;backdrop-filter:blur(4px)}
 .cg-overlay.open{display:flex}
 .cg-sheet{width:min(520px,100%);max-height:min(92dvh,900px);overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:18px 18px 14px 14px;padding:16px;box-shadow:0 24px 60px -20px #000e;color:var(--text)}
@@ -305,15 +305,15 @@ body.navigating .dest-card{max-height:38%}
 .cg-sheet .sheet-sub{color:var(--muted);font-size:12.5px;margin-bottom:12px;line-height:1.45}
 .cg-sheet .sheet-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
 .cg-sheet .icon-close{border:0;background:#ffffff10;color:var(--text);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:16px}
-.why-apex{margin:4px 0 12px;padding:12px 0 10px;border-radius:16px;background:radial-gradient(120% 90% at 0% 0%,#20c47722,#20c47700 60%),linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line2);overflow:hidden}
+.why-apex{margin:4px 0 12px;padding:12px 0 10px;border-radius:16px;background:radial-gradient(120% 90% at 0% 0%,rgb(var(--acc-rgb) / 0.133),rgb(var(--acc-rgb) / 0) 60%),linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line2);overflow:hidden}
 .why-apex .why-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 12px 8px}
 .why-apex h3{margin:0;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--green)}
 .why-apex .why-hint{font-size:10.5px;color:var(--muted);white-space:nowrap}
 .why-track{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 12px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .why-track::-webkit-scrollbar{display:none}
 .why-card{flex:0 0 min(78%,260px);scroll-snap-align:start;display:flex;gap:9px;align-items:flex-start;padding:10px 11px;border-radius:13px;background:#0d1114a8;border:1px solid var(--line);font-size:12.5px;line-height:1.42;color:var(--text);min-height:74px}
-.why-card .why-ico{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:#20c4771c;border:1px solid #20c47744}
-.why-card strong{color:#9ff0c8;font-weight:700}
+.why-card .why-ico{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:rgb(var(--acc-rgb) / 0.11);border:1px solid rgb(var(--acc-rgb) / 0.267)}
+.why-card strong{color:var(--acc-text);font-weight:700}
 .why-card sup a,.why-src a{color:var(--green);text-decoration:none;font-weight:700}
 .why-card sup{font-size:9.5px;margin-left:2px}
 .why-src{margin:4px 12px 0;font-size:10px;line-height:1.5;color:var(--muted)}
@@ -336,7 +336,7 @@ body.theme-light .why-card strong{color:#0f7a48}
 .auth-fields{display:grid;gap:8px;margin:8px 0}
 .auth-fields input,.profile-grid input,.profile-grid select,textarea.cg-input{width:100%;border-radius:11px;border:1px solid var(--line2);background:#0f1418;color:var(--text);padding:10px 12px;font-size:13px}
 .auth-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.auth-links button{background:none;border:0;color:#9be3bf;font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
+.auth-links button{background:none;border:0;color:var(--acc-text);font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
 .benefit-list{margin:0;padding-left:18px;font-size:13px;line-height:1.55;color:var(--silver)}
 .benefit-list li{margin:4px 0}
 .compare{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
@@ -346,16 +346,16 @@ body.theme-light .why-card strong{color:#0f7a48}
 .plan-cards{display:grid;gap:8px;margin:10px 0}
 .plan-card{border:1px solid var(--line2);border-radius:14px;padding:12px;background:#12181c}
 .plan-card strong{display:block;font-size:14px}
-.plan-card .price{color:#9be3bf;font-weight:800;margin:4px 0 8px;font-size:13px}
-.save-badge{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.3px;background:#20c47733;color:#9be3bf;border:1px solid #20c47766;vertical-align:middle}
+.plan-card .price{color:var(--acc-text);font-weight:800;margin:4px 0 8px;font-size:13px}
+.save-badge{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.3px;background:rgb(var(--acc-rgb) / 0.2);color:var(--acc-text);border:1px solid rgb(var(--acc-rgb) / 0.4);vertical-align:middle}
 .price-strike{color:var(--muted);font-weight:600;text-decoration:line-through;margin-right:6px;font-size:12px}
 .currency-switch{display:inline-flex;gap:4px;margin:6px 0 10px}
-.currency-switch .btn.active{border-color:#20c477aa;color:#9be3bf;background:#20c47714}
+.currency-switch .btn.active{border-color:rgb(var(--acc-rgb) / 0.667);color:var(--acc-text);background:rgb(var(--acc-rgb) / 0.078)}
 .btn.sm{padding:7px 10px;font-size:11.5px}
 .btn.danger,.btn.danger-outline{border-color:#ff625c88;color:#ffaaa6}
 .btn.danger{background:#3a1818}
 .pro-badge{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:800;letter-spacing:.5px;background:#7aa2ff33;color:#a8c4ff;border:1px solid #7aa2ff55;vertical-align:middle}
-.preview-gate-bar{position:fixed;z-index:75;left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;background:#12181cf2;border:1px solid #20c47744;font-size:11px;color:#cfd8dd;max-width:calc(100vw - 20px);box-shadow:0 10px 28px -10px #000c}
+.preview-gate-bar{position:fixed;z-index:75;left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;background:#12181cf2;border:1px solid rgb(var(--acc-rgb) / 0.267);font-size:11px;color:#cfd8dd;max-width:calc(100vw - 20px);box-shadow:0 10px 28px -10px #000c}
 .preview-gate-bar label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
 body.focus-mode .preview-gate-bar,body.focus-mode .account-btn,body.focus-mode .account-menu{display:none!important}
 .profile-head{display:flex;gap:12px;align-items:center;margin-bottom:12px}
@@ -365,11 +365,11 @@ body.focus-mode .preview-gate-bar,body.focus-mode .account-btn,body.focus-mode .
 @media(min-width:520px){.profile-grid.two{grid-template-columns:1fr 1fr}}
 .car-icon-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .car-icon-opt{display:flex;flex-direction:column;align-items:center;gap:4px;width:68px;padding:8px 4px;border-radius:12px;border:1px solid var(--line2);background:#0f1418;color:var(--green);cursor:pointer;font-size:10px;text-transform:capitalize}
-.car-icon-opt.active{border-color:#20c477aa;background:#20c47714}
+.car-icon-opt.active{border-color:rgb(var(--acc-rgb) / 0.667);background:rgb(var(--acc-rgb) / 0.078)}
 .car-icon-opt span{color:var(--muted)}
 .profile-fav-row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #ffffff0d}
 .theme-opts{display:flex;flex-wrap:wrap;gap:6px}
-.theme-opts .btn.active{border-color:#20c477aa;color:#9be3bf;background:#20c47714}
+.theme-opts .btn.active{border-color:rgb(var(--acc-rgb) / 0.667);color:var(--acc-text);background:rgb(var(--acc-rgb) / 0.078)}
 .car-marker--svg{width:32px;height:32px;display:grid;place-items:center;filter:drop-shadow(0 2px 5px #0009)}
 .car-marker--svg:before,.car-marker--svg:after{display:none!important}
 .car-marker--svg svg{display:block}
@@ -380,14 +380,14 @@ body.theme-light{background:var(--bg);color:var(--text)}
 body.theme-light .cg-sheet,body.theme-light .account-menu{background:#fff;border-color:var(--line)}
 body.theme-light .auth-fields input,body.theme-light .profile-grid input,body.theme-light .profile-grid select,body.theme-light textarea.cg-input,body.theme-light .compare .col,body.theme-light .plan-card,body.theme-light .car-icon-opt{background:#f4f7fa;color:var(--text)}
 body.theme-light .btn{background:#eef3f6;color:var(--text)}
-body.theme-light .btn.primary{color:#06150d}
+body.theme-light .btn.primary{color:var(--acc-ink)}
 body.theme-light .preview-gate-bar{background:#ffffffef;color:var(--text)}
 body.theme-light .status-chip,body.theme-light .dest-search,body.theme-light .map-reset{color:#eef3f5}
 
 /* Reset view — free map control */
 .map-reset{position:absolute;z-index:4;left:12px;bottom:62px;display:none;align-items:center;gap:7px;border:0;border-radius:999px;padding:10px 12px;background:#12181cf2;color:#eef3f5;font-size:12px;font-weight:750;box-shadow:0 8px 28px -10px #000c;border:1px solid #ffffff24;pointer-events:auto;cursor:pointer}
 .map-reset.show{display:inline-flex}
-.map-reset.needs-reset{border-color:#20c47799;color:#9be3bf;box-shadow:0 8px 28px -10px #000c,0 0 0 3px #20c47722}
+.map-reset.needs-reset{border-color:rgb(var(--acc-rgb) / 0.6);color:var(--acc-text);box-shadow:0 8px 28px -10px #000c,0 0 0 3px rgb(var(--acc-rgb) / 0.133)}
 .map-reset svg{width:16px;height:16px;flex:0 0 auto}
 .map-reset .map-reset-label{display:none}
 @media(min-width:760px){
@@ -437,7 +437,7 @@ body.focus-mode .focus-hud{display:flex;position:fixed;z-index:56;left:12px;top:
 body.focus-mode .focus-exit{display:inline-flex;align-items:center;position:fixed;z-index:58;right:12px;top:12px;border:0;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:750;background:#12181cf2;color:#eef3f5;box-shadow:0 8px 28px -10px #000c;pointer-events:auto}
 /* Compact Ask Niyi in focus (header Niyi is hidden) */
 body.focus-mode .niyi-header-btn{display:none!important}
-body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index:58;right:12px;top:52px;border:0;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:750;background:#12181cf2;color:#9be3bf;box-shadow:0 8px 28px -10px #000c}
+body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index:58;right:12px;top:52px;border:0;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:750;background:#12181cf2;color:var(--acc-text);box-shadow:0 8px 28px -10px #000c}
 .focus-niyi{display:none}
 /* Lift SOS / Niyi above MapLibre attribution; keep 6.0 sizes on desktop */
 .emerg-fab{bottom:max(72px, calc(16px + env(safe-area-inset-bottom)))!important}
@@ -448,6 +448,112 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
   .map-controls{bottom:78px}
   .maplibregl-ctrl-bottom-right{margin-bottom:4px}
 }
+
+/* 7.2.5 accent colour themes (Profile > Appearance). Safety colours (--red, --orange, danger/bend warnings, emergency, GPS accuracy) stay fixed. */
+body[data-accent="blue"]{--acc:#3b8cff;--acc-rgb:59 140 255;--acc-hi:#5aa0ff;--acc2:#2a6fd6;--acc-text:#a8cbff;--acc-pale:#e3eeff;--acc-ink:#04122a;--acc-deep:#1d5bb8;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+body[data-accent="purple"]{--acc:#9b6bff;--acc-rgb:155 107 255;--acc-hi:#ad85ff;--acc2:#7c4ddb;--acc-text:#cdb8ff;--acc-pale:#efe8ff;--acc-ink:#14082e;--acc-deep:#6236c4;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+body[data-accent="orange"]{--acc:#ff8a3d;--acc-rgb:255 138 61;--acc-hi:#ff9f5f;--acc2:#e06f22;--acc-text:#ffc59e;--acc-pale:#fff0e5;--acc-ink:#2a1203;--acc-deep:#b85314;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+body[data-accent="pink"]{--acc:#ff5fa2;--acc-rgb:255 95 162;--acc-hi:#ff7db4;--acc2:#e04585;--acc-text:#ffb3d3;--acc-pale:#ffe8f2;--acc-ink:#2a0616;--acc-deep:#c02a6a;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+body[data-accent="gold"]{--acc:#f2c230;--acc-rgb:242 194 48;--acc-hi:#f7d055;--acc2:#d4a514;--acc-text:#f7dd8a;--acc-pale:#fff7dc;--acc-ink:#231a02;--acc-deep:#8a6a00;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc2:#c9353a;--acc-text:#ffb0b2;--acc-pale:#ffe6e7;--acc-ink:#2a0506;--acc-deep:#b02a2f;--lime:var(--acc);--green:var(--acc);--green2:var(--acc2)}
+/* safety UI keeps its fixed colours whatever accent is chosen */
+.emerg-sheet,.emerg-fab,.status-box,#gpsChip,.bend-list,.speed-warning{--acc:#20c477;--acc-rgb:32 196 119;--acc-hi:#27d083;--acc2:#17a863;--acc-text:#9be3bf;--acc-pale:#dff6ea;--acc-ink:#06150d;--green:#20c477;--green2:#17a863}
+#premiumScreen.is-apex .pay-only{display:none!important}
+.apex-active-box{display:block;line-height:1.5}
+.apex-active-box[hidden]{display:none}
+.accent-opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.accent-opt{display:inline-flex;align-items:center;gap:7px;padding:7px 11px 7px 8px;border-radius:999px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);font-size:12px;font-weight:650;cursor:pointer}
+.accent-opt .sw{width:18px;height:18px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 2px #0003}
+.accent-opt.active{border-color:var(--acc);box-shadow:0 0 0 2px rgb(var(--acc-rgb) / .35)}
+.accent-opt:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(var(--acc-rgb) / .5)}
+
+/* 7.2.5 micro-animations: short (150-300 ms), transform/opacity only, accent-coloured.
+   Never on safety UI (nav banner, curve/bend warnings, emergency). prefers-reduced-motion turns them all off (rule above + JS checks). */
+.btn,.icon-btn,.niyi-chip,.niyi-action,.accent-opt,.car-icon-opt,.account-btn,.niyi-send,.niyi-header-btn,.dest-result{transition:background .18s,border-color .18s,color .18s,box-shadow .18s,transform .14s cubic-bezier(.2,.8,.3,1.4)}
+.btn:active,.icon-btn:active,.niyi-chip:active,.niyi-action:active,.accent-opt:active,.car-icon-opt:active,.account-btn:active,.niyi-send:active,.niyi-header-btn:active{transform:scale(.95)}
+.accent-opt.active .sw{animation:cgSwPop .26s cubic-bezier(.2,.8,.3,1.5)}
+@keyframes cgSwPop{0%{transform:scale(.7)}100%{transform:scale(1)}}
+.cg-ripple-wrap{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none}
+.cg-ripple{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:rgb(var(--acc-rgb) / .35);transform:scale(0);opacity:.9;animation:cgRipple .3s ease-out forwards;pointer-events:none}
+.btn.primary .cg-ripple,.niyi-send .cg-ripple{background:#ffffff59}
+@keyframes cgRipple{to{transform:scale(var(--cg-rs,18));opacity:0}}
+.cg-overlay.open{animation:cgFadeIn .2s ease-out}
+.cg-overlay.open .cg-sheet{animation:cgSheetIn .26s cubic-bezier(.2,.8,.25,1)}
+.cg-overlay.cg-closing,.account-menu.cg-closing{display:flex;pointer-events:none;animation:cgFadeOut .17s ease-in forwards}
+.cg-overlay.cg-closing .cg-sheet{animation:cgSheetOut .17s ease-in forwards}
+.account-menu.open{animation:cgMenuIn .18s cubic-bezier(.2,.8,.3,1.2);transform-origin:top right}
+.niyi-panel.open{animation:cgPanelIn .22s cubic-bezier(.2,.8,.25,1);transform-origin:bottom right}
+@keyframes cgFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes cgFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes cgSheetIn{from{opacity:0;transform:translateY(26px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes cgSheetOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(18px)}}
+@keyframes cgMenuIn{from{opacity:0;transform:translateY(-6px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes cgPanelIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.niyi-msg{animation:cgBubble .22s cubic-bezier(.2,.8,.3,1.25) both}
+.niyi-msg.user{transform-origin:bottom right}.niyi-msg.bot{transform-origin:bottom left}
+@keyframes cgBubble{from{opacity:0;transform:translateY(8px) scale(.94)}to{opacity:1;transform:none}}
+.niyi-msg.typing{font-style:normal;opacity:1}
+.cg-dots{display:inline-flex;gap:4px;align-items:center;height:14px}
+.cg-dots i{width:6px;height:6px;border-radius:50%;background:var(--acc-text);opacity:.35;animation:cgDot 1s infinite ease-in-out}
+.cg-dots i:nth-child(2){animation-delay:.15s}.cg-dots i:nth-child(3){animation-delay:.3s}
+@keyframes cgDot{0%,80%,100%{opacity:.35;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+.cg-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.cg-stagger .why-card,.cg-stagger .profile-fav-row,.cg-stagger .plan-card,.cg-stagger .accent-opt,.cg-stagger .car-icon-opt,.cg-stagger .benefit-list li,.cg-stagger .profile-section{animation:cgItemIn .26s cubic-bezier(.2,.8,.25,1) both}
+.cg-stagger :nth-child(2){animation-delay:.03s!important}.cg-stagger :nth-child(3){animation-delay:.06s!important}.cg-stagger :nth-child(4){animation-delay:.09s!important}.cg-stagger :nth-child(5){animation-delay:.12s!important}.cg-stagger :nth-child(n+6){animation-delay:.15s!important}
+@keyframes cgItemIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.welcome:not([hidden]) .welcome-card{animation:cgWelcomeIn .3s cubic-bezier(.2,.8,.25,1) both}
+.welcome:not([hidden]) .welcome-logo{animation:cgItemIn .3s .06s cubic-bezier(.2,.8,.25,1) both}
+@keyframes cgWelcomeIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.plan-badge.premium{transition:transform .2s}
+.cg-confetti{position:fixed;inset:0;pointer-events:none;z-index:1200;overflow:hidden}
+.cg-confetti i{position:absolute;left:50%;top:38%;width:8px;height:12px;border-radius:2px;opacity:0;will-change:transform,opacity;animation:cgConfetti var(--d,.9s) cubic-bezier(.15,.7,.35,1) forwards}
+@keyframes cgConfetti{0%{opacity:1;transform:translate(-50%,-50%) rotate(0) scale(.6)}70%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r)) scale(1)}}
+.cg-toast{position:fixed;left:50%;top:max(18px,env(safe-area-inset-top));z-index:1201;transform:translateX(-50%);padding:10px 16px;border-radius:999px;background:linear-gradient(180deg,var(--acc-hi),var(--acc2));color:var(--acc-ink);font-weight:800;font-size:13px;box-shadow:0 12px 30px -10px #000c;pointer-events:none;animation:cgToast 2.6s ease forwards}
+@keyframes cgToast{0%{opacity:0;transform:translate(-50%,-10px) scale(.95)}8%{opacity:1;transform:translate(-50%,0) scale(1)}85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-6px)}}
+@media(prefers-reduced-motion:reduce){.cg-confetti,.cg-ripple-wrap{display:none!important}.cg-toast{animation:none!important;opacity:1}}
+
+/* 7.2.5 Niyi mascot: original rounded bot face, inline SVG, accent coloured. States: idle | thinking | happy | error */
+.niyi-face{display:block;overflow:visible}
+.niyi-face .nf-head{fill:var(--acc)}
+.niyi-face .nf-shine{fill:#fff;opacity:.22}
+.niyi-face .nf-screen{fill:#0b1512}
+.niyi-face .nf-eye{fill:#f4fffa;transform-box:fill-box;transform-origin:center}
+.niyi-face .nf-ant{fill:none;stroke:var(--acc);stroke-width:2.4;stroke-linecap:round}
+.niyi-face .nf-ant-dot{fill:var(--acc-hi)}
+.niyi-face .nf-cheek{fill:var(--acc-hi);opacity:0;transition:opacity .2s}
+.niyi-face .nf-smile,.niyi-face .nf-wavy,.niyi-face .nf-happy{fill:none;stroke:#f4fffa;stroke-width:2;stroke-linecap:round;opacity:0;transition:opacity .18s}
+.niyi-face .nf-smile{opacity:.9}
+.niyi-face .nf-all{transform-box:fill-box;transform-origin:50% 60%}
+.niyi-face .nf-eyes{transform-box:fill-box;transform-origin:center}
+.niyi-face[data-state="idle"].live .nf-all{animation:nfFloat 3.2s ease-in-out infinite}
+.niyi-face[data-state="idle"] .nf-eye{animation:nfBlink 4.6s infinite}
+.niyi-face[data-state="thinking"] .nf-eyes{animation:nfLook 1.3s ease-in-out infinite}
+.niyi-face[data-state="thinking"] .nf-all{animation:nfBounce .6s ease-in-out infinite}
+.niyi-face[data-state="thinking"] .nf-smile{opacity:0}
+.niyi-face[data-state="happy"] .nf-eye{opacity:0}
+.niyi-face[data-state="happy"] .nf-happy,.niyi-face[data-state="happy"] .nf-cheek{opacity:.95}
+.niyi-face[data-state="happy"] .nf-all{animation:nfHop .34s cubic-bezier(.2,.8,.3,1.4)}
+.niyi-face[data-state="error"] .nf-eye.l{transform:scaleY(.5)}
+.niyi-face[data-state="error"] .nf-eye.r{transform:translateY(-1px) scale(.85)}
+.niyi-face[data-state="error"] .nf-smile{opacity:0}
+.niyi-face[data-state="error"] .nf-wavy{opacity:.9}
+.niyi-face[data-state="error"] .nf-all{animation:nfTilt .4s ease forwards}
+@keyframes nfFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.6px)}}
+@keyframes nfBlink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.12)}}
+@keyframes nfLook{0%,100%{transform:translateX(0)}25%{transform:translateX(-2.2px)}65%{transform:translateX(2.2px) translateY(-.6px)}}
+@keyframes nfBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes nfHop{0%{transform:translateY(0) scale(1)}45%{transform:translateY(-3px) scale(1.04)}100%{transform:none}}
+@keyframes nfTilt{to{transform:rotate(-8deg)}}
+.niyi-fab .niyi-face{width:34px;height:34px}
+.niyi-header-btn .niyi-face{width:20px;height:20px;margin:-2px 0}
+.niyi-head-face{flex:none;width:34px;height:34px;display:block}
+.niyi-head-face .niyi-face{width:34px;height:34px}
+.niyi-head{justify-content:flex-start}.niyi-head-title{flex:1}
+.niyi-msg.bot.has-face{display:flex;gap:7px;align-items:flex-start}
+.niyi-msg.bot.has-face>.niyi-bubble-face{flex:none;width:18px;height:18px;margin-top:1px}
+.niyi-msg.bot.has-face>.niyi-bubble-body{min-width:0;flex:1}
+.niyi-msg.typing .niyi-bubble-face{width:20px;height:20px}
+.niyi-msg.typing{display:flex;align-items:center;gap:8px}
 </style>
 </head>
 <body class="welcome-open">
@@ -659,12 +765,13 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
   <button type="button" class="btn" id="emergWhatsApp">Share my location on WhatsApp</button>
   <button type="button" class="btn" id="emergClose">Close</button>
 </div>
-<button type="button" class="niyi-fab" id="niyiFab" aria-expanded="false" aria-controls="niyiPanel" title="Ask Niyi">Niyi</button>
+<button type="button" class="niyi-fab" id="niyiFab" aria-expanded="false" aria-controls="niyiPanel" title="Ask Niyi" aria-label="Ask Niyi"><span class="niyi-fab-label">Niyi</span></button>
 <div class="niyi-panel" id="niyiPanel" role="dialog" aria-modal="false" aria-labelledby="niyiTitle" hidden>
   <div class="niyi-head">
+    <span class="niyi-head-face" id="niyiHeadFace" aria-hidden="true"></span>
     <div class="niyi-head-title">
       <strong id="niyiTitle">Niyi · Curve Guide helper</strong>
-      <span id="niyiSubtitle">Smart AI helper when you're signed in · keyword helper offline.</span>
+      <span id="niyiSubtitle">Ask me anything when you're signed in · simple keyword helper offline.</span>
     </div>
     <div class="niyi-head-actions">
       <button type="button" class="niyi-icon" id="niyiSpeak" aria-pressed="false" title="Read answers aloud" aria-label="Read answers aloud">🔊</button>
@@ -676,7 +783,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
   <div class="niyi-chips" id="niyiChips"></div>
   <form class="niyi-input-row" id="niyiForm" autocomplete="off">
     <button type="button" class="niyi-mic" id="niyiMic" title="Voice input" aria-label="Voice input" aria-pressed="false" hidden>🎤</button>
-    <input class="niyi-input" id="niyiInput" type="text" maxlength="240" placeholder="Ask about Curve Guide…" aria-label="Message to Niyi">
+    <input class="niyi-input" id="niyiInput" type="text" maxlength="240" placeholder="Ask Niyi anything…" aria-label="Message to Niyi">
     <button class="niyi-send" id="niyiSend" type="submit">Send</button>
   </form>
   <div class="niyi-limit" id="niyiLimit" hidden></div>
@@ -744,27 +851,28 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <button type="button" class="icon-close" data-close-overlay="premiumScreen" aria-label="Close">✕</button>
     </div>
     <p class="auth-msg" id="premiumGateTip" hidden></p>
-    <ul class="benefit-list">
+    <div class="pay-msg good apex-active-box" id="premiumActiveBox" hidden></div>
+    <ul class="benefit-list pay-only">
       <li>Voice turn-by-turn navigation</li>
       <li>Bend warnings with speed alerts</li>
       <li>Smarter Niyi with no limits</li>
       <li>Favourites and danger reports synced across phones</li>
     </ul>
-    <section class="why-apex" id="whyApex" aria-labelledby="whyApexTitle">
+    <section class="why-apex pay-only" id="whyApex" aria-labelledby="whyApexTitle">
       <div class="why-head"><h3 id="whyApexTitle">Why Apex?</h3><span class="why-hint">Swipe →</span></div>
       <div class="why-track" id="whyApexTrack" role="list"></div>
       <p class="why-src" id="whyApexSources"></p>
       <div class="why-brand"><img src="assets/adeniyi-logo.png" alt="" loading="lazy"><span>Curve Guide Apex · Automotive Division of Adeniyi Investments &amp; Property Ltd.</span></div>
       <p class="why-disclaimer">Curve Guide is a driving aid in early development. It can't prevent crashes. Always obey road signs and drive at a safe speed.</p>
     </section>
-    <div class="compare">
+    <div class="compare pay-only">
       <div class="col"><h3>Free</h3><ul><li>Map &amp; live GPS curve alert</li><li>Bend dots + on-screen slow-down alert</li><li>Search, routing &amp; on-screen directions</li><li>Favourites &amp; reports on this phone</li><li>Niyi: 20 chats a day</li></ul></div>
       <div class="col"><h3>Apex</h3><ul><li>Everything in Free</li><li>Spoken turn-by-turn voice</li><li>Bends-ahead list, safe-speed tips &amp; spoken bend warnings</li><li>Favourites &amp; reports synced across phones</li><li>Unlimited smart Niyi</li></ul></div>
     </div>
-    <div class="currency-switch" role="group" aria-label="Currency">
+    <div class="currency-switch pay-only" role="group" aria-label="Currency">
       <span class="ngn-only-note">Prices in Naira (₦). Visa/Mastercard cards from outside Nigeria can still pay in ₦; your bank converts the amount.</span>
     </div>
-    <div class="plan-cards">
+    <div class="plan-cards pay-only">
       <div class="plan-card">
         <strong>Monthly</strong>
         <div class="price" id="priceMonthly">₦450 / month</div>
@@ -777,7 +885,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       </div>
     </div>
     <p class="pay-msg" id="paystackMsg" hidden aria-live="polite"></p>
-    <p class="sheet-sub">Secure payment by Paystack. <strong>One-time payment, no auto-renew:</strong> Monthly gives 1 month of Apex, Yearly gives 1 year. Pay again any time to add more time. Sign in first so Apex is saved to your account. Curve Guide remains a prototype — never a substitute for careful driving.</p>
+    <p class="sheet-sub pay-only">Secure payment by Paystack. <strong>One-time payment, no auto-renew:</strong> Monthly gives 1 month of Apex, Yearly gives 1 year. Pay again any time to add more time. Sign in first so Apex is saved to your account. Curve Guide remains a prototype — never a substitute for careful driving.</p>
   </div>
 </div>
 
@@ -795,12 +903,14 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <div class="car-icon-row" id="carIconRow"></div>
       <label class="small">Colour <input type="color" id="carColorPick" value="#20c477" aria-label="Car colour"></label>
       <div class="profile-grid two" style="margin-top:10px">
-        <input id="carField_make" placeholder="Make" aria-label="Make">
-        <input id="carField_model" placeholder="Model" aria-label="Model">
-        <input id="carField_year" placeholder="Year" aria-label="Year" inputmode="numeric">
+        <input id="carField_make" placeholder="Make — search (e.g. Toyota)" aria-label="Make" list="carMakeList" autocomplete="off" autocapitalize="words">
+        <input id="carField_model" placeholder="Model — search" aria-label="Model" list="carModelList" autocomplete="off" autocapitalize="words">
+        <select id="carField_year" aria-label="Year"></select>
         <input id="carField_colour" placeholder="Colour" aria-label="Colour">
         <input id="carField_plate" placeholder="Plate (optional)" aria-label="Plate number">
       </div>
+      <datalist id="carMakeList"></datalist><datalist id="carModelList"></datalist>
+      <p class="small car-pick-hint" id="carPickHint">Start typing to search. Not listed? Choose “Other — type it” or just type it.</p>
       <button type="button" class="btn primary sm" id="saveCarDetails" style="margin-top:8px">Save car details</button>
       <p class="small auth-msg good" id="carSaveMsg" hidden></p>
     </section>
@@ -817,6 +927,8 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
         <button type="button" class="btn sm" data-theme-opt="light">Light</button>
         <button type="button" class="btn sm" data-theme-opt="auto">Auto</button>
       </div>
+      <p class="small" style="margin:12px 0 0">App colour <span class="small" style="opacity:.8">(free for everyone)</span></p>
+      <div class="accent-opts" id="accentOpts" role="group" aria-label="App colour"></div>
       <div class="actions" style="margin-top:8px">
         <button type="button" class="btn sm" id="profileNight">Night map</button>
         <button type="button" class="btn sm" id="profileUnits">Units</button>
@@ -864,6 +976,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="auth.js"></script>
+<script src="vehicles.js"></script>
 <script src="premium-ui.js"></script>
 
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
@@ -1034,7 +1147,7 @@ function initMap(){
     map.on('load',function(){
       try{
         map.addSource('route',{type:'geojson',data:EMPTY});
-        map.addLayer({id:'curve-guide-route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#20c477','line-width':6,'line-opacity':0.9}});
+        map.addLayer({id:'curve-guide-route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':cgTrailColor(),'line-width':6,'line-opacity':0.9}});
         map.addSource('curve',{type:'geojson',data:EMPTY});
         map.addLayer({id:'curve-guide-curve',type:'circle',source:'curve',paint:{'circle-radius':9,'circle-color':'#ff625c','circle-stroke-color':'#ffffff','circle-stroke-width':2}});
         map.addSource('directions',{type:'geojson',data:EMPTY});
@@ -1183,6 +1296,9 @@ $('mapType').addEventListener('click',function(){setSatellite(!satellite)});
 $('clearRoute').addEventListener('click',clearRoute);
 window.addEventListener('beforeunload',function(){if(watchId!==null)navigator.geolocation.clearWatch(watchId)});
 /* 7.2 Apex helpers: Apex comes only from the server-written premium field (auth.js). */
+var CG_TRAIL={green:'#20c477',blue:'#2fd0e0',purple:'#9b6bff',orange:'#ff8a3d',pink:'#ff5fa2',gold:'#f2c230',red:'#e5484d'};
+function cgTrailColor(){var a=document.body&&document.body.getAttribute('data-accent');return CG_TRAIL[a]||CG_TRAIL.green}
+document.addEventListener('cg:accent-changed',function(){try{if(map&&map.getLayer&&map.getLayer('curve-guide-route'))map.setPaintProperty('curve-guide-route','line-color',cgTrailColor())}catch(e){}});
 function cgApex(){try{return !!(window.__cgAuth&&window.__cgAuth.isPremium())}catch(e){return false}}
 function cgApexPrompt(f,m){try{if(window.__cgPremiumUI&&window.__cgPremiumUI.apexPrompt)window.__cgPremiumUI.apexPrompt(f,m)}catch(e){}}
 function cgApexLink(label,feature){
@@ -1503,7 +1619,7 @@ function restoreMapOverlays(){
   try{
     if(!map.getSource('route')){
       map.addSource('route',{type:'geojson',data:EMPTY});
-      map.addLayer({id:'curve-guide-route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#20c477','line-width':6,'line-opacity':0.9}});
+      map.addLayer({id:'curve-guide-route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':cgTrailColor(),'line-width':6,'line-opacity':0.9}});
     }
     if(!map.getSource('curve')){
       map.addSource('curve',{type:'geojson',data:EMPTY});
@@ -2367,10 +2483,48 @@ var chips=['How does it work?','Set destination','Take me home','Navigation','Co
 function api(){return window.__cgApi||null}
 
 function escText(s){return String(s==null?'':s)}
+/* 7.2.5 Niyi mascot (original design: rounded bot head, curve-shaped antenna). */
+function niyiFaceSvg(live){
+  return '<svg class="niyi-face'+(live?' live':'')+'" data-state="idle" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><g class="nf-all">'+
+    '<path class="nf-ant" d="M20 9c0-3 2-4.6 4.4-5.2"/><circle class="nf-ant-dot" cx="26" cy="3.4" r="2.3"/>'+
+    '<rect class="nf-head" x="4" y="9" width="32" height="28" rx="11"/><ellipse class="nf-shine" cx="12" cy="13.5" rx="5" ry="2.2"/>'+
+    '<rect class="nf-screen" x="8" y="14.5" width="24" height="17" rx="7.5"/>'+
+    '<g class="nf-eyes"><rect class="nf-eye l" x="13.2" y="18.6" width="4" height="6" rx="2"/><rect class="nf-eye r" x="22.8" y="18.6" width="4" height="6" rx="2"/></g>'+
+    '<path class="nf-happy" d="M12.8 22.6q2.4-3 4.8 0M22.4 22.6q2.4-3 4.8 0"/>'+
+    '<circle class="nf-cheek" cx="11.6" cy="27" r="1.5"/><circle class="nf-cheek" cx="28.4" cy="27" r="1.5"/>'+
+    '<path class="nf-smile" d="M17.2 27.2q2.8 2 5.6 0"/><path class="nf-wavy" d="M16.4 28q1.2-1.2 2.4 0t2.4 0t2.4 0"/>'+
+  '</g></svg>';
+}
+var niyiMoodT=null;
+function niyiMood(state,ms){
+  clearTimeout(niyiMoodT);
+  document.querySelectorAll('.niyi-face.live').forEach(function(f){
+    if(state==='happy'&&f.getAttribute('data-state')==='happy'){f.setAttribute('data-state','idle');void f.getBoundingClientRect()}
+    f.setAttribute('data-state',state||'idle');
+  });
+  if(ms)niyiMoodT=setTimeout(function(){niyiMood('idle')},ms);
+}
+(function mountNiyiFaces(){
+  var f=document.getElementById('niyiFab');
+  if(f&&!f.querySelector('.niyi-face')){f.insertAdjacentHTML('afterbegin',niyiFaceSvg(true));var l=f.querySelector('.niyi-fab-label');if(l)l.className='cg-sr'}
+  var h=document.getElementById('niyiHeaderBtn');
+  if(h){var old=h.querySelector('svg');if(old&&!old.classList.contains('niyi-face'))old.outerHTML=niyiFaceSvg(true)}
+  var hf=document.getElementById('niyiHeadFace');if(hf&&!hf.firstChild)hf.innerHTML=niyiFaceSvg(true);
+})();
+function addFace(d,state){
+  if(!d||d.classList.contains('has-face'))return d;
+  var body=document.createElement('div');body.className='niyi-bubble-body';
+  while(d.firstChild)body.appendChild(d.firstChild);
+  var face=document.createElement('span');face.className='niyi-bubble-face';face.innerHTML=niyiFaceSvg(false);
+  if(state)face.firstChild.setAttribute('data-state',state);
+  d.appendChild(face);d.appendChild(body);d.classList.add('has-face');
+  return d;
+}
 function addMsg(text,who){
   var d=document.createElement('div');
   d.className='niyi-msg '+(who==='user'?'user':'bot');
   d.textContent=escText(text);
+  if(who!=='user'&&text)addFace(d);
   msgs.appendChild(d);
   msgs.scrollTop=msgs.scrollHeight;
   return d;
@@ -2403,6 +2557,7 @@ function addBotRich(text,actions){
     });
     d.appendChild(row);
   }
+  addFace(d);
   msgs.appendChild(d);
   msgs.scrollTop=msgs.scrollHeight;
   return d;
@@ -2442,7 +2597,7 @@ function extractPlace(q){
   var m=s.match(/^(?:take me to|go to|directions to|navigate to|find|search for|search)\s+(.+)$/i);
   return m?m[1].replace(/[?.!]+$/,'').trim():null;
 }
-function confirm(msg){addBotRich(msg);speak(msg);return msg}
+function confirm(msg){addBotRich(msg);speak(msg);niyiMood('happy',2000);return msg}
 function doPageAction(t){
   var A=api();
   if(!A)return null;
@@ -2486,6 +2641,10 @@ function doPageAction(t){
     A.setNavVoice(true);return confirm('Navigation voice unmuted.');
   }
 
+  if(/\b(premium|apex|upgrade|paystack|subscription|pro plan|apex plan|price|pricing)\b/.test(t)&&isApexNow()){
+    if(window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
+    return confirm('You\u2019re on '+apexLabel()+'. Everything in Apex is unlocked — nothing to pay.');
+  }
   if(/\b(premium|apex|upgrade|paystack|subscription|pro plan|apex plan)\b/.test(t)){
     if(window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
     return confirm('Curve Guide Apex: ₦450 for 1 month, or ₦3,780 for 1 year (save 30%). One-time Paystack payment, no auto-renew.');
@@ -2667,7 +2826,7 @@ function openPanel(){
   if(headerBtn)headerBtn.setAttribute('aria-expanded','true');
   if(!greeted){
     greeted=true;
-    addMsg("Hi, I'm Niyi! Ask how Curve Guide works, say “go to …”, or tap Contact us.",'bot');
+    addMsg(aiAvailable()?"Hi, I'm Niyi! Ask me anything — Curve Guide, the road, or everyday questions — or say “go to …”.":"Hi, I'm Niyi! Ask how Curve Guide works, say “go to …”, or tap Contact us. Sign in for smart Niyi.",'bot');
     renderChips();
   }
   refreshDriveNote();
@@ -2713,29 +2872,39 @@ function ask(text){
   // App commands (map views, units, GPS, navigation, emergency…) are instant and never count.
   // Longer sentences go to smart Niyi first (it can do several actions at once); urgent ones stay local.
   var urgent=/\b(emergency|sos|112|crash|accident|stop nav(igation)?|end navigation|mute)\b/.test(t);
-  var longAsk=t.split(/\s+/).length>4;
-  if(urgent||!longAsk||!aiAvailable()){
+  if(!aiAvailable()||urgent||isAppCommand(t)){
     var acted=doPageAction(t);
     if(acted){renderChips();return}
   }
   chatAnswer(q);
+}
+/* 7.2.5: when smart Niyi is available, only short command-style phrases ("satellite", "turn on night mode",
+   "start gps", "take me home") run locally. Questions and everything else ("what is a tomato?") go to the AI. */
+function isAppCommand(t){
+  t=String(t||'').toLowerCase().trim();
+  if(!t||t.split(/\s+/).length>6)return false;
+  if(/\?$/.test(t))return false;
+  if(/^(what|whats|what's|who|whom|whose|why|how|when|where|which|is|are|was|were|can|could|should|would|will|do|does|did|tell|explain|describe|define|wetin|wey|abeg tell|i want to know)\b/.test(t))return false;
+  return true;
 }
 function aiAvailable(){var Au=window.__cgAuth;return !!(Au&&Au.niyiChat&&Au.isSignedIn&&Au.isSignedIn()&&navigator.onLine!==false)}
 
 /* 7.2 Smart Niyi: Cloudflare Workers AI via the Curve Guide Worker (no AI key in the browser).
    Free: NIYI_FREE_LIMIT chats per day (counted here + enforced on the server). Apex: unlimited (fair use). */
 var NIYI_FREE_LIMIT=20, NIYI_USAGE_KEY='curveGuide.niyiUsage', aiHistory=[], aiBusy=false, aiSigninHinted=false;
+function apexLabel(){try{var i=window.__cgPremiumUI&&window.__cgPremiumUI.apexInfo&&window.__cgPremiumUI.apexInfo();return (i&&i.label)||'Apex'}catch(e){return 'Apex'}}
 function isApexNow(){try{return !!(window.__cgAuth&&window.__cgAuth.isPremium())}catch(e){return false}}
 function todayKey(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function niyiUsed(){try{var u=JSON.parse(localStorage.getItem(NIYI_USAGE_KEY)||'{}');return u.day===todayKey()?(u.n||0):0}catch(e){return 0}}
 function niyiCount(n){try{localStorage.setItem(NIYI_USAGE_KEY,JSON.stringify({day:todayKey(),n:typeof n==='number'?n:niyiUsed()+1}))}catch(e){}updateNiyiLimit()}
 function updateNiyiLimit(){
   var el=document.getElementById('niyiLimit');if(!el)return;
-  if(isApexNow()){el.hidden=false;el.textContent='Apex · unlimited Niyi';return}
+  if(isApexNow()){el.hidden=false;el.textContent=apexLabel()+' · unlimited Niyi';return}
   var left=Math.max(0,NIYI_FREE_LIMIT-niyiUsed());
   el.hidden=false;el.textContent='Free plan · '+left+' of '+NIYI_FREE_LIMIT+' Niyi chats left today';
 }
 function showNiyiLimit(){
+  if(isApexNow()){var m2='Niyi has had a lot of chats today. Please try again tomorrow. App commands like “go to …”, “satellite” or “stop navigation” still work.';addMsg(m2,'bot');speak(m2);renderChips();return}
   var msg='You\u2019ve used your '+NIYI_FREE_LIMIT+' free Niyi chats for today. They reset tomorrow, or get unlimited smart Niyi with Apex. App commands like “go to …”, “satellite” or “stop navigation” still work.';
   addBotRich(msg,[{label:'✨ Upgrade to Apex',onClick:function(){if(window.__cgPremiumUI&&window.__cgPremiumUI.apexPrompt)window.__cgPremiumUI.apexPrompt('niyi')}}]);
   speak(msg);renderChips();
@@ -2783,14 +2952,17 @@ function runAiActions(actions){
     }catch(e){}
   });
 }
-function keywordAnswer(q){var a=answer(q);addMsg(a,'bot');speak(a);renderChips()}
+document.addEventListener('cg:premium-changed',function(){try{updateNiyiLimit()}catch(e){}});
+(function hookNiyiPlan(n){var A=window.__cgAuth;if(A&&A.onChange){A.onChange(function(){try{updateNiyiLimit()}catch(e){}})}else if(n<20)setTimeout(function(){hookNiyiPlan(n+1)},300)})(0);
+function keywordAnswer(q){var a=answer(q);addMsg(a,'bot');speak(a);niyiMood('happy',2200);renderChips()}
 function chatAnswer(q){
   var apex=isApexNow();
   var t=String(q).toLowerCase().trim();
   if(!apex&&niyiUsed()>=NIYI_FREE_LIMIT){if(doPageAction(t)){renderChips();return}showNiyiLimit();return}
   var Au=window.__cgAuth;
   var canAi=aiAvailable();
-  if(!canAi||aiBusy){
+  if(canAi&&aiBusy){addMsg('One moment — I\u2019m still answering your last message.','bot');return}
+  if(!canAi){
     if(doPageAction(t)){renderChips();return}
     if(!apex)niyiCount();
     keywordAnswer(q);
@@ -2801,24 +2973,37 @@ function chatAnswer(q){
     return;
   }
   aiBusy=true;
-  var typing=addMsg('Niyi is thinking…','bot');typing.classList.add('typing');
+  var typing=addMsg('','bot');typing.classList.add('typing');typing.innerHTML='<span class="cg-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="cg-sr">Niyi is thinking…</span>';addFace(typing,'thinking');niyiMood('thinking');
   aiHistory.push({role:'user',content:q.slice(0,500)});
   aiHistory=aiHistory.slice(-8);
-  Au.niyiChat(aiHistory,appContext()).then(function(res){
+  function callAi(tries){
+    return Au.niyiChat(aiHistory,appContext()).catch(function(err){
+      // "slow" = two messages within 2 s; network blips: wait a moment and try once more
+      if(tries<1&&err&&(err.code==='slow'||err.status===429&&err.code!=='limit'||!err.status&&err.name!=='AbortError'&&err.code!=='signin')){
+        return new Promise(function(r){setTimeout(r,2300)}).then(function(){return callAi(tries+1)});
+      }
+      throw err;
+    });
+  }
+  callAi(0).then(function(res){
     typing.remove();
     var reply=String(res.reply||'').trim()||'Okay.';
     aiHistory.push({role:'assistant',content:reply.slice(0,600)});
-    addMsg(reply,'bot');speak(reply);
+    addMsg(reply,'bot');speak(reply);niyiMood('happy',2600);
     runAiActions(res.actions);
     if(!apex)niyiCount(typeof res.used==='number'?res.used:undefined);
     renderChips();
   }).catch(function(err){
     typing.remove();
     aiHistory.pop();
-    if(err&&err.code==='limit'){niyiCount(NIYI_FREE_LIMIT);if(doPageAction(t)){renderChips();return}showNiyiLimit();return}
+    niyiMood('error',3200);
+    if(err&&err.code==='limit'){if(!apex)niyiCount(NIYI_FREE_LIMIT);if(doPageAction(t)){renderChips();return}showNiyiLimit();return}
     if(doPageAction(t)){renderChips();return}
-    if(!apex)niyiCount();
-    keywordAnswer(q);
+    // Say so honestly instead of silently switching to keyword answers.
+    var why=err&&err.code==='signin'?'Please sign in again to chat with smart Niyi.':(err&&err.name==='AbortError'?'It took too long to answer.':'Smart Niyi couldn\u2019t answer just now.');
+    addBotRich(why+' Please try again in a moment.',[{label:'Try again',onClick:function(){ask(q)}}]);
+    console.warn('[Niyi]',err);
+    renderChips();
   }).then(function(){aiBusy=false});
 }
 var micBtn=document.getElementById('niyiMic');
@@ -2842,9 +3027,9 @@ function setupMic(){
   recog.lang='en-NG';
   recog.interimResults=false;
   recog.maxAlternatives=1;
-  recog.onstart=function(){listening=true;micBtn.setAttribute('aria-pressed','true');micBtn.title='Listening… tap to stop'};
-  recog.onend=function(){listening=false;micBtn.setAttribute('aria-pressed','false');micBtn.title='Voice input'};
-  recog.onerror=function(){stopMic();addMsg('Could not hear clearly. Try again or type.','bot')};
+  recog.onstart=function(){niyiMood('thinking');listening=true;micBtn.setAttribute('aria-pressed','true');micBtn.title='Listening… tap to stop'};
+  recog.onend=function(){if(!aiBusy)niyiMood('idle');listening=false;micBtn.setAttribute('aria-pressed','false');micBtn.title='Voice input'};
+  recog.onerror=function(){niyiMood('error',2500);stopMic();addMsg('Could not hear clearly. Try again or type.','bot')};
   recog.onresult=function(ev){
     var said=(ev.results&&ev.results[0]&&ev.results[0][0]&&ev.results[0][0].transcript)||'';
     said=String(said).trim();

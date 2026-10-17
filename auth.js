@@ -73,6 +73,57 @@
     return true;
   }
 
+  /* 7.2.5: remember the last server Apex state for this user, so Apex shows instantly on reload
+     instead of "Free / pay" until Firestore answers. Display only: it is re-checked against Firestore
+     on every load, and the Worker always checks Firestore itself (Niyi limits, payments). */
+  var PREMIUM_CACHE_KEY = 'curveGuide.premiumCache';
+  function plainPremium(v) {
+    if (typeof v === 'boolean') return { active: v };
+    if (!v || typeof v !== 'object') return null;
+    var exp = v.expiresAt;
+    var ms = exp && typeof exp.toMillis === 'function' ? exp.toMillis() : (typeof exp === 'number' ? exp : (exp ? Date.parse(exp) : null));
+    return { active: v.active === true, plan: v.plan ? String(v.plan) : '', expiresAt: (ms == null || isNaN(ms)) ? null : ms,
+      test: v.test === true, currency: v.currency || '' };
+  }
+  function setServerPremium(uid, raw) {
+    var before = JSON.stringify([serverPremium, plainPremium(serverPremiumInfo)]);
+    serverPremium = parseServerPremium(raw);
+    serverPremiumInfo = plainPremium(raw);
+    try {
+      if (uid && serverPremiumInfo) localStorage.setItem(PREMIUM_CACHE_KEY, JSON.stringify({ uid: uid, premium: serverPremiumInfo }));
+      else localStorage.removeItem(PREMIUM_CACHE_KEY);
+    } catch (e) {}
+    return before !== JSON.stringify([serverPremium, serverPremiumInfo]);
+  }
+  function clearPremium() {
+    serverPremium = null;
+    serverPremiumInfo = null;
+    try { localStorage.removeItem(PREMIUM_CACHE_KEY); } catch (e) {}
+    if (fb.unsubUserDoc) { try { fb.unsubUserDoc(); } catch (e) {} fb.unsubUserDoc = null; }
+  }
+  function restoreCachedPremium() {
+    try {
+      var c = JSON.parse(localStorage.getItem(PREMIUM_CACHE_KEY) || 'null');
+      var u = JSON.parse(localStorage.getItem(AUTH_KEY) || 'null');
+      if (c && u && c.uid === u.uid && c.premium) {
+        serverPremium = parseServerPremium(c.premium);
+        serverPremiumInfo = c.premium;
+      }
+    } catch (e) {}
+  }
+  // Live updates: if Apex is granted/renewed while the app is open, show it without a reload.
+  function watchUserDoc(uid) {
+    if (!fb.db || !uid || typeof userDoc(uid).onSnapshot !== 'function') return;
+    if (fb.unsubUserDoc && fb.watchUid === uid) return;
+    if (fb.unsubUserDoc) { try { fb.unsubUserDoc(); } catch (e) {} }
+    fb.watchUid = uid;
+    fb.unsubUserDoc = userDoc(uid).onSnapshot(function (snap) {
+      if (!snap.exists) return;
+      var d = snap.data() || {};
+      if (setServerPremium(uid, d.premium)) emit();
+    }, function (err) { console.warn('[Curve Guide] live plan updates off', err && err.code); });
+  }
+
   function loadJson(key, fallback) {
     try {
       var raw = localStorage.getItem(key);
@@ -219,10 +270,11 @@
           if (user) {
             fb.redirectFailed = false;
             cacheUser(mapUser(user));
+            if (fb.watchUid && fb.watchUid !== user.uid) clearPremium();
             pullUserCloud(user.uid).finally(function () { emit(); });
           } else {
             cacheUser(null);
-            serverPremium = null;
+            clearPremium();
             emit();
           }
         });
@@ -250,8 +302,8 @@
         return pushUserCloud(uid, { seed: true });
       }
       var data = snap.data() || {};
-      serverPremium = parseServerPremium(data.premium);
-      serverPremiumInfo = (data.premium && typeof data.premium === 'object') ? data.premium : null;
+      setServerPremium(uid, data.premium);
+      watchUserDoc(uid);
       if (data.profile && typeof data.profile === 'object') {
         try {
           var local = loadJson(PROFILE_KEY, {});
@@ -460,7 +512,7 @@
     if (fb.auth && fb.auth.currentUser) {
       return fb.auth.signOut().then(function () {
         cacheUser(null);
-        serverPremium = null;
+        clearPremium();
         emit();
         return null;
       });
@@ -474,8 +526,7 @@
     var p = (fb.auth) ? fb.auth.signOut() : Promise.resolve();
     return p.catch(function () {}).then(function () {
       cacheUser(null);
-      serverPremium = null;
-      serverPremiumInfo = null;
+      clearPremium();
       emit();
     });
   }
@@ -704,7 +755,7 @@
   function deleteAccount() {
     if (!fb.auth || !fb.auth.currentUser) {
       cacheUser(null);
-      serverPremium = null;
+      clearPremium();
       try { localStorage.removeItem(AUTH_KEY); localStorage.removeItem(PROFILE_KEY); } catch (e) {}
       emit();
       return Promise.resolve({ localOnly: true });
@@ -724,7 +775,7 @@
       return user.delete();
     }).then(function () {
       cacheUser(null);
-      serverPremium = null;
+      clearPremium();
       try {
         localStorage.removeItem(AUTH_KEY);
         localStorage.removeItem(PLAN_KEY);
@@ -752,6 +803,7 @@
 
   // Boot: remove legacy preview-only local Apex switches (Apex is server-only now).
   try { localStorage.removeItem(TEST_REF_KEY); localStorage.removeItem(PLAN_KEY); } catch (e) {}
+  restoreCachedPremium();
   var boot = initFirebase();
   // After sign-in is known, retry any paid-but-unverified Apex payment.
   var autoRetried = {}; // at most one automatic retry per reference per page load
