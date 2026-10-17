@@ -455,6 +455,91 @@ async function handleNiyi(request, env, cors) {
   return json({ ok: true, reply: out.reply, actions: out.actions, apex, used: apex ? undefined : used, limit }, 200, cors);
 }
 
+
+/* ---------------- /resolve-link: Google Maps short-link resolver (8.0) ----------------
+   Browsers can't follow cross-origin redirects, so the app asks us. NOT an open proxy:
+   only allowlisted Google Maps hosts, every redirect hop re-checked, no body returned
+   (only the final URL + coordinates/place name), only from Curve Guide origins, rate-limited per IP. */
+const LINK_HOSTS = ['maps.app.goo.gl', 'goo.gl', 'maps.google.com', 'www.google.com', 'google.com', 'google.com.ng', 'www.google.com.ng', 'maps.google.com.ng'];
+const linkHits = new Map(); // ip -> [count, windowStart]
+function linkHostOk(u) {
+  try {
+    const x = new URL(u);
+    if (x.protocol !== 'https:' && x.protocol !== 'http:') return false;
+    if (x.username || x.password || (x.port && x.port !== '443' && x.port !== '80')) return false;
+    const h = x.hostname.toLowerCase();
+    const googleMaps = /^(www\.|maps\.)?google\.(com|[a-z]{2}|com\.[a-z]{2}|co\.[a-z]{2})$/.test(h);
+    if (!LINK_HOSTS.includes(h) && !googleMaps) return false;
+    if (h === 'goo.gl' && !x.pathname.startsWith('/maps')) return false;
+    if (googleMaps && !h.startsWith('maps.') && !x.pathname.startsWith('/maps') && x.pathname !== '/url') return false;
+    return true;
+  } catch (e) { return false; }
+}
+function parseMapUrl(u) {
+  const num = (a, b) => { const lat = parseFloat(a), lng = parseFloat(b); return isFinite(lat) && isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180 && !(lat === 0 && lng === 0) ? { lat, lng } : null; };
+  const LL = /^\s*(?:loc:)?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/;
+  let x = null;
+  try { x = new URL(u); } catch (e) { return { coords: null, name: '' }; }
+  let path = x.pathname;
+  try { path = decodeURIComponent(path); } catch (e) {}
+  let c = null, m;
+  m = path.match(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/); if (m) c = num(m[1], m[2]);
+  if (!c) for (const k of ['q', 'query', 'll', 'daddr', 'destination', 'center', 'sll']) {
+    const v = x.searchParams.get(k); m = v && v.match(LL); if (m && (c = num(m[1], m[2]))) break;
+  }
+  if (!c) { m = path.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/); if (m) c = num(m[1], m[2]); }
+  let name = '';
+  m = path.match(/\/maps\/place\/([^/@]+)/) || path.match(/\/maps\/search\/([^/@]+)/);
+  let raw = m ? m[1] : (x.searchParams.get('q') || x.searchParams.get('query') || x.searchParams.get('daddr') || x.searchParams.get('destination') || '');
+  raw = String(raw).replace(/\+/g, ' ').trim();
+  if (raw && !LL.test(raw)) name = raw.slice(0, 140);
+  return { coords: c, name };
+}
+async function handleResolveLink(request, env, cors) {
+  if (!cors['Access-Control-Allow-Origin']) return json({ ok: false, error: 'Not allowed' }, 403, cors);
+  const ip = request.headers.get('CF-Connecting-IP') || 'x';
+  const now = Date.now();
+  const h = linkHits.get(ip);
+  if (!h || now - h[1] > 60000) linkHits.set(ip, [1, now]);
+  else if (++h[0] > 15) return json({ ok: false, code: 'slow', error: 'Too many links, please wait a minute' }, 429, cors);
+  if (linkHits.size > 5000) linkHits.clear();
+  let input = {};
+  try { input = await request.json(); } catch (e) {}
+  let cur = String(input.url || '').trim().slice(0, 600);
+  if (!/^https?:\/\//i.test(cur)) cur = 'https://' + cur;
+  if (!linkHostOk(cur)) return json({ ok: false, error: 'Only Google Maps links are supported' }, 400, cors);
+  for (let hop = 0; hop < 5; hop++) {
+    const parsed = parseMapUrl(cur);
+    if (parsed.coords && !/goo\.gl/i.test(new URL(cur).hostname)) return json({ ok: true, url: cur, ...parsed }, 200, cors);
+    let res;
+    try {
+      res = await fetch(cur, { method: 'GET', redirect: 'manual', headers: { 'User-Agent': 'Mozilla/5.0 (CurveGuide link resolver)', Accept: 'text/html' }, cf: { cacheTtl: 300 } });
+    } catch (e) { return json({ ok: false, error: 'Could not open that link' }, 502, cors); }
+    const loc = res.headers.get('Location');
+    try { res.body && res.body.cancel(); } catch (e) {}
+    if (res.status >= 300 && res.status < 400 && loc) {
+      const next = new URL(loc, cur).toString();
+      // consent / sign-in interstitials carry the real target in ?continue=
+      let target = next;
+      try { const nx = new URL(next); const cont = nx.searchParams.get('continue'); if (cont && (/consent\.google\.|accounts\.google\./.test(nx.hostname) || nx.pathname.startsWith('/sorry'))) target = cont; } catch (e) {}
+      if (target !== next) {
+        // Interstitial (consent / "unusual traffic"): read the real target without fetching Google again.
+        const p0 = parseMapUrl(target);
+        if (p0.coords || p0.name) return json({ ok: true, url: linkHostOk(target) ? target : '', ...p0 }, 200, cors);
+      }
+      if (!linkHostOk(target)) {
+        const p = parseMapUrl(target);
+        return p.coords || p.name ? json({ ok: true, url: '', ...p }, 200, cors) : json({ ok: false, error: 'That link does not lead to Google Maps' }, 400, cors);
+      }
+      cur = target;
+      continue;
+    }
+    const p = parseMapUrl(cur);
+    return json({ ok: !!(p.coords || p.name), url: cur, ...p, error: p.coords || p.name ? undefined : 'No location found in that link' }, 200, cors);
+  }
+  return json({ ok: false, error: 'Too many redirects' }, 400, cors);
+}
+
 /* ---------------- handlers ---------------- */
 async function handleVerify(request, env, cors) {
   let input = {};
@@ -519,6 +604,7 @@ export default {
           (!env.PAYSTACK_SECRET_KEY || !env.FIREBASE_SERVICE_ACCOUNT)) {
         return json({ ok: false, notConfigured: true, error: 'Payment server is not fully set up yet (secrets missing).' }, 503, cors);
       }
+      if (request.method === 'POST' && url.pathname === '/resolve-link') return await handleResolveLink(request, env, cors);
       if (request.method === 'POST' && url.pathname === '/niyi') return await handleNiyi(request, env, cors);
       if (request.method === 'POST' && url.pathname === '/verify') return await handleVerify(request, env, cors);
       if (request.method === 'POST' && url.pathname === '/webhook') return await handleWebhook(request, env);

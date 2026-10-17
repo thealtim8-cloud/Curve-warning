@@ -651,7 +651,7 @@ body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc
 <div class="map-search" id="mapSearchWrap">
           <div class="dest-search-wrap">
             <svg class="dest-search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-            <input class="dest-search" id="destSearch" type="search" placeholder="Search destination" autocomplete="off" aria-label="Search destination" aria-autocomplete="list" aria-controls="destResults">
+            <input class="dest-search" id="destSearch" type="search" placeholder="Search or paste a Google Maps link" autocomplete="off" aria-label="Search destination or paste a Google Maps link" aria-autocomplete="list" aria-controls="destResults">
           </div>
           <div class="dest-results" id="destResults" role="listbox" hidden></div>
         </div>
@@ -1307,6 +1307,7 @@ function cgApexLink(label,feature){
 }
 window.__cgGeoSearch=function(q){return geoSearch(q)};
 window.__cgParseCoords=function(q){return parseCoordQuery(q)};
+window.__cgParseMapLink=function(q){return parseMapLink(q)};
 window.__cgIsDriving=function(){
   if(watchId===null||!current)return false;
   var s=current.coords.speed;
@@ -1402,13 +1403,43 @@ function nomFetch(url){
   });
 }
 function inNigeria(c){return c&&c[1]>3.8&&c[1]<14.2&&c[0]>2.4&&c[0]<15}
+/* 8.0: coordinates and map links (Google Maps: @lat,lng, !3d..!4d.., ?q=/query=/ll=/daddr=, /place/NAME, /search/NAME;
+   Apple Maps: ll=, q=, address=; geo: URIs). Short share links (maps.app.goo.gl, goo.gl/maps) are resolved by the Worker. */
+function pinItem(lat,lon,name,sub){
+  return {name:name||('Pinned spot '+lat.toFixed(5)+', '+lon.toFixed(5)),subtitle:sub||'From the coordinates you pasted',coord:[lon,lat]};
+}
+function okLL(lat,lon){return isFinite(lat)&&isFinite(lon)&&Math.abs(lat)<=90&&Math.abs(lon)<=180&&!(lat===0&&lon===0)}
+function parseMapLink(q){
+  var s=String(q||'').trim(), m;
+  var um=s.match(/(?:https?:\/\/|\b)(?:[a-z0-9-]+\.)*(?:google\.[a-z.]{2,6}|goo\.gl|apple\.com)\/[^\s]*/i);
+  if(/^geo:/i.test(s)){m=s.match(/^geo:\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);if(m&&okLL(+m[1],+m[2]))return {coords:{lat:+m[1],lng:+m[2]},name:(s.match(/[?&]q=[^(]*\(([^)]+)\)/)||[])[1]||''}}
+  if(!um)return null;
+  var raw=um[0]; if(!/^https?:/i.test(raw))raw='https://'+raw;
+  var u; try{u=new URL(raw)}catch(e){return null}
+  var host=u.hostname.toLowerCase();
+  if(/(^|\.)maps\.app\.goo\.gl$/.test(host)||(host==='goo.gl'&&/^\/maps/.test(u.pathname)))return {short:raw};
+  var isApple=/(^|\.)maps\.apple\.com$/.test(host);
+  if(!isApple&&!/google\./.test(host))return null;
+  var path=u.pathname; try{path=decodeURIComponent(path)}catch(e){}
+  var LL=/^\s*(?:loc:)?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/, c=null;
+  m=path.match(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/); if(m&&okLL(+m[1],+m[2]))c={lat:+m[1],lng:+m[2]};
+  if(!c)['q','query','ll','daddr','destination','center','sll','coordinate'].some(function(k){var v=u.searchParams.get(k);var mm=v&&v.match(LL);if(mm&&okLL(+mm[1],+mm[2])){c={lat:+mm[1],lng:+mm[2]};return true}return false});
+  if(!c){m=path.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);if(m&&okLL(+m[1],+m[2]))c={lat:+m[1],lng:+m[2]}}
+  m=path.match(/\/maps\/place\/([^/@]+)/)||path.match(/\/maps\/search\/([^/@]+)/);
+  var nm=m?m[1]:(u.searchParams.get('q')||u.searchParams.get('query')||u.searchParams.get('name')||u.searchParams.get('address')||u.searchParams.get('daddr')||u.searchParams.get('destination')||'');
+  nm=String(nm).replace(/\+/g,' ').trim(); if(LL.test(nm))nm='';
+  return {coords:c,name:nm.slice(0,140),apple:isApple};
+}
 function parseCoordQuery(q){
   var s=String(q||'');
+  var link=parseMapLink(s);
+  if(link&&link.coords)return pinItem(link.coords.lat,link.coords.lng,link.name||'',link.name?'From the map link you pasted':'From the map link you pasted');
+  if(link)return null;
   var m=s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||s.match(/(-?\d{1,2}\.\d{3,})\s*[, ]\s*(-?\d{1,3}\.\d{3,})/);
   if(!m)return null;
   var lat=parseFloat(m[1]),lon=parseFloat(m[2]);
   if(!(Math.abs(lat)<=90&&Math.abs(lon)<=180))return null;
-  return {name:'Pinned spot '+lat.toFixed(5)+', '+lon.toFixed(5),subtitle:'From the coordinates you pasted',coord:[lon,lat]};
+  return pinItem(lat,lon);
 }
 function simplifyPlaceQuery(q){
   var s=String(q||'').toLowerCase();
@@ -1439,6 +1470,17 @@ function photonParse(data,preferNg){
 function geoSearch(q){
   var pinned=parseCoordQuery(q);
   if(pinned)return Promise.resolve({items:[pinned],source:'coords'});
+  var link=parseMapLink(q);
+  if(link&&link.short){
+    var A=window.__cgAuth;
+    if(!A||!A.resolveMapLink)return Promise.resolve({items:[],source:'link-failed'});
+    return A.resolveMapLink(link.short).then(function(r){
+      if(r&&r.coords&&okLL(r.coords.lat,r.coords.lng))return {items:[pinItem(r.coords.lat,r.coords.lng,r.name||'',r.name?'From your Google Maps link':'From your Google Maps link')],source:'link'};
+      if(r&&r.name)return geoSearch(r.name).then(function(res){res.fromLink=r.name;return res});
+      return {items:[],source:'link-failed'};
+    }).catch(function(){return {items:[],source:'link-failed'}});
+  }
+  if(link&&link.name)return geoSearch(link.name).then(function(res){res.fromLink=link.name;return res});
   var o0=originLonLat(), ng=inNigeria(o0);
   // Only a rough area (~10 km, 1 decimal place) is sent to the search services, never exact GPS.
   var o=[Math.round(o0[0]*10)/10, Math.round(o0[1]*10)/10];
@@ -1478,7 +1520,9 @@ function searchNominatim(q){
   var seq=++searchSeq;
   geoSearch(q).then(function(res){
     if(seq!==searchSeq)return;
-    if(!res.items.length){var box=$('destResults');if(box)showNoResults(q,box);return}
+    if(res.source==='link-failed'){var bx=$('destResults');if(bx){bx.textContent='';var dl=document.createElement('div');dl.className='dest-result';dl.style.cursor='default';
+      dl.textContent='Couldn\u2019t read that map link. Open it in Google Maps, long-press the exact spot, copy the numbers (like 6.5982, 3.2765) and paste them here.';bx.appendChild(dl);bx.hidden=false}return}
+    if(!res.items.length){var box=$('destResults');if(box)showNoResults(res.fromLink||q,box);return}
     showResults(res.items);
     if(res.source==='simplified'){
       var box2=$('destResults');
@@ -2862,7 +2906,7 @@ function ask(text){
     renderChips();
     return;
   }
-  if(window.__cgParseCoords&&window.__cgParseCoords(q)){searchPlaceInChat(q);renderChips();return}
+  if((window.__cgParseCoords&&window.__cgParseCoords(q))||(window.__cgParseMapLink&&window.__cgParseMapLink(q))){searchPlaceInChat(q);renderChips();return}
   var place=extractPlace(q);
   if(place&&place.length>=2){
     searchPlaceInChat(place);

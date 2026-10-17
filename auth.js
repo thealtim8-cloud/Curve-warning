@@ -36,6 +36,7 @@
   var VERIFY_URL = 'https://curveguide-verify.thealtim8.workers.dev/verify';
   // Smart Niyi (Cloudflare Workers AI behind the same Worker; no AI key in the browser).
   var NIYI_URL = 'https://curveguide-verify.thealtim8.workers.dev/niyi';
+  var RESOLVE_URL = 'https://curveguide-verify.thealtim8.workers.dev/resolve-link'; // 8.0: Google Maps short links
 
   // Prices in the smallest unit (kobo / cents). Must match server/verify-payment PRICES.
   var APEX_PRICES = {
@@ -855,6 +856,12 @@
     saveFavouritesLocalAndCloud: saveFavouritesLocalAndCloud,
     NIYI_URL: NIYI_URL,
     niyiChat: niyiChat,
+    resolveMapLink: function (url) {
+      var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var to = ctl ? setTimeout(function () { ctl.abort(); }, 9000) : null;
+      return fetch(RESOLVE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: url }), signal: ctl ? ctl.signal : undefined })
+        .then(function (r) { if (to) clearTimeout(to); return r.json().catch(function () { return { ok: false }; }); });
+    },
     isSignedIn: function () { return !!(fb.auth && fb.auth.currentUser); },
     getFirebase: function () { return fb; },
     deleteAccount: deleteAccount,
