@@ -349,6 +349,10 @@ export default {
           serviceAccount: env.FIREBASE_SERVICE_ACCOUNT ? 'set' : 'missing'
         }, 200, cors);
       }
+      if (request.method === 'POST' && (url.pathname === '/verify' || url.pathname === '/webhook') &&
+          (!env.PAYSTACK_SECRET_KEY || !env.FIREBASE_SERVICE_ACCOUNT)) {
+        return json({ ok: false, notConfigured: true, error: 'Payment server is not fully set up yet (secrets missing).' }, 503, cors);
+      }
       if (request.method === 'POST' && url.pathname === '/verify') return await handleVerify(request, env, cors);
       if (request.method === 'POST' && url.pathname === '/webhook') return await handleWebhook(request, env);
       return json({ ok: false, error: 'Not found' }, 404, cors);

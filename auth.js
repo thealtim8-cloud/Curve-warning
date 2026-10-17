@@ -26,9 +26,10 @@
   // Public TEST key — safe to commit. Never put the secret key (sk_...) in this file.
   var PAYSTACK_PUBLIC_KEY = 'pk_test_94e4ea814054a2a166783d3982176f703f516c07';
   var PAYSTACK_INLINE_SRC = 'https://js.paystack.co/v2/inline.js';
-  // Server verification endpoint (Cloudflare Worker), e.g.
-  // 'https://curveguide-verify.<you>.workers.dev'. Empty = server step not deployed yet.
-  var VERIFY_URL = '';
+  // Server verification endpoint (Cloudflare Worker, server/verify-payment).
+  // Empty = server step not deployed. If the Worker's secrets are missing it answers
+  // 503 notConfigured and the app falls back to the local TEST flag.
+  var VERIFY_URL = 'https://curveguide-verify.thealtim8.workers.dev/verify';
 
   // Prices in the smallest unit (kobo / cents). Must match server/verify-payment PRICES.
   var APEX_PRICES = {
@@ -462,7 +463,9 @@
     return getIdToken().then(function (token) {
       var headers = { 'Content-Type': 'application/json' };
       if (token) headers.Authorization = 'Bearer ' + token;
-      return fetch(VERIFY_URL.replace(/\/+$/, '') + '/verify', {
+      var url = VERIFY_URL.replace(/\/+$/, '');
+      if (!/\/verify$/.test(url)) url += '/verify';
+      return fetch(url, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ reference: reference })
