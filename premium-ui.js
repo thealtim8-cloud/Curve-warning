@@ -1,4 +1,4 @@
-/* Curve Guide Premium / Auth / Profile UI (preview)
+/* Curve Guide Apex / Auth / Profile UI (preview)
  * Local-only until Firebase + Paystack are wired (see auth.js).
  * Profile fields: curveGuide.profile — comment markers show where cloud sync goes.
  */
@@ -104,7 +104,7 @@
 
   function badgeHtml(snap) {
     if (!snap.signedIn) return '<span class="plan-badge free">Guest</span>';
-    if (snap.premium) return '<span class="plan-badge premium">Premium</span>';
+    if (snap.premium) return '<span class="plan-badge premium">Apex</span>';
     return '<span class="plan-badge free">Free</span>';
   }
 
@@ -142,7 +142,7 @@
           '<button type="button" class="btn" data-acct="profile">Profile &amp; settings</button>' +
           (snap.premium
             ? '<button type="button" class="btn" data-acct="premium">Manage plan</button>'
-            : '<button type="button" class="btn primary" data-acct="upgrade">Upgrade to Premium</button>') +
+            : '<button type="button" class="btn primary" data-acct="upgrade">Upgrade to Apex</button>') +
           '<button type="button" class="btn" data-acct="signout">Sign out</button>';
       }
     }
@@ -164,7 +164,7 @@
       if (!badge) {
         badge = document.createElement('span');
         badge.className = 'pro-badge';
-        badge.textContent = 'PRO';
+        badge.textContent = 'APEX';
         el.appendChild(badge);
       }
       badge.hidden = !gate;
@@ -259,10 +259,10 @@
     var status = $('premiumStatusLine');
     if (status && snap) {
       status.textContent = snap.premium
-        ? 'You are on Premium (preview).'
+        ? 'You are on Apex (preview).'
         : snap.signedIn
           ? 'You are on the Free plan.'
-          : 'Sign in to keep Premium across devices (when Firebase is connected).';
+          : 'Sign in to keep Apex across devices (when Firebase is connected).';
     }
   }
 
@@ -298,7 +298,7 @@
         escapeHtml((user && user.displayName) || 'Not signed in') + '</div><div class="small">' +
         escapeHtml((user && user.email) || '') + '</div>' + badgeHtml(snap || {}) +
         (!(snap && snap.premium)
-          ? ' <button type="button" class="btn primary sm" id="profileUpgradeBtn">Upgrade</button>'
+          ? ' <button type="button" class="btn primary sm" id="profileUpgradeBtn">Upgrade to Apex</button>'
           : '') +
         '</div>';
       var ub = $('profileUpgradeBtn');
@@ -392,8 +392,8 @@
     var planLine = $('profilePlanLine');
     if (planLine && snap) {
       planLine.innerHTML = snap.premium
-        ? '<strong>Premium</strong> · Renewal date: <em>TBD (preview)</em>'
-        : '<strong>Free</strong> · <button type="button" class="btn primary sm" id="profilePlanUpgrade">Upgrade</button>';
+        ? '<strong>Apex</strong> · Renewal date: <em>TBD (preview)</em>'
+        : '<strong>Free</strong> · <button type="button" class="btn primary sm" id="profilePlanUpgrade">Upgrade to Apex</button>';
       var pu = $('profilePlanUpgrade');
       if (pu) pu.onclick = function () { showPremium(); };
     }
@@ -415,7 +415,7 @@
       var tip = $('premiumGateTip');
       if (tip) {
         tip.hidden = false;
-        tip.textContent = '“' + featureId + '” is a Premium feature in this preview demo (gating is on).';
+        tip.textContent = '“' + featureId + '” is an Apex feature in this preview demo (gating is on).';
       }
       return;
     }
@@ -435,7 +435,7 @@
           var tip = $('premiumGateTip');
           if (tip) {
             tip.hidden = false;
-            tip.textContent = 'This feature is marked PRO while preview gating is on.';
+            tip.textContent = 'This feature is marked APEX while preview gating is on.';
           }
         },
         true
@@ -577,7 +577,7 @@
       };
     });
 
-    // Premium
+    // Apex plans
     document.querySelectorAll('[data-currency]').forEach(function (b) {
       b.onclick = function () {
         auth().setCurrency(b.getAttribute('data-currency'));
@@ -591,12 +591,12 @@
         if (auth().isPreview() || !auth().snapshot().paystackReady) {
           if (msg) {
             msg.hidden = false;
-            msg.textContent = 'Payments not connected yet. Test mode coming soon — simulating Premium upgrade for this preview.';
+            msg.textContent = 'Payments not connected yet. Test mode coming soon — simulating Apex upgrade for this preview.';
           }
           auth().simulatePremiumUpgrade(plan).then(function () {
             syncAccountButton(auth().snapshot());
             renderPremium();
-            if (msg) msg.textContent = 'Preview: you are now Premium on this device.';
+            if (msg) msg.textContent = 'Preview: you are now on Apex on this device.';
           });
           return;
         }
@@ -650,7 +650,7 @@
     var cancelPrem = $('profileCancelPremium');
     if (cancelPrem)
       cancelPrem.onclick = function () {
-        if (!confirm('Cancel Premium on this device? (Preview only — no real subscription.)')) return;
+        if (!confirm('Cancel Apex on this device? (Preview only — no real subscription.)')) return;
         auth().setPlanLocal('free');
         syncAccountButton(auth().snapshot());
         renderProfile('premium');

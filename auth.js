@@ -382,7 +382,7 @@
       return Promise.reject(new Error('Paystack key set but checkout not implemented yet'));
     }
     if (!currentUser()) {
-      return localFakeSignIn('preview', 'Premium Preview', 'premium.preview@curveguide.local').then(function () {
+      return localFakeSignIn('preview', 'Apex Preview', 'apex.preview@curveguide.local').then(function () {
         saveJson(PLAN_KEY, 'premium');
         try { localStorage.setItem('curveGuide.previewPlanId', planId || 'monthly'); } catch (e) {}
         emit();

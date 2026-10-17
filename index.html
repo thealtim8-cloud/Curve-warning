@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<title>Curve Guide 7.1 preview | Sign-in &amp; Premium</title>
+<title>Curve Guide 7.1 preview | Sign-in &amp; Apex</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -267,7 +267,7 @@ body.navigating .dest-card{max-height:38%}
 
 
 
-/* Account / Premium / Profile preview */
+/* Account / Apex / Profile preview */
 .account-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;border:1px solid #20c47766;background:#20c47714;color:#9be3bf;padding:0;cursor:pointer}
 .account-btn.signed-in{padding:0;border-color:#20c477aa}
 .account-avatar{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;font-size:11px;font-weight:800;background:linear-gradient(180deg,#27d083,#17a863);color:#06150d}
@@ -677,12 +677,12 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
   </div>
 </div>
 
-<!-- Premium -->
+<!-- Apex -->
 <div class="cg-overlay" id="premiumScreen" hidden role="dialog" aria-modal="true" aria-labelledby="premiumTitle">
   <div class="cg-sheet">
     <div class="sheet-head">
       <div>
-        <h2 id="premiumTitle">Curve Guide Premium</h2>
+        <h2 id="premiumTitle">Curve Guide Apex</h2>
         <div class="sheet-sub" id="premiumStatusLine">Unlock the full driving companion.</div>
       </div>
       <button type="button" class="icon-close" data-close-overlay="premiumScreen" aria-label="Close">✕</button>
@@ -696,7 +696,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
     </ul>
     <div class="compare">
       <div class="col"><h3>Free</h3><ul><li>Map &amp; GPS curve awareness</li><li>Search &amp; basic routing</li><li>Local favourites on this device</li><li>Niyi keyword helper (limits in future)</li></ul></div>
-      <div class="col"><h3>Premium</h3><ul><li>Everything in Free</li><li>Voice guidance</li><li>Bend speed alerts</li><li>Synced favourites &amp; hazards</li><li>Priority Niyi</li></ul></div>
+      <div class="col"><h3>Apex</h3><ul><li>Everything in Free</li><li>Voice guidance</li><li>Bend speed alerts</li><li>Synced favourites &amp; hazards</li><li>Priority Niyi</li></ul></div>
     </div>
     <div class="currency-switch" role="group" aria-label="Currency">
       <button type="button" class="btn sm active" data-currency="NGN">NGN</button>
@@ -715,7 +715,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       </div>
     </div>
     <p class="pay-msg" id="paystackMsg" hidden></p>
-    <p class="sheet-sub">Secure payments by Paystack. Cancel anytime. Cancel anytime. Curve Guide remains a prototype — never a substitute for careful driving.</p>
+    <p class="sheet-sub">Secure payments by Paystack. Cancel anytime. Curve Guide remains a prototype — never a substitute for careful driving.</p>
   </div>
 </div>
 
@@ -762,9 +762,9 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
     </section>
 
     <section class="profile-section" data-profile-section="premium">
-      <h3>Premium</h3>
+      <h3>Apex</h3>
       <div id="profilePlanLine" class="small"></div>
-      <button type="button" class="btn sm danger-outline" id="profileCancelPremium" hidden style="margin-top:8px">Cancel premium</button>
+      <button type="button" class="btn sm danger-outline" id="profileCancelPremium" hidden style="margin-top:8px">Cancel Apex</button>
     </section>
 
     <section class="profile-section" data-profile-section="support">
@@ -797,9 +797,9 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
 
 <div class="preview-gate-bar" id="previewGateBar" aria-label="Preview controls">
   <strong>Preview</strong>
-  <label><input type="checkbox" id="previewGateToggle"> Gate PRO features</label>
-  <label><input type="checkbox" id="previewPlanToggle"> Premium</label>
-  <span class="small" id="previewAuthNote">Paystack not connected · Premium simulated</span>
+  <label><input type="checkbox" id="previewGateToggle"> Gate Apex features</label>
+  <label><input type="checkbox" id="previewPlanToggle"> Apex</label>
+  <span class="small" id="previewAuthNote">Paystack not connected · Apex simulated</span>
 </div>
 
 <!-- FIREBASE_SDK: compat bundles from gstatic (v13.0.0 verified). Analytics skipped. -->
@@ -2263,9 +2263,9 @@ function doPageAction(t){
     A.setNavVoice(true);return confirm('Navigation voice unmuted.');
   }
 
-  if(/\b(premium|upgrade|paystack|subscription|pro plan)\b/.test(t)){
+  if(/\b(premium|apex|upgrade|paystack|subscription|pro plan|apex plan)\b/.test(t)){
     if(window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
-    return confirm('Curve Guide Premium is in preview. Prices are not set yet (shown as TBD). Payments are not connected.');
+    return confirm('Curve Guide Apex: ₦450/month or $1/month; yearly ₦3,780/$8.40 (save 30%). Payments not connected yet — upgrade is simulated.');
   }
   if(/\b(sign in|sign-in|login|log in|create account)\b/.test(t)){
     if(window.__cgPremiumUI)window.__cgPremiumUI.showAuth('signin');
@@ -2273,7 +2273,7 @@ function doPageAction(t){
   }
   if(/\b(price|pricing|how much|cost|₦|naira|dollar)\b/.test(t)){
     if(window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
-    return confirm('Curve Guide Premium: ₦450/month or $1/month; yearly with 30% off is ₦3,780/year or $8.40/year (was ₦5,400 / $12). NGN for Nigeria, USD for foreign users. Payments not connected yet.');
+    return confirm('Curve Guide Apex: ₦450/month or $1/month; yearly with 30% off is ₦3,780/year or $8.40/year (was ₦5,400 / $12). NGN for Nigeria, USD for foreign users. Payments not connected yet.');
   }
   if(/\b(profile|settings|account page)\b/.test(t)){
     if(window.__cgPremiumUI)window.__cgPremiumUI.showProfile();
@@ -2355,7 +2355,8 @@ function explainButton(t){
     'stop navigation':'Stop navigation ends voice guidance and hides the next-turn banner.',
     'clear':'Clear removes the destination pin and driving route.',
     'clear route':'Clear route removes the green GPS trail you have driven.',
-    'premium':'Premium: ₦450/mo ($1) or ₦3,780/yr ($8.40, save 30%). Paystack not connected yet — upgrade is simulated in preview.',
+    'premium':'Apex: ₦450/mo ($1) or ₦3,780/yr ($8.40, save 30%). Paystack not connected yet — upgrade is simulated in preview.',
+    'apex':'Apex is the paid Curve Guide plan: voice nav, bend alerts, synced favourites/hazards, and priority Niyi.',
     'sign in':'Sign in opens the account screen. Firebase Auth is configured for Google and email/password.',
     'profile':'Profile stores car icon, theme, and settings on this device in preview.',
     'recenter':'Reset view (or say reset map) turns follow back on and flies to your GPS position, or Lagos if GPS is off.',
