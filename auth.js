@@ -34,6 +34,8 @@
   // Empty = server step not deployed. If the Worker's secrets are missing it answers
   // 503 notConfigured and the app shows an error (never a local grant).
   var VERIFY_URL = 'https://curveguide-verify.thealtim8.workers.dev/verify';
+  // Smart Niyi (Cloudflare Workers AI behind the same Worker; no AI key in the browser).
+  var NIYI_URL = 'https://curveguide-verify.thealtim8.workers.dev/niyi';
 
   // Prices in the smallest unit (kobo / cents). Must match server/verify-payment PRICES.
   var APEX_PRICES = {
@@ -49,6 +51,7 @@
   var CURRENCY_KEY = 'curveGuide.previewCurrency';
   var PROFILE_KEY = 'curveGuide.profile';
   var FAV_KEY = 'curveGuide.favourites';
+  var HAZARD_KEY = 'curveGuide.hazards';
   var PENDING_REDIRECT = 'curveGuide.authRedirect';
 
   var listeners = [];
@@ -137,8 +140,9 @@
   }
 
   function isPremium() { return plan() === 'premium'; }
-  function gatingOn() { return loadJson(GATE_KEY, false) === true; }
-  function setGating(on) { saveJson(GATE_KEY, !!on); emit(); }
+  // 7.2: Apex locks are always on. Apex = server-written premium (active + expiresAt in future).
+  function gatingOn() { return true; }
+  function setGating() { emit(); }
   function currency() { return USD_ENABLED && loadJson(CURRENCY_KEY, 'NGN') === 'USD' ? 'USD' : 'NGN'; }
   function setCurrency(c) { saveJson(CURRENCY_KEY, USD_ENABLED && c === 'USD' ? 'USD' : 'NGN'); emit(); }
 
@@ -242,9 +246,40 @@
           if (window.__cgPremiumUI && window.__cgPremiumUI.applyTheme) window.__cgPremiumUI.applyTheme();
         } catch (e) {}
       }
-      if (data.favourites && typeof data.favourites === 'object') {
-        saveJson(FAV_KEY, data.favourites);
-        document.dispatchEvent(new CustomEvent('cg:favs-changed'));
+      // Cloud sync of favourites + danger reports is an Apex feature.
+      // Free users keep everything on this phone (local still works).
+      if (serverPremium === true) {
+        var changed = false;
+        if (data.favourites && typeof data.favourites === 'object') {
+          var localF = loadJson(FAV_KEY, {}) || {};
+          var mergedF = Object.assign({}, localF, data.favourites);
+          var cust = [].concat(localF.custom || [], data.favourites.custom || []);
+          var seen = {};
+          mergedF.custom = cust.filter(function (c) {
+            var k = c && c.name + '|' + (c.coord || []).join(',');
+            if (!c || seen[k]) return false; seen[k] = true; return true;
+          }).slice(-8);
+          if (!mergedF.custom.length) delete mergedF.custom;
+          saveJson(FAV_KEY, mergedF);
+          changed = true;
+        }
+        if (Array.isArray(data.hazards)) {
+          var localH = loadJson(HAZARD_KEY, []) || [];
+          var byKey = {};
+          localH.concat(data.hazards).forEach(function (h) {
+            if (h && h.coord) byKey[(h.at || 0) + '|' + h.coord.join(',')] = h;
+          });
+          var mergedH = Object.keys(byKey).map(function (k) { return byKey[k]; })
+            .sort(function (a, b) { return (a.at || 0) - (b.at || 0); }).slice(-100);
+          saveJson(HAZARD_KEY, mergedH);
+          changed = true;
+        }
+        if (changed) {
+          document.dispatchEvent(new CustomEvent('cg:favs-changed'));
+          document.dispatchEvent(new CustomEvent('cg:hazards-changed'));
+        }
+        // upload anything that only existed on this phone
+        pushUserCloud(uid);
       }
       return data;
     }).catch(function (err) {
@@ -260,16 +295,19 @@
     if (!fb.db || !uid) return Promise.resolve(null);
     var u = currentUser() || {};
     var profile = loadJson(PROFILE_KEY, {});
-    var favs = loadJson(FAV_KEY, {});
     // Never send `premium` from the client — rules reject changes to it.
     var payload = {
       displayName: u.displayName || '',
       email: u.email || '',
       photoURL: u.photoURL || null,
       profile: profile,
-      favourites: favs,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
+    // Favourites + danger reports sync across phones only for Apex.
+    if (isPremium()) {
+      payload.favourites = loadJson(FAV_KEY, {}) || {};
+      payload.hazards = (loadJson(HAZARD_KEY, []) || []).slice(-100);
+    }
     var ref = userDoc(uid);
     return ref.set(payload, { merge: true }).then(function () {
       fb.firestoreOk = true;
@@ -602,9 +640,34 @@
   }
 
   function requiresPremium() {
-    if (!gatingOn()) return false;
-    if (isPremium()) return false;
-    return true;
+    return !isPremium();
+  }
+
+  // Smart Niyi: ask the Worker (Workers AI). Needs sign-in; the server also
+  // enforces the daily limit (free) and checks Apex from Firestore itself.
+  function niyiChat(messages, context) {
+    if (!NIYI_URL) return Promise.reject(new Error('Niyi AI not configured'));
+    if (!(fb.auth && fb.auth.currentUser)) return Promise.reject(Object.assign(new Error('signin'), { code: 'signin' }));
+    return getIdToken().then(function (token) {
+      var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var to = ctl ? setTimeout(function () { ctl.abort(); }, 15000) : null;
+      return fetch(NIYI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({ messages: messages, context: context || {} }),
+        signal: ctl ? ctl.signal : undefined
+      }).then(function (res) {
+        if (to) clearTimeout(to);
+        return res.json().catch(function () { return {}; }).then(function (body) {
+          if (!res.ok || !body.ok) {
+            var e = new Error(body.error || ('Niyi server ' + res.status));
+            e.status = res.status; e.code = body.code || ''; e.body = body;
+            throw e;
+          }
+          return body;
+        });
+      });
+    });
   }
 
   function saveProfileLocalAndCloud(profileObj) {
@@ -719,6 +782,9 @@
     },
     saveProfileLocalAndCloud: saveProfileLocalAndCloud,
     saveFavouritesLocalAndCloud: saveFavouritesLocalAndCloud,
+    NIYI_URL: NIYI_URL,
+    niyiChat: niyiChat,
+    isSignedIn: function () { return !!(fb.auth && fb.auth.currentUser); },
     getFirebase: function () { return fb; },
     deleteAccount: deleteAccount,
     tryWritePremiumField: tryWritePremiumField

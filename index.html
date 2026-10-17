@@ -254,6 +254,10 @@ body.navigating .dest-card{max-height:38%}
 .bend-item:last-child{border-bottom:0}
 .bend-tag{font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px}
 .bend-tag.mild{color:#ffd08a}.bend-tag.moderate{color:#ffb347}.bend-tag.sharp{color:#ff625c}
+.apex-upsell{margin-top:8px;background:linear-gradient(90deg,#20c47733,#ffb34733);border-color:#20c47788;color:#eafff3}
+.linkish{background:none;border:0;padding:0;color:#7fe0b0;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.niyi-msg.typing{opacity:.7;font-style:italic}
+.niyi-limit{font-size:11px;color:var(--muted);padding:2px 12px 6px;text-align:right}
 .speed-bend-banner{display:none;margin-top:6px;padding:8px 10px;border-radius:10px;background:#ff625c22;border:1px solid #ff625c66;color:#ffd0ce;font-size:12px;font-weight:700}
 .speed-bend-banner.open{display:block}
 .fav-row,.hazard-row,.emerg-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -445,7 +449,8 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <li><strong>Not a certified safety system.</strong> It is not an approved driver-assistance or navigation device, and its warnings may be missing, late, or wrong.</li>
       <li><strong>You remain responsible.</strong> Always obey traffic laws, road signs, speed limits, and actual road conditions.</li>
       <li><strong>Do not operate while driving.</strong> Set it up before your trip, or have a passenger operate it.</li>
-      <li><strong>Location privacy.</strong> Your location is processed only on your device, in your browser. Curve Guide does not store or send it anywhere.</li>
+      <li><strong>Location privacy.</strong> Your exact GPS location is processed only on your device, in your browser. Curve Guide does not store it. When you search, your search text and a rough area (about 10 km) are sent to free OpenStreetMap search services to find nearby places.</li>
+      <li><strong>Smart Niyi.</strong> When you are signed in, messages you send to Niyi are processed on Curve Guide's server (Cloudflare AI) to write a reply. Don't share passwords or card details with Niyi.</li>
       <li><strong>Map data.</strong> Maps come from OpenStreetMap contributors and may be incomplete or inaccurate.</li>
       <li><strong>No liability.</strong> Adeniyi Investments &amp; Property Ltd. accepts no liability for any accident, injury, loss, or damage arising from use of Curve Guide. You use it at your own risk.</li>
       <li><strong>Changes.</strong> These terms may be updated at any time; continued use means you accept the current terms.</li>
@@ -537,7 +542,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
           <p class="dest-meta" id="destMeta"></p>
           <div class="dest-actions">
             <button type="button" class="btn primary" id="destRoute">Route</button>
-            <button type="button" class="btn primary" id="destNavStart" data-pro-feature="voice navigation">Start navigation</button>
+            <button type="button" class="btn primary" id="destNavStart">Start navigation</button>
             <button type="button" class="btn" id="destNavStop" hidden>Stop navigation</button>
             <button type="button" class="btn" id="destClear">Clear</button>
           </div>
@@ -547,9 +552,9 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
           </details>
           <div class="bend-list" id="bendList" hidden></div>
           <div class="speed-bend-banner" id="speedBendBanner" role="alert">Slow down — sharp bend ahead</div>
-          <div class="small" id="favHint" style="margin-top:8px">Favourites (Home/School/Work) are saved on this phone only.</div><div class="fav-row" id="favRow" data-pro-feature="favourites"></div>
+          <div class="small" id="favHint" style="margin-top:8px">Favourites (Home/School/Work) are saved on this phone.</div><div class="fav-row" id="favRow"></div>
           <div class="hazard-row">
-            <button type="button" class="btn" id="reportHazard" data-pro-feature="danger reports">Report danger spot</button>
+            <button type="button" class="btn" id="reportHazard">Report danger spot</button>
           </div>
           <p class="dest-note">Routing by OpenStreetMap/OSRM demo — free test service, may be slow or unavailable. Voice uses your browser speechSynthesis (prototype guidance, not a certified navigation system).</p>
         </div>
@@ -588,7 +593,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
             <div class="section-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h8"/></svg>Route &amp; map data</div>
             <span class="small" id="routeState">No route yet</span>
           </div>
-          <div class="small" style="line-height:1.6;margin-top:9px">The map uses community map data. Destination search uses Nominatim; driving routes use the public OSRM demo. Road geometry, routes, and curve estimates may be incomplete or inaccurate.</div>
+          <div class="small" style="line-height:1.6;margin-top:9px">The map uses community map data. Destination search uses Nominatim and Photon (OpenStreetMap data); driving routes use the public OSRM demo. Road geometry, routes, and curve estimates may be incomplete or inaccurate.</div>
           <div class="actions">
             <button class="btn" id="recenter">Reset view</button>
             <button class="btn" id="clearRoute">Clear route</button>
@@ -633,7 +638,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
   <div class="niyi-head">
     <div class="niyi-head-title">
       <strong id="niyiTitle">Niyi · Curve Guide helper</strong>
-      <span>Simple prototype helper — keyword answers, not a smart AI.</span>
+      <span id="niyiSubtitle">Smart AI helper when you're signed in · keyword helper offline.</span>
     </div>
     <div class="niyi-head-actions">
       <button type="button" class="niyi-icon" id="niyiSpeak" aria-pressed="false" title="Read answers aloud" aria-label="Read answers aloud">🔊</button>
@@ -648,7 +653,8 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
     <input class="niyi-input" id="niyiInput" type="text" maxlength="240" placeholder="Ask about Curve Guide…" aria-label="Message to Niyi">
     <button class="niyi-send" id="niyiSend" type="submit">Send</button>
   </form>
-  <p class="niyi-mic-note" id="niyiMicNote" hidden>Mic turns speech into text for Niyi's keyword helper — not a smart AI. Nothing is uploaded by Curve Guide.</p>
+  <div class="niyi-limit" id="niyiLimit" hidden></div>
+  <p class="niyi-mic-note" id="niyiMicNote" hidden>Mic turns your speech into text using your browser. When you're signed in, Niyi's smart answers are made on Curve Guide's server (Cloudflare AI), so don't share passwords or card details.</p>
 </div>
 
 <!-- Account menu -->
@@ -726,8 +732,8 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <p class="why-disclaimer">Curve Guide is a driving aid in early development. It can't prevent crashes. Always obey road signs and drive at a safe speed.</p>
     </section>
     <div class="compare">
-      <div class="col"><h3>Free</h3><ul><li>Map &amp; GPS curve awareness</li><li>Search &amp; basic routing</li><li>Local favourites on this device</li><li>Niyi keyword helper (limits in future)</li></ul></div>
-      <div class="col"><h3>Apex</h3><ul><li>Everything in Free</li><li>Voice guidance</li><li>Bend speed alerts</li><li>Synced favourites &amp; hazards</li><li>Priority Niyi</li></ul></div>
+      <div class="col"><h3>Free</h3><ul><li>Map &amp; live GPS curve alert</li><li>Bend dots + on-screen slow-down alert</li><li>Search, routing &amp; on-screen directions</li><li>Favourites &amp; reports on this phone</li><li>Niyi: 10 chats a day</li></ul></div>
+      <div class="col"><h3>Apex</h3><ul><li>Everything in Free</li><li>Spoken turn-by-turn voice</li><li>Bends-ahead list, safe-speed tips &amp; spoken bend warnings</li><li>Favourites &amp; reports synced across phones</li><li>Unlimited smart Niyi</li></ul></div>
     </div>
     <div class="currency-switch" role="group" aria-label="Currency">
       <span class="ngn-only-note">Prices in Naira (₦). Visa/Mastercard cards from outside Nigeria can still pay in ₦; your bank converts the amount.</span>
@@ -1150,6 +1156,15 @@ syncResetBtn();
 $('mapType').addEventListener('click',function(){setSatellite(!satellite)});
 $('clearRoute').addEventListener('click',clearRoute);
 window.addEventListener('beforeunload',function(){if(watchId!==null)navigator.geolocation.clearWatch(watchId)});
+/* 7.2 Apex helpers: Apex comes only from the server-written premium field (auth.js). */
+function cgApex(){try{return !!(window.__cgAuth&&window.__cgAuth.isPremium())}catch(e){return false}}
+function cgApexPrompt(f,m){try{if(window.__cgPremiumUI&&window.__cgPremiumUI.apexPrompt)window.__cgPremiumUI.apexPrompt(f,m)}catch(e){}}
+function cgApexLink(label,feature){
+  var b=document.createElement('button');b.type='button';b.className='btn sm apex-upsell';b.textContent='✨ '+label;
+  b.addEventListener('click',function(){cgApexPrompt(feature)});return b;
+}
+window.__cgGeoSearch=function(q){return geoSearch(q)};
+window.__cgParseCoords=function(q){return parseCoordQuery(q)};
 window.__cgIsDriving=function(){
   if(watchId===null||!current)return false;
   var s=current.coords.speed;
@@ -1166,7 +1181,7 @@ window.__cgApi={
   startNavigation:startNavigation,stopNavigation:stopNavigation,
   isNavigating:function(){return navigating},
   setNavVoice:setNavVoice,getNavVoice:function(){return navVoiceOn},
-  searchNominatim:searchNominatim,showResults:showResults,
+  searchNominatim:searchNominatim,showResults:showResults,geoSearch:function(q){return geoSearch(q)},
   getDestination:function(){return destination},
   injectPos:function(lon,lat,o){
     o=o||{};
@@ -1228,31 +1243,108 @@ function showResults(items){
   });
   box.hidden=false;
 }
+/* 7.2 search: Nominatim (Nigeria + near-you bias) → Photon → simplified street → worldwide.
+   Also accepts pasted coordinates or a Google Maps link with coordinates.
+   All free, no API key. Google results are NOT used inside the app (Google's terms
+   don't allow Google place data on a non-Google map); we only link out to Google Maps. */
+var lastNomAt=0;
+function nomFetch(url){
+  var wait=Math.max(0,lastNomAt+1100-Date.now()); // Nominatim policy: max 1 request/second
+  lastNomAt=Date.now()+wait;
+  return new Promise(function(r){setTimeout(r,wait)}).then(function(){
+    return fetch(url,{headers:{'Accept':'application/json'}});
+  }).then(function(res){
+    if(res.status===429)throw new Error('rate');
+    if(!res.ok)throw new Error('http');
+    return res.json();
+  });
+}
+function inNigeria(c){return c&&c[1]>3.8&&c[1]<14.2&&c[0]>2.4&&c[0]<15}
+function parseCoordQuery(q){
+  var s=String(q||'');
+  var m=s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||s.match(/(-?\d{1,2}\.\d{3,})\s*[, ]\s*(-?\d{1,3}\.\d{3,})/);
+  if(!m)return null;
+  var lat=parseFloat(m[1]),lon=parseFloat(m[2]);
+  if(!(Math.abs(lat)<=90&&Math.abs(lon)<=180))return null;
+  return {name:'Pinned spot '+lat.toFixed(5)+', '+lon.toFixed(5),subtitle:'From the coordinates you pasted',coord:[lon,lat]};
+}
+function simplifyPlaceQuery(q){
+  var s=String(q||'').toLowerCase();
+  var parts=s.split(',').map(function(x){return x.trim()}).filter(Boolean);
+  var streetRe=/\b(street|st|road|rd|avenue|ave|close|crescent|way|drive|lane)\b/;
+  var pick=parts.filter(function(x){return streetRe.test(x)})[0]||s;
+  pick=pick.replace(/\b(plot|no\.?|number|house|block|flat|apartment)\s*\d+[a-z]?\b/g,' ')
+           .replace(/^\s*\d+[a-z]?\s+/,' ')
+           .replace(/\b[a-z]+\s+estate\b/g,' ').replace(/\bestate\b/g,' ')
+           .replace(/\s+/g,' ').trim();
+  return pick&&pick!==s.trim()?pick:null;
+}
+function nomParse(list,tag){
+  return (list||[]).map(function(r){
+    var name=r.namedetails&&r.namedetails.name?r.namedetails.name:(r.display_name||'').split(',')[0];
+    return {name:name||r.display_name, subtitle:(tag?tag+' · ':'')+r.display_name, coord:[parseFloat(r.lon),parseFloat(r.lat)]};
+  }).filter(function(x){return Number.isFinite(x.coord[0])&&Number.isFinite(x.coord[1])});
+}
+function photonParse(data,preferNg){
+  var feats=(data&&data.features)||[];
+  if(preferNg)feats=feats.filter(function(f){return (f.properties||{}).countrycode==='NG'});
+  return feats.map(function(f){
+    var p=f.properties||{},c=f.geometry&&f.geometry.coordinates;
+    var sub=[p.street,p.district||p.locality,p.city||p.county,p.state,p.country].filter(Boolean).join(', ');
+    return {name:p.name||p.street||'Place',subtitle:sub,coord:c?[c[0],c[1]]:[NaN,NaN]};
+  }).filter(function(x){return Number.isFinite(x.coord[0])&&Number.isFinite(x.coord[1])}).slice(0,5);
+}
+function geoSearch(q){
+  var pinned=parseCoordQuery(q);
+  if(pinned)return Promise.resolve({items:[pinned],source:'coords'});
+  var o0=originLonLat(), ng=inNigeria(o0);
+  // Only a rough area (~10 km, 1 decimal place) is sent to the search services, never exact GPS.
+  var o=[Math.round(o0[0]*10)/10, Math.round(o0[1]*10)/10];
+  var base='https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=0&limit=5&accept-language=en&q=';
+  var bias='&viewbox='+(o[0]-0.6).toFixed(3)+','+(o[1]+0.6).toFixed(3)+','+(o[0]+0.6).toFixed(3)+','+(o[1]-0.6).toFixed(3);
+  var simple=simplifyPlaceQuery(q);
+  return nomFetch(base+encodeURIComponent(q)+'&countrycodes=ng'+bias).then(function(d){
+    var items=nomParse(d);
+    if(items.length)return {items:items,source:'nominatim'};
+    return fetch('https://photon.komoot.io/api/?limit=8&lang=en&lat='+o[1].toFixed(1)+'&lon='+o[0].toFixed(1)+'&q='+encodeURIComponent(q))
+      .then(function(r){if(!r.ok)throw new Error('http');return r.json()})
+      .then(function(pd){return photonParse(pd,ng)}).catch(function(){return []})
+      .then(function(pi){
+        if(pi.length)return {items:pi,source:'photon'};
+        if(!simple)return null;
+        return nomFetch(base+encodeURIComponent(simple)+'&countrycodes=ng'+bias).then(function(sd){
+          var si=nomParse(sd,'Close match: street').sort(function(x,y){return distance(o0,x.coord)-distance(o0,y.coord)});
+          return si.length?{items:si,source:'simplified',simple:simple}:null;
+        });
+      }).then(function(res){
+        if(res)return res;
+        return nomFetch(base+encodeURIComponent(q)+bias).then(function(gd){return {items:nomParse(gd),source:'world'}});
+      });
+  });
+}
+function googleMapsLink(q){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)}
+function showNoResults(q,box){
+  box.textContent='';
+  var d=document.createElement('div');d.className='dest-result';d.style.cursor='default';
+  d.appendChild(document.createTextNode('Not on our free map yet. '));
+  var tip=document.createElement('small');
+  tip.textContent='Tip: in Google Maps, long-press the exact spot, copy the numbers (like 6.5982, 3.2765) and paste them here. Or long-press our map to drop a pin.';
+  var a=document.createElement('a');a.href=googleMapsLink(q);a.target='_blank';a.rel='noopener';a.className='linkish';a.textContent='Find it in Google Maps ↗';
+  d.appendChild(a);d.appendChild(tip);box.appendChild(d);box.hidden=false;
+}
 function searchNominatim(q){
   var seq=++searchSeq;
-  var base='https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=0&limit=5&accept-language=en&q=';
-  function parse(list){
-    return (list||[]).map(function(r){
-      var name=r.namedetails&&r.namedetails.name?r.namedetails.name:(r.display_name||'').split(',')[0];
-      return {name:name||r.display_name, subtitle:r.display_name, coord:[parseFloat(r.lon),parseFloat(r.lat)]};
-    }).filter(function(x){return Number.isFinite(x.coord[0])&&Number.isFinite(x.coord[1])});
-  }
-  function fetchUrl(url,isFallback){
-    return fetch(url,{headers:{'Accept':'application/json'}}).then(function(res){
-      if(res.status===429)throw new Error('rate');
-      if(!res.ok)throw new Error('http');
-      return res.json();
-    }).then(function(data){
-      if(seq!==searchSeq)return;
-      var items=parse(data);
-      if(!items.length&&!isFallback){
-        return fetchUrl(base+encodeURIComponent(q),true);
-      }
-      showResults(items);
-    });
-  }
-  var ngUrl=base+encodeURIComponent(q)+'&countrycodes=ng';
-  fetchUrl(ngUrl,false).catch(function(err){
+  geoSearch(q).then(function(res){
+    if(seq!==searchSeq)return;
+    if(!res.items.length){var box=$('destResults');if(box)showNoResults(q,box);return}
+    showResults(res.items);
+    if(res.source==='simplified'){
+      var box2=$('destResults');
+      if(box2){var n=document.createElement('div');n.className='dest-result';n.style.cursor='default';
+        var sm=document.createElement('small');sm.textContent='The exact estate/house isn\u2019t on the free map yet, so these are streets called “'+res.simple+'”. Pick the one in your area, then long-press the map to fine-tune.';
+        n.appendChild(sm);box2.insertBefore(n,box2.firstChild)}
+    }
+  }).catch(function(err){
     if(seq!==searchSeq)return;
     var box=$('destResults');if(!box)return;
     box.textContent='';
@@ -1451,6 +1543,10 @@ function loadHazards(){
 }
 function saveHazards(list){
   try{localStorage.setItem(HAZARD_KEY,JSON.stringify(list.slice(-100)))}catch(e){}
+  cgCloudSync();
+}
+function cgCloudSync(){ // Apex only: sync favourites + reports across phones
+  try{if(cgApex()&&window.__cgAuth&&window.__cgAuth.syncNow)window.__cgAuth.syncNow()}catch(e){}
 }
 function paintHazards(){
   if(!ready||!map||!map.getSource('hazards'))return;
@@ -1464,8 +1560,13 @@ function reportHazardAt(coord,type){
   var list=loadHazards();
   list.push({coord:coord,type:type||'danger',note:'',at:Date.now()});
   saveHazards(list);paintHazards();
-  setWarning('Danger spot saved on this phone only — sharing with other drivers coming later.','warn');
-  setStatus('Danger spot saved (this device)','good');
+  if(cgApex()){
+    setWarning('Danger spot saved and synced to your account (Apex). Sharing with other drivers is coming later.','warn');
+    setStatus('Danger spot saved · synced','good');
+  }else{
+    setWarning('Danger spot saved on this phone. Apex syncs your reports across phones.','warn');
+    setStatus('Danger spot saved (this phone)','good');
+  }
 }
 function bindHazardUi(){
   var btn=$('reportHazard');
@@ -1492,7 +1593,16 @@ var FAV_KEY='curveGuide.favourites';
 function loadFavs(){
   try{var raw=localStorage.getItem(FAV_KEY);var o=raw?JSON.parse(raw):{};return o&&typeof o==='object'?o:{}}catch(e){return {}}
 }
-function saveFavs(o){try{localStorage.setItem(FAV_KEY,JSON.stringify(o))}catch(e){}}
+function saveFavs(o){try{localStorage.setItem(FAV_KEY,JSON.stringify(o))}catch(e){}cgCloudSync()}
+function renderFavHint(){
+  var h=$('favHint');if(!h)return;
+  h.textContent='';
+  if(cgApex()){h.textContent='☁️ Favourites sync across your phones (Apex).';return}
+  h.appendChild(document.createTextNode('Favourites are saved on this phone. '));
+  var a=document.createElement('button');a.type='button';a.className='linkish';a.textContent='Sync across phones with Apex';
+  a.addEventListener('click',function(){cgApexPrompt('cloud sync')});
+  h.appendChild(a);
+}
 function renderFavRow(){window.__cgRefreshFavs=renderFavRow;
   var row=$('favRow'); if(!row)return;
   row.textContent='';
@@ -1508,7 +1618,7 @@ function renderFavRow(){window.__cgRefreshFavs=renderFavRow;
       favs=loadFavs();
       favs[key]={name:destination.name,coord:destination.coord};
       saveFavs(favs); renderFavRow();
-      setStatus(label+' saved on this phone','good');
+      setStatus(label+(cgApex()?' saved · synced':' saved on this phone'),'good');
     });
     row.appendChild(b);
   });
@@ -1597,9 +1707,21 @@ function paintBends(){
   });
   map.getSource('bends').setData({type:'FeatureCollection',features:feats});
 }
+function bendTeaser(el){
+  el.hidden=false; el.textContent='';
+  var sharp=routeBends.filter(function(b){return b.sharpness!=='mild'}).length;
+  var t=document.createElement('strong');
+  t.textContent=routeBends.length+' bend'+(routeBends.length===1?'':'s')+' marked on the map'+(sharp?' ('+sharp+' sharp or moderate)':'');
+  el.appendChild(t);
+  var d=document.createElement('div');d.className='small';
+  d.textContent='You still get the on-screen slow-down alert. Apex adds the bends-ahead list with distances, suggested safe speeds and spoken bend warnings.';
+  el.appendChild(d);
+  el.appendChild(cgApexLink('Unlock bend alerts with Apex','bend alerts'));
+}
 function renderBendList(){
   var el=$('bendList'); if(!el)return;
   if(!routeBends.length){el.hidden=true;el.textContent='';return}
+  if(!cgApex()){bendTeaser(el);return}
   el.hidden=false; el.textContent='';
   var title=document.createElement('strong');
   title.textContent='Upcoming bends on route (from geometry · estimate)';
@@ -1624,6 +1746,7 @@ function safeSpeedKmh(radius){
 }
 function updateBendListFromPos(coord){
   var el=$('bendList'); if(!el||!routeBends.length)return;
+  if(!cgApex()){if(el.hidden||!el.querySelector('.apex-upsell'))bendTeaser(el);return}
   // rewrite with distance from current
   el.hidden=false; el.textContent='';
   var title=document.createElement('strong');
@@ -1664,7 +1787,10 @@ function checkBendSpeedWarning(pos){
   if(!hit){if(banner)banner.classList.remove('open');return}
   if(banner){
     banner.classList.add('open');
-    banner.textContent='Slow down, sharp bend in '+fmtNearDist(hit.d)+' (suggest ≤'+Math.round(hit.lim)+' km/h · estimate)';
+    // Free: basic visual alert (core safety). Apex: adds the suggested safe speed.
+    banner.textContent=cgApex()
+      ?'Slow down, sharp bend in '+fmtNearDist(hit.d)+' (suggest ≤'+Math.round(hit.lim)+' km/h · estimate)'
+      :'Slow down, sharp bend in '+fmtNearDist(hit.d)+' (estimate)';
   }
   var key=Math.round(hit.bend.along)+':'+hit.bend.sharpness;
   var now=Date.now();
@@ -1715,6 +1841,7 @@ function pickVoice(){
 }
 function navSpeak(text){
   if(!navigating||!navVoiceOn||!window.speechSynthesis||!text)return;
+  if(!cgApex())return; // spoken guidance is Apex; on-screen banner stays free
   try{
     speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(text);
@@ -1727,6 +1854,7 @@ function updateMuteUi(){
   var b=$('navMuteBtn'),d=$('destMute');
   var label=navVoiceOn?'Mute voice':'Unmute voice';
   var icon=navVoiceOn?'🔊':'🔇';
+  if(!cgApex()){label='Voice guidance is an Apex feature';icon='🔇'}
   if(b){b.textContent=icon;b.setAttribute('aria-pressed',navVoiceOn?'false':'true');b.title=label}
 }
 function setNavVoice(on){
@@ -1989,7 +2117,7 @@ function onNavPosition(pos){
 function startNavigation(){
   if(!destination){setWarning('Pick a destination first.','warn');return}
   unlockSpeech();
-  setNavVoice(true); // voice on by default when navigation starts
+  if(cgApex())setNavVoice(true); // voice on by default when navigation starts (Apex)
   function begin(){
     if(!destination.steps||!destination.steps.length){
       setWarning('Getting a route before navigation…','warn');
@@ -2011,7 +2139,7 @@ function startNavigation(){
     var step=destination.steps[0];
     updateNavBanner(destination.steps[0]&&destination.steps[0].distance||0, step);
     setStatus('Navigation started','good');
-    setWarning('Prototype guidance. Always obey road signs and drive carefully. Curve warnings remain estimates only.','warn');
+    setWarning(cgApex()?'Prototype guidance. Always obey road signs and drive carefully. Curve warnings remain estimates only.':'On-screen directions are on. Spoken voice directions are an Apex feature (tap 🔇 to upgrade). Prototype guidance: always obey road signs.','warn');
     navSpeak('Starting navigation to '+(destination.name||'your destination'));
     if(current)onNavPosition(current);
   }
@@ -2100,6 +2228,19 @@ function bindMapDestinationGestures(){
 }
 bindDestinationUi();
 document.addEventListener('cg:favs-changed',function(){try{renderFavRow()}catch(e){}});
+document.addEventListener('cg:hazards-changed',function(){try{paintHazards()}catch(e){}});
+(function bindApexState(){
+  function refresh(){
+    try{renderFavHint()}catch(e){}
+    try{updateMuteUi()}catch(e){}
+    try{if(routeBends.length)renderBendList()}catch(e){}
+  }
+  function attach(){
+    if(window.__cgAuth&&window.__cgAuth.onChange){window.__cgAuth.onChange(refresh);refresh();return true}
+    return false;
+  }
+  if(!attach())setTimeout(attach,800);
+})();
 bindFocusUi();
 
 setText('unit','Units: '+(useMph?'mph':'km/h'));
@@ -2352,7 +2493,7 @@ function doPageAction(t){
   if(/\b(report|danger spot|pothole|hazard)\b/.test(t)){
     var coord=null;
     // use report via API with GPS if any — prompt type
-    return confirm('Use Report danger spot on the destination card. Spots are saved on this phone only — sharing with other drivers coming later.');
+    return confirm('Use Report danger spot on the destination card. Spots save on this phone; Apex syncs them across your phones. Sharing with other drivers is coming later.');
   }
   if(/\b(offline|install|pwa|home screen)\b/.test(t)){
     return 'Curve Guide can cache its shell for offline use (map tiles still need network). On supported browsers tap Install; on iPhone use Share → Add to Home Screen.';
@@ -2381,13 +2522,13 @@ function explainButton(t){
     'clear':'Clear removes the destination pin and driving route.',
     'clear route':'Clear route removes the green GPS trail you have driven.',
     'premium':'Apex: ₦450 for 1 month or ₦3,780 for 1 year (save 30%). One-time Paystack payment, no auto-renew.',
-    'apex':'Apex is the paid Curve Guide plan: voice nav, bend alerts, synced favourites/hazards, and priority Niyi.',
+    'apex':'Apex is the paid Curve Guide plan: spoken voice navigation, advanced bend alerts, favourites/reports synced across phones, and unlimited smart Niyi.',
     'sign in':'Sign in opens the account screen. Firebase Auth is configured for Google and email/password.',
     'profile':'Profile stores your car icon, theme, car details and saved places, synced to your account when signed in.',
     'recenter':'Reset view (or say reset map) turns follow back on and flies to your GPS position, or Lagos if GPS is off.',
     'reset map':'Reset view turns follow back on and restores the camera (GPS or default start view).',
-    'ask niyi':'Ask Niyi opens this helper. I match keywords and can tap a few page controls — I am not a smart AI.',
-    'niyi':'Ask Niyi opens this helper. I match keywords and can tap a few page controls — I am not a smart AI.'
+    'ask niyi':'Ask Niyi opens this helper. Signed in, I answer with smart AI and can control the map; offline I use simple keywords.',
+    'niyi':'Ask Niyi opens this helper. Signed in, I answer with smart AI and can control the map; offline I use simple keywords.'
   };
   for(var k in map){if(x.indexOf(k)>=0)return map[k]}
   return 'I am not sure about “'+m[1]+'”. Try asking about Start GPS, Units, Sat, 3D, Route, or Start navigation.';
@@ -2396,29 +2537,19 @@ function searchPlaceInChat(place){
   var A=api();
   if(!A){addMsg('Map tools are not ready yet.','bot');return}
   addMsg('Searching for “'+place+'”…','bot');
-  var base='https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=0&limit=5&accept-language=en&q=';
-  function parse(list){
-    return (list||[]).map(function(r){
-      var name=(r.display_name||'').split(',')[0];
-      return {name:name||r.display_name, subtitle:r.display_name, coord:[parseFloat(r.lon),parseFloat(r.lat)]};
-    }).filter(function(x){return Number.isFinite(x.coord[0])&&Number.isFinite(x.coord[1])});
-  }
-  function show(items){
-    if(!items.length){addMsg('No places found for “'+place+'”. Try a clearer name.','bot');return}
-    var actions=items.map(function(it){
-      return {label:it.name, onClick:function(){pickPlace(it)}};
-    });
-    addBotRich('Pick a place (top Nominatim results):', actions);
-  }
-  fetch(base+encodeURIComponent(place)+'&countrycodes=ng',{headers:{'Accept':'application/json'}})
-    .then(function(r){if(!r.ok)throw new Error('http');return r.json()})
-    .then(function(data){
-      var items=parse(data);
-      if(items.length)return show(items);
-      return fetch(base+encodeURIComponent(place),{headers:{'Accept':'application/json'}})
-        .then(function(r2){return r2.json()}).then(function(d2){show(parse(d2))});
-    })
-    .catch(function(){addMsg('Search failed. Check your connection and try again.','bot')});
+  var gs=window.__cgGeoSearch;
+  if(!gs){addMsg('Search is not ready yet.','bot');return}
+  gs(place).then(function(res){
+    var items=res.items||[];
+    if(!items.length){
+      addBotRich('“'+place+'” isn\u2019t on our free map yet. You can find it in Google Maps, long-press the spot, copy the numbers (like 6.5982, 3.2765) and send them to me.',[
+        {label:'Open Google Maps',href:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place),external:true}
+      ]);
+      return;
+    }
+    var actions=items.map(function(it){return {label:it.name+(it.subtitle?' — '+String(it.subtitle).split(',').slice(1,3).join(',').trim():''), onClick:function(){pickPlace(it)}}});
+    addBotRich(res.source==='simplified'?('The exact place isn\u2019t on the free map yet. Closest streets called “'+res.simple+'”:'):'Pick a place:', actions);
+  }).catch(function(){addMsg('Search failed. Check your connection and try again.','bot')});
 }
 function pickPlace(it){
   var A=api();if(!A)return;
@@ -2454,14 +2585,14 @@ function answer(q){
   if(/satellit|3d|2d|map type|aerial|street/.test(t))
     return 'Say “satellite”, “street map”, “3D on”, or “3D off” — or use the map buttons. Views do not change curve estimates.';
   if(/how (does|do)|work|estimat|curve|heading|detect|what is curve guide/.test(t))
-    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Version 7.1 adds free search, OSRM routing, voice navigation, bend estimates, favourites, and more — still a prototype aid only.';
+    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Curve Guide adds free search, OSRM routing, voice navigation, bend estimates, favourites, and more — still a prototype aid only.';
   if(/tip|advice|safe|prevent|brake|tyre|tire|seatbelt|distance|headlight|fatigue/.test(t)){
     var tip=tips[tipI%tips.length];
     tipI++;
     return tip+' (Ask for another safety tip anytime.)';
   }
   if(/hello|hi\b|hey|good (morning|afternoon|evening)/.test(t))
-    return "Hi! I'm Niyi for Curve Guide 7.1 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
+    return "Hi! I'm Niyi for Curve Guide. Try a chip, say “go to …”, or “start GPS”.";
   return "I'm still learning — I match simple keywords and a few page actions. Try: go to …, start GPS, satellite, Contact us, or Navigation.";
 }
 function refreshDriveNote(){
@@ -2483,6 +2614,7 @@ function openPanel(){
     renderChips();
   }
   refreshDriveNote();
+  updateNiyiLimit();
   if(!input.disabled)input.focus();
 }
 function closePanel(){
@@ -2507,25 +2639,130 @@ function ask(text){
   ask._fromVoice=false;
   addMsg(q,'user');
   var t=q.toLowerCase().trim();
-  if(/contact|phone|email|call|whatsapp|reach|help me contact|contact us/.test(t)){
+  if(/\b(contact|whatsapp)\b|\b(your|the|company|adeniyi)('s)? (phone|email|number)\b|\b(call|reach|email) (you|adeniyi|curve guide|the company|support)\b/.test(t)){
     var msg='You can reach Adeniyi Investments & Property Ltd. Tap a button below.';
     addBotRich(msg, contactActions());
     speak(msg);
     renderChips();
     return;
   }
+  if(window.__cgParseCoords&&window.__cgParseCoords(q)){searchPlaceInChat(q);renderChips();return}
   var place=extractPlace(q);
   if(place&&place.length>=2){
     searchPlaceInChat(place);
     renderChips();
     return;
   }
-  var acted=doPageAction(t);
-  if(acted){renderChips();return}
-  var a=answer(q);
-  addMsg(a,'bot');
-  speak(a);
-  renderChips();
+  // App commands (map views, units, GPS, navigation, emergency…) are instant and never count.
+  // Longer sentences go to smart Niyi first (it can do several actions at once); urgent ones stay local.
+  var urgent=/\b(emergency|sos|112|crash|accident|stop nav(igation)?|end navigation|mute)\b/.test(t);
+  var longAsk=t.split(/\s+/).length>4;
+  if(urgent||!longAsk||!aiAvailable()){
+    var acted=doPageAction(t);
+    if(acted){renderChips();return}
+  }
+  chatAnswer(q);
+}
+function aiAvailable(){var Au=window.__cgAuth;return !!(Au&&Au.niyiChat&&Au.isSignedIn&&Au.isSignedIn()&&navigator.onLine!==false)}
+
+/* 7.2 Smart Niyi: Cloudflare Workers AI via the Curve Guide Worker (no AI key in the browser).
+   Free: NIYI_FREE_LIMIT chats per day (counted here + enforced on the server). Apex: unlimited (fair use). */
+var NIYI_FREE_LIMIT=10, NIYI_USAGE_KEY='curveGuide.niyiUsage', aiHistory=[], aiBusy=false, aiSigninHinted=false;
+function isApexNow(){try{return !!(window.__cgAuth&&window.__cgAuth.isPremium())}catch(e){return false}}
+function todayKey(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function niyiUsed(){try{var u=JSON.parse(localStorage.getItem(NIYI_USAGE_KEY)||'{}');return u.day===todayKey()?(u.n||0):0}catch(e){return 0}}
+function niyiCount(n){try{localStorage.setItem(NIYI_USAGE_KEY,JSON.stringify({day:todayKey(),n:typeof n==='number'?n:niyiUsed()+1}))}catch(e){}updateNiyiLimit()}
+function updateNiyiLimit(){
+  var el=document.getElementById('niyiLimit');if(!el)return;
+  if(isApexNow()){el.hidden=false;el.textContent='Apex · unlimited Niyi';return}
+  var left=Math.max(0,NIYI_FREE_LIMIT-niyiUsed());
+  el.hidden=false;el.textContent='Free plan · '+left+' of '+NIYI_FREE_LIMIT+' Niyi chats left today';
+}
+function showNiyiLimit(){
+  var msg='You\u2019ve used your '+NIYI_FREE_LIMIT+' free Niyi chats for today. They reset tomorrow, or get unlimited smart Niyi with Apex. App commands like “go to …”, “satellite” or “stop navigation” still work.';
+  addBotRich(msg,[{label:'✨ Upgrade to Apex',onClick:function(){if(window.__cgPremiumUI&&window.__cgPremiumUI.apexPrompt)window.__cgPremiumUI.apexPrompt('niyi')}}]);
+  speak(msg);renderChips();
+}
+function appContext(){
+  var A=api()||{};var d=A.getDestination&&A.getDestination();
+  return {
+    driving:!!(typeof window.__cgIsDriving==='function'&&window.__cgIsDriving()),
+    navigating:!!(A.isNavigating&&A.isNavigating()),
+    destination:d?String(d.name||'').slice(0,80):'',
+    units:A.getUseMph&&A.getUseMph()?'mph':'kmh',
+    satellite:!!(A.getSatellite&&A.getSatellite()),
+    night:!!(A.getNightMode&&A.getNightMode()),
+    favourites:Object.keys((A.loadFavs&&A.loadFavs())||{}).filter(function(k){return k!=='custom'})
+  };
+}
+function runAiActions(actions){
+  var A=api();if(!A||!Array.isArray(actions))return;
+  actions.slice(0,3).forEach(function(a){
+    if(!a||typeof a!=='object')return;
+    try{
+      switch(a.type){
+        case 'set_destination': if(a.query)searchPlaceInChat(String(a.query).slice(0,120)); break;
+        case 'go_favourite': if(/^(home|school|work)$/.test(a.name))A.goFavourite(a.name).catch(function(){addMsg('No '+a.name+' saved yet. Set a destination, then tap Save '+a.name+'.','bot')}); break;
+        case 'map_view': if(a.view==='satellite')A.setSatellite(true); else if(a.view==='street')A.setSatellite(false); break;
+        case 'night_mode': A.setNightMode(!!a.on); break;
+        case 'tilt_3d': A.setTilt3d(!!a.on); break;
+        case 'units': A.setUnitsMph(a.units==='mph'); break;
+        case 'start_nav': A.startNavigation(); break;
+        case 'stop_nav': A.stopNavigation(); break;
+        case 'start_gps': A.startGps(); break;
+        case 'stop_gps': A.stopGps(); break;
+        case 'voice': A.setNavVoice(!!a.on); break;
+        case 'focus_mode': A.setFocusMode(!!a.on); break;
+        case 'reset_view': if(A.resetMapView)A.resetMapView(); break;
+        case 'clear_destination': A.clearDestination(); break;
+        case 'open':
+          if(a.screen==='apex'&&window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
+          else if(a.screen==='profile'&&window.__cgPremiumUI)window.__cgPremiumUI.showProfile();
+          else if(a.screen==='signin'&&window.__cgPremiumUI)window.__cgPremiumUI.showAuth('signin');
+          else if(a.screen==='emergency'&&typeof window.__cgOpenEmergency==='function')window.__cgOpenEmergency();
+          else if(a.screen==='contact')addBotRich('Contact Adeniyi Investments & Property Ltd.:',contactActions());
+          break;
+      }
+    }catch(e){}
+  });
+}
+function keywordAnswer(q){var a=answer(q);addMsg(a,'bot');speak(a);renderChips()}
+function chatAnswer(q){
+  var apex=isApexNow();
+  var t=String(q).toLowerCase().trim();
+  if(!apex&&niyiUsed()>=NIYI_FREE_LIMIT){if(doPageAction(t)){renderChips();return}showNiyiLimit();return}
+  var Au=window.__cgAuth;
+  var canAi=aiAvailable();
+  if(!canAi||aiBusy){
+    if(doPageAction(t)){renderChips();return}
+    if(!apex)niyiCount();
+    keywordAnswer(q);
+    if(!aiSigninHinted&&Au&&Au.isSignedIn&&!Au.isSignedIn()){
+      aiSigninHinted=true;
+      addBotRich('Sign in to chat with smart Niyi (AI). Right now I\u2019m using simple keyword answers.',[{label:'Sign in',onClick:function(){if(window.__cgPremiumUI)window.__cgPremiumUI.showAuth('signin')}}]);
+    }
+    return;
+  }
+  aiBusy=true;
+  var typing=addMsg('Niyi is thinking…','bot');typing.classList.add('typing');
+  aiHistory.push({role:'user',content:q.slice(0,500)});
+  aiHistory=aiHistory.slice(-8);
+  Au.niyiChat(aiHistory,appContext()).then(function(res){
+    typing.remove();
+    var reply=String(res.reply||'').trim()||'Okay.';
+    aiHistory.push({role:'assistant',content:reply.slice(0,600)});
+    addMsg(reply,'bot');speak(reply);
+    runAiActions(res.actions);
+    if(!apex)niyiCount(typeof res.used==='number'?res.used:undefined);
+    renderChips();
+  }).catch(function(err){
+    typing.remove();
+    aiHistory.pop();
+    if(err&&err.code==='limit'){niyiCount(NIYI_FREE_LIMIT);if(doPageAction(t)){renderChips();return}showNiyiLimit();return}
+    if(doPageAction(t)){renderChips();return}
+    if(!apex)niyiCount();
+    keywordAnswer(q);
+  }).then(function(){aiBusy=false});
 }
 var micBtn=document.getElementById('niyiMic');
 var micNote=document.getElementById('niyiMicNote');

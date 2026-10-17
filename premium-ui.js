@@ -218,6 +218,7 @@
   function showPremium() {
     closeOverlay('accountMenu');
     openOverlay('premiumScreen');
+    var gt = $('premiumGateTip'); if (gt) gt.hidden = true;
     payMsg('');
     renderPremium();
     try { if (auth() && auth().loadPaystack) auth().loadPaystack().catch(function () {}); } catch (e) {}
@@ -502,6 +503,17 @@
       var keys = Object.keys(favs);
       if (!keys.length) {
         favList.innerHTML = '<p class="small">No saved places yet. Save Home / School / Work from the map destination card.</p>';
+      }
+      var syncNote = document.createElement('p');
+      syncNote.className = 'small';
+      syncNote.style.marginTop = '6px';
+      syncNote.innerHTML = (snap && snap.premium)
+        ? '☁️ Apex: your favourites and danger reports sync across your phones when you sign in.'
+        : '📱 Saved on this phone. <button type="button" class="btn sm" id="profileSyncUpgrade">Sync across phones with Apex</button>';
+      favList.appendChild(syncNote);
+      var su = $('profileSyncUpgrade');
+      if (su) su.onclick = function () { apexPrompt('cloud sync'); };
+      if (!keys.length) {
       } else {
         keys.forEach(function (k) {
           var f = favs[k];
@@ -570,17 +582,24 @@
     }
   }
 
+  var FEATURE_TIPS = {
+    'voice navigation': 'Spoken turn-by-turn directions are part of Apex. Navigation with the on-screen banner stays free.',
+    'bend alerts': 'The list of bends ahead, suggested safe speeds and spoken bend warnings are part of Apex. The basic on-screen curve alert stays free for everyone.',
+    'niyi': 'You\'ve used today\'s free Niyi messages. Apex gives you unlimited smart Niyi.',
+    'cloud sync': 'Saving favourites and danger reports across all your phones is part of Apex. They still save on this phone for free.'
+  };
+  function apexPrompt(featureId, customMsg) {
+    showPremium();
+    var tip = $('premiumGateTip');
+    if (tip) {
+      tip.hidden = false;
+      tip.className = 'auth-msg';
+      tip.textContent = '✨ Upgrade to Apex: ' + (customMsg || FEATURE_TIPS[featureId] || 'this is an Apex feature.');
+    }
+  }
   function gateOrRun(featureId, fn) {
     var A = auth();
-    if (A && A.requiresPremium(featureId)) {
-      showPremium();
-      var tip = $('premiumGateTip');
-      if (tip) {
-        tip.hidden = false;
-        tip.textContent = '“' + featureId + '” is an Apex feature.';
-      }
-      return;
-    }
+    if (A && A.requiresPremium(featureId)) { apexPrompt(featureId); return; }
     if (typeof fn === 'function') fn();
   }
 
@@ -593,12 +612,7 @@
           if (!(A && A.requiresPremium(el.getAttribute('data-pro-feature')))) return;
           e.preventDefault();
           e.stopImmediatePropagation();
-          showPremium();
-          var tip = $('premiumGateTip');
-          if (tip) {
-            tip.hidden = false;
-            tip.textContent = 'This is an Apex feature.';
-          }
+          apexPrompt(el.getAttribute('data-pro-feature'));
         },
         true
       );
@@ -912,6 +926,7 @@
       loadProfile: loadProfile,
       saveProfile: saveProfile,
       gateOrRun: gateOrRun,
+      apexPrompt: apexPrompt,
       CAR_ICONS: CAR_ICONS
     };
   }
