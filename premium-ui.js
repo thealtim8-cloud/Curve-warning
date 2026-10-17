@@ -238,10 +238,63 @@
     renderProfile(section);
   }
 
+  /* ---------- "Why Apex" sourced copy (NGN vs USD) ---------- */
+  var WHY_APEX = {
+    NGN: {
+      sources: [
+        ['NBS Selected Food Price Watch, May 2026', 'https://microdata.nigerianstat.gov.ng/index.php/catalog/162'],
+        ['FRSC 2025 report (Punch)', 'https://punchng.com/frsc-records-10446-crashes-5289-deaths-in-2025/'],
+        ['FRSC Dec 2025 (BusinessDay)', 'https://businessday.ng/transport/article/speeding-remains-nigerias-deadliest-road-habit-frsc/'],
+        ['US FHWA, horizontal curve safety', 'https://highways.dot.gov/safety/rwd/keep-vehicles-road/horizontal-curve-safety']
+      ],
+      lines: [
+        ['🍞', 'Apex costs <strong>₦15 a day</strong>, less than a quarter of a loaf of bread.', 1],
+        ['🛣️', 'FRSC recorded <strong>5,289 road deaths</strong> in Nigeria in 2025. Apex gives you extra heads-ups before sharp bends.', 2],
+        ['⚠️', 'In December 2025, <strong>speeding was behind 41%</strong> of identified crash causes. Apex could help you ease off before the curve.', 3],
+        ['🎉', 'Go yearly: <strong>₦3,780</strong> instead of ₦5,400, about <strong>₦10 a day</strong>.', 0],
+        ['↪️', 'Crash rates on bends are about <strong>3× higher</strong> than on straight road (US data). That\'s exactly where Apex speaks up.', 4]
+      ]
+    },
+    USD: {
+      sources: [
+        ['Toast, Sept 2026 (US median coffee $3.79)', 'https://pos.toasttab.com/blog/data/coffee-prices'],
+        ['WHO Global Status Report on Road Safety 2023', 'https://www.who.int/news/item/13-12-2023-despite-notable-progress-road-safety-remains-urgent-global-issue'],
+        ['US FHWA, horizontal curve safety', 'https://highways.dot.gov/safety/rwd/keep-vehicles-road/horizontal-curve-safety']
+      ],
+      lines: [
+        ['☕', 'A whole month of Apex costs <strong>less than one café coffee</strong>.', 1],
+        ['🎉', 'A full year is <strong>$8.40</strong>, about two coffees.', 1],
+        ['🌍', 'About <strong>1.19 million people</strong> die on the world\'s roads each year. Apex gives you an extra heads-up on bends.', 2],
+        ['↪️', 'More than <strong>25% of fatal US crashes</strong> happen on curves, where crash rates are about 3× higher.', 3],
+        ['🧒', 'Road crashes are the <strong>#1 killer of people aged 5–29</strong> worldwide.', 2]
+      ]
+    }
+  };
+
+  function renderWhyApex(cur) {
+    var data = WHY_APEX[cur === 'USD' ? 'USD' : 'NGN'];
+    var track = $('whyApexTrack');
+    var src = $('whyApexSources');
+    if (!track || !src) return;
+    function link(n, label) {
+      var s = data.sources[n - 1];
+      return '<a href="' + s[1] + '" target="_blank" rel="noopener" title="' + escapeHtml(s[0]) + '">' + (label || n) + '</a>';
+    }
+    track.innerHTML = data.lines.map(function (l) {
+      return '<div class="why-card" role="listitem"><span class="why-ico" aria-hidden="true">' + l[0] + '</span><span>' + l[1] +
+        (l[2] ? '<sup>[' + link(l[2]) + ']</sup>' : '') + '</span></div>';
+    }).join('');
+    track.scrollLeft = 0;
+    src.innerHTML = 'Sources: ' + data.sources.map(function (s, i) {
+      return '[' + (i + 1) + '] ' + link(i + 1, escapeHtml(s[0]));
+    }).join(' · ');
+  }
+
   function renderPremium() {
     var snap = auth() && auth().snapshot();
     var cur = (auth() && auth().currency()) || 'NGN';
     var ngn = cur === 'NGN';
+    renderWhyApex(cur);
     var monthly = $('priceMonthly');
     var yearly = $('priceYearly');
     var ystrike = $('priceYearlyStrike');
