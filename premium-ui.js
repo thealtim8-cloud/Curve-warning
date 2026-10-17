@@ -1145,7 +1145,7 @@
           return;
         }
         var sub = encodeURIComponent('Curve Guide feedback — ' + cat);
-        var body = encodeURIComponent('Category: ' + cat + '\n\n' + msg + '\n\n— Sent from Curve Guide 7.1');
+        var body = encodeURIComponent('Category: ' + cat + '\n\n' + msg + '\n\n— Sent from Curve Guide 8.0');
         window.location.href = 'mailto:info@adeniyiltd.com?subject=' + sub + '&body=' + body;
       };
 

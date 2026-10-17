@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<title>Curve Guide 7.1 | Safer turns. Smarter drives.</title>
+<title>Curve Guide 8.0 | Safer turns. Smarter drives.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://js.paystack.co">
@@ -571,6 +571,80 @@ body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc
 .sos-list{display:flex;flex-direction:column;gap:6px;margin:8px 0}
 .sos-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
 .sos-item .small{display:block}
+
+/* 8.0 what's new */
+.whats-new{margin:0 0 14px;border:1px solid rgb(var(--acc-rgb) / .3);background:rgb(var(--acc-rgb) / .07);border-radius:12px;padding:0 14px}
+.whats-new summary{cursor:pointer;list-style:none;padding:12px 0;font-weight:750;font-size:13.5px;color:var(--acc-text);min-height:44px;display:flex;align-items:center}
+.whats-new summary::-webkit-details-marker{display:none}
+.whats-new summary::after{content:"＋";margin-left:auto;opacity:.7}
+.whats-new[open] summary::after{content:"－"}
+.whats-new ul{margin:0 0 12px;padding-left:18px;font-size:12.8px;line-height:1.6;color:var(--silver)}
+
+/* ===== 8.0 layout & spacing polish =====
+   Spacing scale: --s1 4 · --s2 8 · --s3 12 · --s4 16 · --s5 24 · (--s6 32). Radii: cards 18, sheets 20, controls 12.
+   Tap targets >= 44px on touch screens. Safety UI keeps its own sizes/colours. */
+:root{--s6:32px;--r-card:18px;--r-ctl:12px}
+.app{gap:var(--s4);padding:var(--s4)}
+@media(min-width:760px){.app{gap:var(--s5);padding:var(--s5)}}
+.content{padding:var(--s4) var(--s4) var(--s5)}
+@media(min-width:760px){.content{padding:var(--s5)}}
+.panel{border-radius:var(--r-card)}
+.metric{padding:var(--s3) var(--s4);border-radius:var(--r-card)}
+.metrics{gap:var(--s3)}
+.actions{gap:var(--s2);margin-top:var(--s4)}
+.row{gap:var(--s3)}
+.small{line-height:1.5}
+.btn{border-radius:var(--r-ctl);padding:10px 16px}
+.header-actions{gap:var(--s2)}
+@media(pointer:coarse){
+  .btn,.btn.sm,.icon-btn,.niyi-chip,.niyi-action,.accent-opt,.theme-opts .btn,.currency-switch .btn,.tip-arrow{min-height:44px}
+  .icon-btn,.account-btn,.tip-arrow{min-width:44px}
+  .account-btn{width:44px;height:44px}
+  .niyi-icon{min-width:44px;min-height:44px}
+  .cg-sheet .icon-close{width:44px;height:44px}
+  .btn.sm{padding:9px 14px}
+}
+/* sheets: more air, clear hierarchy */
+.cg-sheet{padding:var(--s5) var(--s4) var(--s5);border-radius:20px 20px 16px 16px}
+@media(min-width:760px){.cg-overlay{align-items:center;padding:var(--s5)}.cg-sheet{padding:var(--s5) 28px 28px;border-radius:20px}}
+.cg-sheet .sheet-head{margin-bottom:var(--s3);gap:var(--s3)}
+.cg-sheet h2{font-size:1.3rem;letter-spacing:-.2px}
+.cg-sheet .sheet-sub{margin-bottom:var(--s4);line-height:1.55}
+.profile-section{padding:var(--s5) 0 var(--s4)}
+.profile-section:first-of-type{border-top:0}
+.profile-section h3{font-size:15px;font-weight:750;letter-spacing:-.1px;margin:0 0 var(--s2)}
+.profile-section>.small:first-of-type{margin:0 0 var(--s3)}
+.profile-grid{gap:var(--s3)}
+.profile-grid input,.profile-grid select,textarea.cg-input,.cg-input{min-height:46px;border-radius:var(--r-ctl)}
+.car-icon-row{gap:var(--s2)}
+.profile-head{gap:var(--s4)}
+.benefit-list{line-height:1.6}.benefit-list li{margin:6px 0}
+.compare{gap:var(--s3);margin:var(--s4) 0}.compare .col{padding:var(--s3) var(--s4);border-radius:14px}
+.plan-cards{gap:var(--s3);margin:var(--s4) 0}.plan-card{padding:var(--s4);border-radius:16px}
+@media(min-width:600px){.plan-cards{grid-template-columns:1fr 1fr}}
+.why-apex{margin:var(--s2) 0 var(--s4)}
+.account-menu{padding:var(--s4);gap:var(--s2)}
+/* Niyi panel */
+.niyi-msgs{padding:var(--s4);gap:var(--s3)}
+.niyi-msg{padding:10px 14px;line-height:1.55}
+.niyi-chips{gap:var(--s2);padding:0 var(--s4) var(--s3)}
+.niyi-head{padding:var(--s3) var(--s4);gap:var(--s3)}
+/* welcome */
+.welcome-card{padding:24px 22px 20px}
+@media(min-width:760px){.welcome-card{padding:30px 34px 24px}}
+.welcome-intro{line-height:1.6}
+.welcome-account{gap:var(--s3)}
+/* header balance */
+@media(min-width:760px){header{gap:var(--s4)}}
+@media(max-width:759px){.header-actions{gap:6px}}
+
+.emerg-sheet{background:#14191d;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.profile-grid select{-webkit-appearance:none;appearance:none;background:#0f1418 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2393a3ad' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 14px center;color:var(--text);border:1px solid var(--line2);padding:0 36px 0 14px;font-size:14px}
+body.theme-light .profile-grid select{background-color:#f4f7fa}
+.profile-head .plan-badge{vertical-align:middle;margin-right:6px}
+
+/* 8.0 light theme: darker accent text where the background is light (readable contrast) */
+body.theme-light .cg-sheet,body.theme-light .account-menu,body.theme-light .panel,body.theme-light header,body.theme-light .hero,body.theme-light .install-bar,body.theme-light .metric{--acc-text:var(--acc-deep);--acc-pale:var(--acc-deep)}
 </style>
 </head>
 <body class="welcome-open">
@@ -580,6 +654,15 @@ body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc
     <video class="welcome-video" id="welcomeVideo" autoplay muted loop playsinline preload="auto" poster="assets/welcome-poster.jpg" aria-label="Curve Guide — Safer turns. Smarter drives." disablepictureinpicture><source src="assets/welcome.mp4" type="video/mp4"></video>
     <h2 id="welcomeTitle">Welcome to Curve Guide</h2>
     <p class="welcome-intro" id="welcomeIntro">Curve Guide is a product of the Automotive Division of <strong>Adeniyi Investments &amp; Property Ltd.</strong>, built to help prevent road accidents on dangerous bends and curves. By giving drivers early awareness of sharp turns ahead, it supports safer, more confident driving on Nigerian roads. Curve Guide is currently a prototype: it is designed to supplement, never replace, careful and attentive driving.</p>
+    <details class="whats-new" id="whatsNew"><summary>✨ What’s new in 8.0</summary><ul>
+      <li><strong>Smart Niyi</strong> answers everyday questions too, now with its own animated face</li>
+      <li><strong>Apex</strong> plan: voice navigation, bends-ahead list, synced favourites, unlimited Niyi</li>
+      <li><strong>Sign in</strong> right here on the welcome screen</li>
+      <li><strong>SOS contacts</strong>: text or WhatsApp your location in one tap</li>
+      <li><strong>App colours</strong>, smooth animations and a cleaner layout</li>
+      <li><strong>Car picker</strong> for make, model and year</li>
+      <li><strong>Google Maps links</strong>: paste any link into search</li>
+    </ul></details>
     <p class="welcome-quote" id="welcomeQuote" aria-live="off">“Prevention is better than cure.”</p>
     <h3 class="terms-title">Terms &amp; Conditions</h3>
     <ol class="terms-box" tabindex="0" aria-label="Terms and Conditions">
@@ -617,7 +700,7 @@ body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc
       <div>
         <h1>Curve Guide</h1>
         <div class="tagline">Safer turns. Smarter drives.</div>
-        <div class="subtitle">Intelligent Road Safety System · Development prototype v7.1</div>
+        <div class="subtitle">Intelligent Road Safety System · Development prototype v8.0</div>
       </div>
     </div>
     <div class="header-actions">
@@ -629,7 +712,7 @@ body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc
       <button type="button" class="account-btn" id="accountBtn" title="Sign in" aria-label="Sign in" aria-haspopup="true" aria-controls="accountMenu">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
       </button>
-      <div class="pill">PROTOTYPE · v7.1</div>
+      <div class="pill">PROTOTYPE · v8.0</div>
     </div>
   </header>
   <div class="install-bar" id="installBar"><span id="installText">Install Curve Guide on your phone for quicker access.</span><button type="button" class="btn primary" id="installBtn">Install</button></div>
@@ -769,7 +852,7 @@ body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc
     <div class="credit-copy">&copy; 2026 Curve Guide — Automotive Division of <a href="https://adeniyiltd.com/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Adeniyi Investments &amp; Property Ltd.</a> All rights reserved.</div>
     <div class="contact-line">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
   </div>
-  <footer>Curve Guide 7.1 · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
+  <footer>Curve Guide 8.0 · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
   </div>
 </div>
 
@@ -971,6 +1054,19 @@ body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc
       <h3>Apex</h3>
       <div id="profilePlanLine" class="small"></div>
       <button type="button" class="btn sm danger-outline" id="profileCancelPremium" hidden style="margin-top:8px">Cancel Apex</button>
+    </section>
+
+    <section class="profile-section" data-profile-section="about">
+      <h3>About Curve Guide 8.0</h3>
+      <details class="whats-new" id="whatsNewProfile"><summary>✨ What’s new in 8.0</summary><ul>
+      <li><strong>Smart Niyi</strong> answers everyday questions too, now with its own animated face</li>
+      <li><strong>Apex</strong> plan: voice navigation, bends-ahead list, synced favourites, unlimited Niyi</li>
+      <li><strong>Sign in</strong> right here on the welcome screen</li>
+      <li><strong>SOS contacts</strong>: text or WhatsApp your location in one tap</li>
+      <li><strong>App colours</strong>, smooth animations and a cleaner layout</li>
+      <li><strong>Car picker</strong> for make, model and year</li>
+      <li><strong>Google Maps links</strong>: paste any link into search</li>
+    </ul></details>
     </section>
 
     <section class="profile-section" data-profile-section="support">
@@ -2858,7 +2954,7 @@ function pickPlace(it){
 }
 function answer(q){
   var t=String(q||'').toLowerCase().trim();
-  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 7.1.";
+  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 8.0.";
   var explained=explainButton(t);
   if(explained)return explained;
   if(/voice|speak|mute|unmute|speech|talk|announce|mic|microphone/.test(t))
@@ -2868,7 +2964,7 @@ function answer(q){
   if(/destin|search|route|how do i (set|find)|directions?/.test(t)&&!extractPlace(q))
     return 'Say “go to …” or “take me to …”, or type in Search destination on the map. Then Route and Start navigation.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
-    return 'Curve Guide 7.1 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
+    return 'Curve Guide 8.0 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
   if(/disclaim|liabilit|certified|safe to use|replace|prototype/.test(t))
     return 'Curve Guide is an experimental prototype, not a certified safety or navigation system. Warnings and routes can be wrong. Always obey the road.';
   if(/gps|accur|±|plus.?minus|poor|fair|green|yellow|red chip/.test(t))
@@ -3256,7 +3352,7 @@ setInterval(refreshDriveNote,1500);
     sendEl.appendChild(all);
     list.forEach(function(c){
       var row=document.createElement('div');row.className='emerg-contact';
-      var nm=document.createElement('span');nm.textContent=c.name+' · '+c.phone;row.appendChild(nm);
+      var nm=document.createElement('span');nm.textContent=c.name+' · '+String(c.phone).replace(/^\+234(\d{3})(\d{3})(\d{4})$/,'+234 $1 $2 $3');row.appendChild(nm);
       var acts=document.createElement('div');acts.className='acts';
       var sms=document.createElement('a');sms.className='btn sm';sms.textContent='SMS';sms.setAttribute('aria-label','Text '+c.name);
       sms.href=smsHref([c.phone]);sms.onclick=function(){sms.href=smsHref([c.phone])};
