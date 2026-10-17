@@ -1,5 +1,5 @@
 /* Curve Guide offline shell cache — prototype */
-const CACHE = 'curveguide-shell-v712-verify';
+const CACHE = 'curveguide-shell-v713-e2e';
 const ASSETS = [
   './',
   './index.html',

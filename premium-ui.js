@@ -367,7 +367,7 @@
       var ref = escapeHtml(res.reference);
       if (v.ok) {
         payMsg('<strong>Apex is active! 🎉</strong> Plan: ' + escapeHtml(v.plan || plan) +
-          (v.expiresAt ? ' · Renews/ends: ' + escapeHtml(new Date(v.expiresAt).toLocaleDateString()) : '') +
+          (v.expiresAt ? ' · Active until ' + escapeHtml(new Date(v.expiresAt).toLocaleDateString()) : '') +
           '<br>Reference: <code>' + ref + '</code>', 'good');
       } else if (v.notConfigured) {
         payMsg('<strong>Test payment succeeded</strong> (reference <code>' + ref + '</code>).<br>' +
@@ -532,7 +532,9 @@
     if (planLine && snap) {
       planLine.innerHTML = snap.premium
         ? (snap.serverPremium === true && snap.serverPremiumInfo && snap.serverPremiumInfo.expiresAt
-            ? '<strong>Apex</strong> · ' + escapeHtml(snap.serverPremiumInfo.plan || '') + ' · Ends: ' + escapeHtml(fmtDate(snap.serverPremiumInfo.expiresAt))
+            ? '<strong>Apex</strong> · ' + escapeHtml(snap.serverPremiumInfo.plan || '') + ' · Active until ' + escapeHtml(fmtDate(snap.serverPremiumInfo.expiresAt)) +
+              (snap.serverPremiumInfo.test ? ' <span class="plan-badge free">Paystack test payment</span>' : '') +
+              '<br><span class="small">One-time payment: it won\'t renew or charge you again automatically. Pay again any time to add more time.</span>'
             : snap.testApex
               ? '<strong>Apex (TEST)</strong> · test payment <code>' + escapeHtml(snap.testApex.reference) + '</code> · server activation pending'
               : '<strong>Apex</strong> · Renewal date: <em>TBD (preview)</em>')
@@ -542,7 +544,8 @@
     }
     var cancelBtn = $('profileCancelPremium');
     if (cancelBtn) {
-      cancelBtn.hidden = !(snap && snap.premium);
+      // Real (server) Apex is a one-time payment, so there is nothing to cancel here.
+      cancelBtn.hidden = !(snap && snap.premium) || snap.serverPremium === true;
     }
 
     if (focusSection) {
