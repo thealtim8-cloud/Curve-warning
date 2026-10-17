@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://curveguide.name.ng/sitemap.xml
