@@ -121,14 +121,18 @@
     var menu = $('accountMenu');
     if (!btn) return;
     snap = snap || (auth() && auth().snapshot()) || { signedIn: false, premium: false };
+    // Only touch the button's inner HTML when it really changes. Rewriting it during a tap
+    // detached the tapped <span>, so the "click outside closes the menu" handler closed the
+    // menu instantly (7.2.4 fix: account button "shows nothing" on iPad/iPhone).
+    function setBtnHtml(html) { if (btn.getAttribute('data-html') !== html) { btn.innerHTML = html; btn.setAttribute('data-html', html); } }
     if (snap.signedIn && snap.user) {
       btn.classList.add('signed-in');
-      btn.innerHTML = '<span class="account-avatar" aria-hidden="true">' + initials(snap.user) + '</span>';
+      setBtnHtml('<span class="account-avatar" aria-hidden="true">' + initials(snap.user) + '</span>');
       btn.title = snap.user.displayName || snap.user.email || 'Account';
       btn.setAttribute('aria-label', 'Account menu');
     } else {
       btn.classList.remove('signed-in');
-      btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>';
+      setBtnHtml('<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>');
       btn.title = 'Sign in';
       btn.setAttribute('aria-label', 'Sign in');
     }
@@ -655,7 +659,10 @@
       var menu = $('accountMenu');
       var btn = $('accountBtn');
       if (!menu || !menu.classList.contains('open')) return;
+      var path = e.composedPath ? e.composedPath() : [];
+      if (path.indexOf(menu) >= 0 || (btn && path.indexOf(btn) >= 0)) return;
       if (menu.contains(e.target) || (btn && btn.contains(e.target))) return;
+      if (e.target && e.target.isConnected === false) return; // element was re-rendered mid-tap
       closeOverlay('accountMenu');
     });
 
