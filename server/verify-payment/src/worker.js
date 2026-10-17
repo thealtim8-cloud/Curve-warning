@@ -294,8 +294,11 @@ async function grantApex(env, info) {
 /* ---------------- Smart Niyi (Workers AI) ---------------- */
 const NIYI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const NIYI_FALLBACK_MODEL = '@cf/meta/llama-3.1-8b-instruct-fp8';
-const NIYI_FREE_PER_DAY = 20;
-const NIYI_APEX_PER_DAY = 150; // "unlimited" for people, but stops abuse of the free AI allowance
+// 8.0 (SW v805): Niyi looks unlimited in the app. Quiet safety limits stay here only:
+const NIYI_FREE_PER_DAY = 60;       // per signed-in Free user per Lagos day (never shown in the app)
+const NIYI_GLOBAL_CHEAP_AFTER = 150; // after this many chats today (all users), use the cheaper model
+const NIYI_GLOBAL_PER_DAY = 3000;    // soft global stop so the AI allowance isn't burnt by abuse
+const NIYI_REST_MSG = 'Niyi needs a short rest \u2014 please try again a bit later.';
 const NIYI_ACTIONS = ['set_destination', 'go_favourite', 'map_view', 'night_mode', 'tilt_3d', 'units', 'start_nav', 'stop_nav',
   'start_gps', 'stop_gps', 'voice', 'focus_mode', 'reset_view', 'clear_destination', 'open'];
 const niyiBurst = new Map(); // uid -> last request ms (per Worker instance)
@@ -307,8 +310,8 @@ CURVE GUIDE FACTS (use exactly these for anything about the app; never invent ap
 - Curve Guide is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Contact: phone/WhatsApp +234 805 352 9802, email info@adeniyiltd.com.
 - It is a prototype driving aid, NOT a certified safety or navigation system. Curve warnings are estimates from phone GPS heading changes and route shape. Always obey road signs.
 - Maps use OpenStreetMap data; routes use the free OSRM demo; search uses Nominatim/Photon. If a place (like an estate or house) is missing, the user can open Google Maps, long-press the spot, copy the coordinates (e.g. 6.5982, 3.2765) and paste them into Curve Guide search, or long-press the Curve Guide map to drop a pin.
-- Free plan: map, live GPS curve alert, bend dots and on-screen slow-down alert, search, routing, on-screen directions, favourites and danger reports saved on the phone, Niyi 20 chats a day, app colour themes.
-- Apex plan: spoken turn-by-turn voice, bends-ahead list with suggested safe speeds and spoken bend warnings, favourites and danger reports synced across phones, unlimited smart Niyi. Price: ₦450 for 1 month or ₦3,780 for 1 year. One-time Paystack payment in Naira (₦), no auto-renew.
+- Free plan: map, live GPS curve alert, bend dots and on-screen slow-down alert, search, routing, on-screen directions, favourites and danger reports saved on the phone, smart Niyi (for everyone who signs in), app colour themes.
+- Apex plan: spoken turn-by-turn voice, bends-ahead list with suggested safe speeds and spoken bend warnings, favourites and danger reports synced across phones. Smart Niyi is not an Apex perk: everyone gets it. Never mention a Niyi chat limit or count. Price: ₦450 for 1 month or ₦3,780 for 1 year. One-time Paystack payment in Naira (₦), no auto-renew.
 - If PLAN says Apex, the user already has Apex: never ask them to pay or upgrade.
 - Emergency in Nigeria: call 112. The app has an Emergency button.
 RULES:
@@ -344,26 +347,31 @@ function isApexFields(userDoc) {
   }
 }
 
+// One Firestore commit bumps both the user's counter and the day's global counter.
 async function bumpNiyiUsage(env, token, uid) {
   const day = lagosDay();
+  const w = (id, fields) => ({
+    update: { name: docName(env, 'niyiUsage/' + id), fields },
+    updateMask: { fieldPaths: Object.keys(fields) },
+    updateTransforms: [
+      { fieldPath: 'count', increment: { integerValue: '1' } },
+      { fieldPath: 'updatedAt', setToServerValue: 'REQUEST_TIME' }
+    ]
+  });
   const res = await fetch(fsBase(env) + ':commit', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      writes: [{
-        update: { name: docName(env, 'niyiUsage/' + uid + '_' + day), fields: { uid: { stringValue: uid }, day: { stringValue: day } } },
-        updateMask: { fieldPaths: ['uid', 'day'] },
-        updateTransforms: [
-          { fieldPath: 'count', increment: { integerValue: '1' } },
-          { fieldPath: 'updatedAt', setToServerValue: 'REQUEST_TIME' }
-        ]
-      }]
+      writes: [
+        w(uid + '_' + day, { uid: { stringValue: uid }, day: { stringValue: day } }),
+        w('_global_' + day, { uid: { stringValue: '_global' }, day: { stringValue: day } })
+      ]
     })
   });
   if (!res.ok) throw new Error('Usage write failed: ' + res.status);
   const body = await res.json();
-  const tr = body.writeResults && body.writeResults[0] && body.writeResults[0].transformResults;
-  return Number((tr && tr[0] && tr[0].integerValue) || 1);
+  const n = (i) => { const tr = body.writeResults && body.writeResults[i] && body.writeResults[i].transformResults; return Number((tr && tr[0] && tr[0].integerValue) || 1); };
+  return { user: n(0), global: n(1) };
 }
 
 function cleanMessages(list) {
@@ -436,23 +444,24 @@ async function handleNiyi(request, env, cors) {
 
   const token = await googleAccessToken(env);
   const apex = isApexFields(await fsGet(env, token, 'users/' + uid));
-  const limit = apex ? NIYI_APEX_PER_DAY : NIYI_FREE_PER_DAY;
   const used = await bumpNiyiUsage(env, token, uid);
-  if (used > limit) {
-    return json({ ok: false, code: 'limit', apex, limit, used: limit,
-      error: apex ? 'Niyi has had a lot of chats today. Please try again tomorrow.' : 'Free daily Niyi limit reached' }, 429, cors);
-  }
+  // Quiet limits: Free users get NIYI_FREE_PER_DAY, Apex has no per-user cap; everyone shares the soft global stop.
+  // The reply never mentions a number or asks anyone to pay.
+  const rest = () => json({ ok: false, code: 'rest', reply: NIYI_REST_MSG, error: NIYI_REST_MSG }, 429, cors);
+  if ((!apex && used.user > NIYI_FREE_PER_DAY) || used.global > NIYI_GLOBAL_PER_DAY) return rest();
 
   const aiMessages = [{ role: 'system', content: NIYI_SYSTEM + '\nCONTEXT: ' + JSON.stringify(context) + '\nPLAN: ' + (apex ? 'Apex (already paid/unlocked)' : 'Free') }]
     .concat(messages);
+  const opts = { messages: aiMessages, max_tokens: 320, temperature: 0.5 };
   let r;
   try {
-    r = await env.AI.run(NIYI_MODEL, { messages: aiMessages, max_tokens: 320, temperature: 0.5 });
+    if (used.global > NIYI_GLOBAL_CHEAP_AFTER) throw new Error('busy day: use the cheaper model');
+    r = await env.AI.run(NIYI_MODEL, opts);
   } catch (e) {
-    r = await env.AI.run(NIYI_FALLBACK_MODEL, { messages: aiMessages, max_tokens: 320, temperature: 0.5 });
+    try { r = await env.AI.run(NIYI_FALLBACK_MODEL, opts); } catch (e2) { return rest(); } // e.g. AI allowance used up
   }
   const out = parseNiyiOutput(aiText(r));
-  return json({ ok: true, reply: out.reply, actions: out.actions, apex, used: apex ? undefined : used, limit }, 200, cors);
+  return json({ ok: true, reply: out.reply, actions: out.actions, apex }, 200, cors);
 }
 
 

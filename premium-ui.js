@@ -413,7 +413,7 @@
         box.innerHTML = '<strong>✅ You\'re on ' + escapeHtml(ai.label) + '</strong>' +
           (ai.never ? '' : (ai.until ? '<br><span class="small">' + escapeHtml(ai.until) + '. One-time payment, nothing renews automatically.</span>' : '')) +
           (ai.test ? ' <span class="plan-badge free">Paystack test payment</span>' : '') +
-          '<br><span class="small">Everything in Apex is unlocked: spoken voice navigation, bends-ahead list with safe-speed tips, favourites and danger reports synced across your phones, and smart Niyi.</span>';
+          '<br><span class="small">Everything in Apex is unlocked: spoken voice navigation, bends-ahead list with safe-speed tips, and favourites and danger reports synced across your phones.</span>';
       }
     }
     var title = $('premiumTitle');
@@ -824,7 +824,7 @@
         renderCarFacts();
       }).catch(function (err) {
         ask.disabled = false;
-        ask.textContent = err && err.code === 'limit' ? 'Niyi\u2019s free chats are used up for today' : 'Couldn\u2019t get facts. Tap to try again';
+        ask.textContent = err && (err.code === 'rest' || err.code === 'limit') ? 'Niyi needs a short rest. Try again a bit later' : 'Couldn\u2019t get facts. Tap to try again';
       });
     };
   }
@@ -981,7 +981,6 @@
   var FEATURE_TIPS = {
     'voice navigation': 'Spoken turn-by-turn directions are part of Apex. Navigation with the on-screen banner stays free.',
     'bend alerts': 'The list of bends ahead, suggested safe speeds and spoken bend warnings are part of Apex. The basic on-screen curve alert stays free for everyone.',
-    'niyi': 'You\'ve used today\'s free Niyi messages. Apex gives you unlimited smart Niyi.',
     'cloud sync': 'Saving favourites and danger reports across all your phones is part of Apex. They still save on this phone for free.'
   };
   function apexPrompt(featureId, customMsg) {

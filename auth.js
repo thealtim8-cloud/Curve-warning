@@ -715,7 +715,7 @@
   }
 
   // Smart Niyi: ask the Worker (Workers AI). Needs sign-in; the server also
-  // enforces the daily limit (free) and checks Apex from Firestore itself.
+  // keeps a quiet safety limit (code 'rest') and checks Apex from Firestore itself.
   function niyiChat(messages, context) {
     if (!NIYI_URL) return Promise.reject(new Error('Niyi AI not configured'));
     if (!(fb.auth && fb.auth.currentUser)) return Promise.reject(Object.assign(new Error('signin'), { code: 'signin' }));

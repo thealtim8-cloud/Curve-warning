@@ -272,7 +272,6 @@ body.navigating .dest-card{max-height:38%}
 .apex-upsell{margin-top:8px;background:linear-gradient(90deg,rgb(var(--acc-rgb) / 0.2),#ffb34733);border-color:rgb(var(--acc-rgb) / 0.533);color:var(--acc-pale)}
 .linkish{background:none;border:0;padding:0;color:#7fe0b0;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
 .niyi-msg.typing{opacity:.7;font-style:italic}
-.niyi-limit{font-size:11px;color:var(--muted);padding:2px 12px 6px;text-align:right}
 .speed-bend-banner{display:none;margin-top:6px;padding:8px 10px;border-radius:10px;background:#ff625c22;border:1px solid #ff625c66;color:#ffd0ce;font-size:12px;font-weight:700}
 .speed-bend-banner.open{display:block}
 .fav-row,.hazard-row,.emerg-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -739,7 +738,7 @@ label.accept{min-height:40px}
     <p class="welcome-intro" id="welcomeIntro">Curve Guide is a product of the Automotive Division of <strong>Adeniyi Investments &amp; Property Ltd.</strong>, built to help prevent road accidents on dangerous bends and curves. By giving drivers early awareness of sharp turns ahead, it supports safer, more confident driving on Nigerian roads. Curve Guide is currently a prototype: it is designed to supplement, never replace, careful and attentive driving.</p>
     <details class="whats-new" id="whatsNew"><summary>✨ What’s new in 8.0</summary><ul>
       <li><strong>Smart Niyi</strong> answers everyday questions too, now with its own animated face</li>
-      <li><strong>Apex</strong> plan: voice navigation, bends-ahead list, synced favourites, unlimited Niyi</li>
+      <li><strong>Apex</strong> plan: voice navigation, bends-ahead list, synced favourites</li>
       <li><strong>Sign in</strong> right here on the welcome screen</li>
       <li><strong>SOS contacts</strong>: text or WhatsApp your location in one tap</li>
       <li><strong>App colours</strong>, smooth animations and a cleaner layout</li>
@@ -764,7 +763,7 @@ label.accept{min-height:40px}
     </ol>
     <label class="accept"><input type="checkbox" id="acceptTerms"> I have read and accept the Terms &amp; Conditions</label>
     <div class="welcome-account" id="welcomeAccount">
-      <p class="welcome-why" id="welcomeWhy">✨ <strong>Sign in</strong> to use smart Niyi (20 free chats a day), keep your account, and unlock Apex.</p>
+      <p class="welcome-why" id="welcomeWhy">✨ <strong>Sign in</strong> to use smart Niyi, keep your account, and unlock Apex.</p>
       <div class="welcome-signed" id="welcomeSigned" hidden>
         <span class="welcome-avatar" id="welcomeAvatar" aria-hidden="true">D</span>
         <div><div class="welcome-signed-name" id="welcomeSignedName"></div><div class="welcome-signed-email" id="welcomeSignedEmail"></div></div>
@@ -975,7 +974,6 @@ label.accept{min-height:40px}
     <input class="niyi-input" id="niyiInput" type="text" maxlength="240" placeholder="Ask Niyi anything…" aria-label="Message to Niyi">
     <button class="niyi-send" id="niyiSend" type="submit">Send</button>
   </form>
-  <div class="niyi-limit" id="niyiLimit" hidden></div>
   <p class="niyi-mic-note" id="niyiMicNote" hidden>Mic turns your speech into text using your browser. When you're signed in, Niyi's smart answers are made on Curve Guide's server (Cloudflare AI), so don't share passwords or card details.</p>
 </div>
 
@@ -1044,7 +1042,6 @@ label.accept{min-height:40px}
     <ul class="benefit-list pay-only">
       <li>Voice turn-by-turn navigation</li>
       <li>Bend warnings with speed alerts</li>
-      <li>Smarter Niyi with no limits</li>
       <li>Favourites and danger reports synced across phones</li>
     </ul>
     <section class="why-apex pay-only" id="whyApex" aria-labelledby="whyApexTitle">
@@ -1055,8 +1052,8 @@ label.accept{min-height:40px}
       <p class="why-disclaimer">Curve Guide is a driving aid in early development. It can't prevent crashes. Always obey road signs and drive at a safe speed.</p>
     </section>
     <div class="compare pay-only">
-      <div class="col"><h3>Free</h3><ul><li>Map &amp; live GPS curve alert</li><li>Bend dots + on-screen slow-down alert</li><li>Search, routing &amp; on-screen directions</li><li>Favourites &amp; reports on this phone</li><li>Niyi: 20 chats a day</li></ul></div>
-      <div class="col"><h3>Apex</h3><ul><li>Everything in Free</li><li>Spoken turn-by-turn voice</li><li>Bends-ahead list, safe-speed tips &amp; spoken bend warnings</li><li>Favourites &amp; reports synced across phones</li><li>Unlimited smart Niyi</li></ul></div>
+      <div class="col"><h3>Free</h3><ul><li>Map &amp; live GPS curve alert</li><li>Bend dots + on-screen slow-down alert</li><li>Search, routing &amp; on-screen directions</li><li>Favourites &amp; reports on this phone</li><li>Smart Niyi</li></ul></div>
+      <div class="col"><h3>Apex</h3><ul><li>Everything in Free</li><li>Spoken turn-by-turn voice</li><li>Bends-ahead list, safe-speed tips &amp; spoken bend warnings</li><li>Favourites &amp; reports synced across phones</li></ul></div>
     </div>
     <div class="currency-switch pay-only" role="group" aria-label="Currency">
       <span class="ngn-only-note">Prices in Naira (₦). Visa/Mastercard cards from outside Nigeria can still pay in ₦; your bank converts the amount.</span>
@@ -1149,7 +1146,7 @@ label.accept{min-height:40px}
       <h3>About Curve Guide 8.0</h3>
       <details class="whats-new" id="whatsNewProfile"><summary>✨ What’s new in 8.0</summary><ul>
       <li><strong>Smart Niyi</strong> answers everyday questions too, now with its own animated face</li>
-      <li><strong>Apex</strong> plan: voice navigation, bends-ahead list, synced favourites, unlimited Niyi</li>
+      <li><strong>Apex</strong> plan: voice navigation, bends-ahead list, synced favourites</li>
       <li><strong>Sign in</strong> right here on the welcome screen</li>
       <li><strong>SOS contacts</strong>: text or WhatsApp your location in one tap</li>
       <li><strong>App colours</strong>, smooth animations and a cleaner layout</li>
@@ -3052,7 +3049,7 @@ function explainButton(t){
     'clear':'Clear removes the destination pin and driving route.',
     'clear route':'Clear route removes the green GPS trail you have driven.',
     'premium':'Apex: ₦450 for 1 month or ₦3,780 for 1 year (save 30%). One-time Paystack payment, no auto-renew.',
-    'apex':'Apex is the paid Curve Guide plan: spoken voice navigation, advanced bend alerts, favourites/reports synced across phones, and unlimited smart Niyi.',
+    'apex':'Apex is the paid Curve Guide plan: spoken voice navigation, advanced bend alerts, and favourites/reports synced across phones. Smart Niyi is free for everyone who signs in.',
     'sign in':'Sign in opens the account screen. Firebase Auth is configured for Google and email/password.',
     'profile':'Profile stores your car icon, theme, car details and saved places, synced to your account when signed in.',
     'recenter':'Reset view (or say reset map) turns follow back on and flies to your GPS position, or Lagos if GPS is off.',
@@ -3144,7 +3141,6 @@ function openPanel(){
     renderChips();
   }
   refreshDriveNote();
-  updateNiyiLimit();
   if(!input.disabled)input.focus();
 }
 function closePanel(){
@@ -3204,25 +3200,13 @@ function isAppCommand(t){
 function aiAvailable(){var Au=window.__cgAuth;return !!(Au&&Au.niyiChat&&Au.isSignedIn&&Au.isSignedIn()&&navigator.onLine!==false)}
 
 /* 7.2 Smart Niyi: Cloudflare Workers AI via the Curve Guide Worker (no AI key in the browser).
-   Free: NIYI_FREE_LIMIT chats per day (counted here + enforced on the server). Apex: unlimited (fair use). */
-var NIYI_FREE_LIMIT=20, NIYI_USAGE_KEY='curveGuide.niyiUsage', aiHistory=[], aiBusy=false, aiSigninHinted=false;
+   8.0 (SW v805): no chat counter in the app. The Worker keeps a quiet safety limit and, when hit,
+   replies with code 'rest' + a friendly message, which we show as Niyi's reply. */
+var NIYI_REST_MSG='Niyi needs a short rest \u2014 please try again a bit later.', aiHistory=[], aiBusy=false, aiSigninHinted=false;
+try{localStorage.removeItem('curveGuide.niyiUsage')}catch(e){}
 function apexLabel(){try{var i=window.__cgPremiumUI&&window.__cgPremiumUI.apexInfo&&window.__cgPremiumUI.apexInfo();return (i&&i.label)||'Apex'}catch(e){return 'Apex'}}
 function isApexNow(){try{return !!(window.__cgAuth&&window.__cgAuth.isPremium())}catch(e){return false}}
-function todayKey(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
-function niyiUsed(){try{var u=JSON.parse(localStorage.getItem(NIYI_USAGE_KEY)||'{}');return u.day===todayKey()?(u.n||0):0}catch(e){return 0}}
-function niyiCount(n){try{localStorage.setItem(NIYI_USAGE_KEY,JSON.stringify({day:todayKey(),n:typeof n==='number'?n:niyiUsed()+1}))}catch(e){}updateNiyiLimit()}
-function updateNiyiLimit(){
-  var el=document.getElementById('niyiLimit');if(!el)return;
-  if(isApexNow()){el.hidden=false;el.textContent=apexLabel()+' · unlimited Niyi';return}
-  var left=Math.max(0,NIYI_FREE_LIMIT-niyiUsed());
-  el.hidden=false;el.textContent='Free plan · '+left+' of '+NIYI_FREE_LIMIT+' Niyi chats left today';
-}
-function showNiyiLimit(){
-  if(isApexNow()){var m2='Niyi has had a lot of chats today. Please try again tomorrow. App commands like “go to …”, “satellite” or “stop navigation” still work.';addMsg(m2,'bot');speak(m2);renderChips();return}
-  var msg='You\u2019ve used your '+NIYI_FREE_LIMIT+' free Niyi chats for today. They reset tomorrow, or get unlimited smart Niyi with Apex. App commands like “go to …”, “satellite” or “stop navigation” still work.';
-  addBotRich(msg,[{label:'✨ Upgrade to Apex',onClick:function(){if(window.__cgPremiumUI&&window.__cgPremiumUI.apexPrompt)window.__cgPremiumUI.apexPrompt('niyi')}}]);
-  speak(msg);renderChips();
-}
+function showNiyiRest(msg){msg=String(msg||'').trim()||NIYI_REST_MSG;addMsg(msg,'bot');speak(msg);renderChips()}
 function appContext(){
   var A=api()||{};var d=A.getDestination&&A.getDestination();
   return {
@@ -3266,19 +3250,14 @@ function runAiActions(actions){
     }catch(e){}
   });
 }
-document.addEventListener('cg:premium-changed',function(){try{updateNiyiLimit()}catch(e){}});
-(function hookNiyiPlan(n){var A=window.__cgAuth;if(A&&A.onChange){A.onChange(function(){try{updateNiyiLimit()}catch(e){}})}else if(n<20)setTimeout(function(){hookNiyiPlan(n+1)},300)})(0);
 function keywordAnswer(q){var a=answer(q);addMsg(a,'bot');speak(a);niyiMood('happy',2200);renderChips()}
 function chatAnswer(q){
-  var apex=isApexNow();
   var t=String(q).toLowerCase().trim();
-  if(!apex&&niyiUsed()>=NIYI_FREE_LIMIT){if(doPageAction(t)){renderChips();return}showNiyiLimit();return}
   var Au=window.__cgAuth;
   var canAi=aiAvailable();
   if(canAi&&aiBusy){addMsg('One moment — I\u2019m still answering your last message.','bot');return}
   if(!canAi){
     if(doPageAction(t)){renderChips();return}
-    if(!apex)niyiCount();
     keywordAnswer(q);
     if(!aiSigninHinted&&Au&&Au.isSignedIn&&!Au.isSignedIn()){
       aiSigninHinted=true;
@@ -3293,7 +3272,7 @@ function chatAnswer(q){
   function callAi(tries){
     return Au.niyiChat(aiHistory,appContext()).catch(function(err){
       // "slow" = two messages within 2 s; network blips: wait a moment and try once more
-      if(tries<1&&err&&(err.code==='slow'||err.status===429&&err.code!=='limit'||!err.status&&err.name!=='AbortError'&&err.code!=='signin')){
+      if(tries<1&&err&&(err.code==='slow'||err.status===429&&err.code!=='limit'&&err.code!=='rest'||!err.status&&err.name!=='AbortError'&&err.code!=='signin')){
         return new Promise(function(r){setTimeout(r,2300)}).then(function(){return callAi(tries+1)});
       }
       throw err;
@@ -3305,13 +3284,13 @@ function chatAnswer(q){
     aiHistory.push({role:'assistant',content:reply.slice(0,600)});
     addMsg(reply,'bot');speak(reply);niyiMood('happy',2600);
     runAiActions(res.actions);
-    if(!apex)niyiCount(typeof res.used==='number'?res.used:undefined);
     renderChips();
   }).catch(function(err){
     typing.remove();
     aiHistory.pop();
     niyiMood('error',3200);
-    if(err&&err.code==='limit'){if(!apex)niyiCount(NIYI_FREE_LIMIT);if(doPageAction(t)){renderChips();return}showNiyiLimit();return}
+    // Quiet safety limit (or AI busy): Niyi's own friendly reply. No keyword answer pretending to be smart Niyi.
+    if(err&&(err.code==='rest'||err.code==='limit')){niyiMood('thinking',3200);showNiyiRest(err.body&&err.body.reply);return}
     if(doPageAction(t)){renderChips();return}
     // Say so honestly instead of silently switching to keyword answers.
     var why=err&&err.code==='signin'?'Please sign in again to chat with smart Niyi.':(err&&err.name==='AbortError'?'It took too long to answer.':'Smart Niyi couldn\u2019t answer just now.');
