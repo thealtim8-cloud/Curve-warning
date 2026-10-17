@@ -1,5 +1,5 @@
 /* Curve Guide offline shell cache — prototype */
-const CACHE = 'curveguide-shell-v705';
+const CACHE = 'curveguide-shell-v710-live';
 const ASSETS = [
   './',
   './index.html',
@@ -27,6 +27,8 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+  // Never cache payments, auth or the verify server: always go to the network.
+  if (/(^|\.)paystack\.(co|com)$/i.test(url.hostname) || /googleapis\.com$|firebaseapp\.com$|workers\.dev$/i.test(url.hostname)) return;
   if (/\.mp4($|\?)/i.test(url.pathname)) {
     event.respondWith(fetch(req).catch(() => caches.match(req)));
     return;

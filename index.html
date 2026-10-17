@@ -9,9 +9,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<title>Curve Guide 7.0.5 | Intelligent Road Safety System</title>
+<title>Curve Guide 7.1 | Safer turns. Smarter drives.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://js.paystack.co">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
@@ -182,7 +183,7 @@ body.welcome-open{overflow:hidden}
 .niyi-header-btn svg{width:16px;height:16px;flex:none}
 @keyframes niyiPulse{0%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 #20c47766}70%{box-shadow:0 10px 28px -8px #000c,0 0 0 14px #20c47700}100%{box-shadow:0 10px 28px -8px #000c,0 0 0 0 #20c47700}}
 .niyi-fab.niyi-pulse{animation:niyiPulse 1.2s ease-out 2}
-@media(max-width:420px){.pill{display:none}.niyi-header-btn{padding:8px 11px;font-size:12px}.header-actions{gap:0}}
+@media(max-width:420px){.pill{display:none}.niyi-header-btn{padding:8px 10px;font-size:12px;gap:5px}.niyi-header-btn svg{width:15px;height:15px}.header-actions{gap:6px;flex:none}.night-toggle{padding:8px 10px}.account-btn{width:36px;height:36px}header{gap:8px}.brand{flex:1 1 auto;gap:9px}.brand h1{font-size:19px}.brand .tagline{white-space:normal;letter-spacing:.6px;font-size:9px;line-height:1.3}.logo-img{width:42px;height:42px}}
 /* Destination search */
 .map-search{position:absolute;z-index:5;left:12px;right:12px;top:52px;pointer-events:none}
 .map-search>*{pointer-events:auto}
@@ -265,6 +266,104 @@ body.navigating .dest-card{max-height:38%}
 .install-bar{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid #20c47744;background:#20c47712;font-size:12px}
 .install-bar.show{display:flex}
 
+
+
+/* Account / Apex / Profile preview */
+.account-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;border:1px solid #20c47766;background:#20c47714;color:#9be3bf;padding:0;cursor:pointer}
+.account-btn.signed-in{padding:0;border-color:#20c477aa}
+.account-avatar{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;font-size:11px;font-weight:800;background:linear-gradient(180deg,#27d083,#17a863);color:#06150d}
+.account-avatar.lg{width:52px;height:52px;font-size:16px;flex:0 0 auto}
+.account-menu{position:fixed;z-index:80;right:max(12px,env(safe-area-inset-right));top:64px;width:min(300px,calc(100vw - 24px));background:#14191df7;border:1px solid var(--line2);border-radius:16px;padding:12px;box-shadow:0 20px 50px -16px #000e;display:none;flex-direction:column;gap:8px}
+.account-menu.open{display:flex}
+.acct-head{display:flex;gap:10px;align-items:center;margin-bottom:4px}
+.plan-badge{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase}
+.plan-badge.free{background:#ffffff12;color:#c9d1d6;border:1px solid #ffffff22}
+.plan-badge.premium{background:#20c47722;color:#9be3bf;border:1px solid #20c47766}
+.cg-overlay{position:fixed;inset:0;z-index:90;display:none;align-items:flex-end;justify-content:center;padding:12px;background:#000a;backdrop-filter:blur(4px)}
+.cg-overlay.open{display:flex}
+.cg-sheet{width:min(520px,100%);max-height:min(92dvh,900px);overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:18px 18px 14px 14px;padding:16px;box-shadow:0 24px 60px -20px #000e;color:var(--text)}
+.cg-sheet h2{margin:0 0 4px;font-size:1.25rem}
+.cg-sheet .sheet-sub{color:var(--muted);font-size:12.5px;margin-bottom:12px;line-height:1.45}
+.cg-sheet .sheet-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
+.cg-sheet .icon-close{border:0;background:#ffffff10;color:var(--text);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:16px}
+.why-apex{margin:4px 0 12px;padding:12px 0 10px;border-radius:16px;background:radial-gradient(120% 90% at 0% 0%,#20c47722,#20c47700 60%),linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line2);overflow:hidden}
+.why-apex .why-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 12px 8px}
+.why-apex h3{margin:0;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--green)}
+.why-apex .why-hint{font-size:10.5px;color:var(--muted);white-space:nowrap}
+.why-track{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 12px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.why-track::-webkit-scrollbar{display:none}
+.why-card{flex:0 0 min(78%,260px);scroll-snap-align:start;display:flex;gap:9px;align-items:flex-start;padding:10px 11px;border-radius:13px;background:#0d1114a8;border:1px solid var(--line);font-size:12.5px;line-height:1.42;color:var(--text);min-height:74px}
+.why-card .why-ico{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:#20c4771c;border:1px solid #20c47744}
+.why-card strong{color:#9ff0c8;font-weight:700}
+.why-card sup a,.why-src a{color:var(--green);text-decoration:none;font-weight:700}
+.why-card sup{font-size:9.5px;margin-left:2px}
+.why-src{margin:4px 12px 0;font-size:10px;line-height:1.5;color:var(--muted)}
+.why-src a{font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.why-brand{display:flex;align-items:center;gap:7px;margin:8px 12px 0;font-size:10px;color:var(--muted)}
+.why-brand img{height:18px;width:auto;border-radius:4px;background:#fff;padding:1px 3px}
+.why-disclaimer{margin:8px 12px 0;padding:7px 9px;border-radius:10px;background:#ffb34712;border:1px solid #ffb34744;color:#ffd08a;font-size:10.5px;line-height:1.45}
+body.theme-light .why-card{background:#ffffffcc}
+body.theme-light .why-card strong{color:#0f7a48}
+.pay-msg.good{background:#20c47718;border-color:#20c47766;color:#9ff0c8}
+.pay-msg.warn{background:#ff5a5a14;border-color:#ff7a7a66;color:#ffb3b3}
+.pay-msg code{font-size:11px;word-break:break-all}
+.ngn-only-note{font-size:11px;color:var(--muted);line-height:1.4}
+.test-mode-note{margin:8px 0 4px;padding:6px 10px;border-radius:10px;border:1px dashed #ffb34788;color:#ffd08a;font-size:11.5px;font-weight:600}
+.auth-preview-note,.pay-msg,.auth-msg{margin:8px 0;padding:8px 10px;border-radius:10px;background:#ffb34718;border:1px solid #ffb34755;color:#ffd08a;font-size:12px;line-height:1.4}
+.auth-msg.good{background:#20c47718;border-color:#20c47755;color:#9be3bf}
+.auth-google{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:8px 0}
+.auth-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:11px;margin:10px 0}
+.auth-divider:before,.auth-divider:after{content:"";flex:1;height:1px;background:var(--line)}
+.auth-fields{display:grid;gap:8px;margin:8px 0}
+.auth-fields input,.profile-grid input,.profile-grid select,textarea.cg-input{width:100%;border-radius:11px;border:1px solid var(--line2);background:#0f1418;color:var(--text);padding:10px 12px;font-size:13px}
+.auth-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.auth-links button{background:none;border:0;color:#9be3bf;font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
+.benefit-list{margin:0;padding-left:18px;font-size:13px;line-height:1.55;color:var(--silver)}
+.benefit-list li{margin:4px 0}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.compare .col{background:#0f1418;border:1px solid var(--line);border-radius:12px;padding:10px}
+.compare h3{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.compare ul{margin:0;padding-left:16px;font-size:12px;line-height:1.5;color:var(--silver)}
+.plan-cards{display:grid;gap:8px;margin:10px 0}
+.plan-card{border:1px solid var(--line2);border-radius:14px;padding:12px;background:#12181c}
+.plan-card strong{display:block;font-size:14px}
+.plan-card .price{color:#9be3bf;font-weight:800;margin:4px 0 8px;font-size:13px}
+.save-badge{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.3px;background:#20c47733;color:#9be3bf;border:1px solid #20c47766;vertical-align:middle}
+.price-strike{color:var(--muted);font-weight:600;text-decoration:line-through;margin-right:6px;font-size:12px}
+.currency-switch{display:inline-flex;gap:4px;margin:6px 0 10px}
+.currency-switch .btn.active{border-color:#20c477aa;color:#9be3bf;background:#20c47714}
+.btn.sm{padding:7px 10px;font-size:11.5px}
+.btn.danger,.btn.danger-outline{border-color:#ff625c88;color:#ffaaa6}
+.btn.danger{background:#3a1818}
+.pro-badge{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:800;letter-spacing:.5px;background:#7aa2ff33;color:#a8c4ff;border:1px solid #7aa2ff55;vertical-align:middle}
+.preview-gate-bar{position:fixed;z-index:75;left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;background:#12181cf2;border:1px solid #20c47744;font-size:11px;color:#cfd8dd;max-width:calc(100vw - 20px);box-shadow:0 10px 28px -10px #000c}
+.preview-gate-bar label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+body.focus-mode .preview-gate-bar,body.focus-mode .account-btn,body.focus-mode .account-menu{display:none!important}
+.profile-head{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.profile-section{border-top:1px solid var(--line);padding:12px 0}
+.profile-section h3{margin:0 0 8px;font-size:13px;letter-spacing:.3px}
+.profile-grid{display:grid;gap:8px}
+@media(min-width:520px){.profile-grid.two{grid-template-columns:1fr 1fr}}
+.car-icon-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.car-icon-opt{display:flex;flex-direction:column;align-items:center;gap:4px;width:68px;padding:8px 4px;border-radius:12px;border:1px solid var(--line2);background:#0f1418;color:var(--green);cursor:pointer;font-size:10px;text-transform:capitalize}
+.car-icon-opt.active{border-color:#20c477aa;background:#20c47714}
+.car-icon-opt span{color:var(--muted)}
+.profile-fav-row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #ffffff0d}
+.theme-opts{display:flex;flex-wrap:wrap;gap:6px}
+.theme-opts .btn.active{border-color:#20c477aa;color:#9be3bf;background:#20c47714}
+.car-marker--svg{width:32px;height:32px;display:grid;place-items:center;filter:drop-shadow(0 2px 5px #0009)}
+.car-marker--svg:before,.car-marker--svg:after{display:none!important}
+.car-marker--svg svg{display:block}
+
+/* Light theme */
+body.theme-light{--bg:#f4f6f8;--bg2:#e8eef2;--panel:#ffffff;--panel2:#f7fafc;--line:#d5dee5;--line2:#c1ccd5;--text:#152028;--muted:#5b6b75;--silver:#3a4a54;--shadow:0 1px 0 #fff inset,0 10px 30px -12px #0d111433}
+body.theme-light{background:var(--bg);color:var(--text)}
+body.theme-light .cg-sheet,body.theme-light .account-menu{background:#fff;border-color:var(--line)}
+body.theme-light .auth-fields input,body.theme-light .profile-grid input,body.theme-light .profile-grid select,body.theme-light textarea.cg-input,body.theme-light .compare .col,body.theme-light .plan-card,body.theme-light .car-icon-opt{background:#f4f7fa;color:var(--text)}
+body.theme-light .btn{background:#eef3f6;color:var(--text)}
+body.theme-light .btn.primary{color:#06150d}
+body.theme-light .preview-gate-bar{background:#ffffffef;color:var(--text)}
+body.theme-light .status-chip,body.theme-light .dest-search,body.theme-light .map-reset{color:#eef3f5}
 
 /* Reset view — free map control */
 .map-reset{position:absolute;z-index:4;left:12px;bottom:62px;display:none;align-items:center;gap:7px;border:0;border-radius:999px;padding:10px 12px;background:#12181cf2;color:#eef3f5;font-size:12px;font-weight:750;box-shadow:0 8px 28px -10px #000c;border:1px solid #ffffff24;pointer-events:auto;cursor:pointer}
@@ -364,7 +463,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <div>
         <h1>Curve Guide</h1>
         <div class="tagline">Safer turns. Smarter drives.</div>
-        <div class="subtitle">Intelligent Road Safety System · Development prototype v7.0.5</div>
+        <div class="subtitle">Intelligent Road Safety System · Development prototype v7.1</div>
       </div>
     </div>
     <div class="header-actions">
@@ -373,7 +472,10 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
         Ask Niyi
       </button>
-      <div class="pill">PROTOTYPE · v7.0.5 3D</div>
+      <button type="button" class="account-btn" id="accountBtn" title="Sign in" aria-label="Sign in" aria-haspopup="true" aria-controls="accountMenu">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+      <div class="pill">PROTOTYPE · v7.1</div>
     </div>
   </header>
   <div class="install-bar" id="installBar"><span id="installText">Install Curve Guide on your phone for quicker access.</span><button type="button" class="btn primary" id="installBtn">Install</button></div>
@@ -423,7 +525,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
               <div class="nav-dist" id="navDist">—</div>
               <div class="nav-text" id="navText">—</div>
             </div>
-            <button type="button" class="nav-mute" id="navMuteBtn" aria-pressed="false" title="Mute voice">🔊</button>
+            <button type="button" class="nav-mute" id="navMuteBtn" data-pro-feature="voice navigation" aria-pressed="false" title="Mute voice">🔊</button>
           </div>
           <div class="nav-banner-sub">
             <span class="nav-remain" id="navRemain">—</span>
@@ -435,7 +537,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
           <p class="dest-meta" id="destMeta"></p>
           <div class="dest-actions">
             <button type="button" class="btn primary" id="destRoute">Route</button>
-            <button type="button" class="btn primary" id="destNavStart">Start navigation</button>
+            <button type="button" class="btn primary" id="destNavStart" data-pro-feature="voice navigation">Start navigation</button>
             <button type="button" class="btn" id="destNavStop" hidden>Stop navigation</button>
             <button type="button" class="btn" id="destClear">Clear</button>
           </div>
@@ -445,9 +547,9 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
           </details>
           <div class="bend-list" id="bendList" hidden></div>
           <div class="speed-bend-banner" id="speedBendBanner" role="alert">Slow down — sharp bend ahead</div>
-          <div class="small" id="favHint" style="margin-top:8px">Favourites (Home/School/Work) are saved on this phone only.</div><div class="fav-row" id="favRow"></div>
+          <div class="small" id="favHint" style="margin-top:8px">Favourites (Home/School/Work) are saved on this phone only.</div><div class="fav-row" id="favRow" data-pro-feature="favourites"></div>
           <div class="hazard-row">
-            <button type="button" class="btn" id="reportHazard">Report danger spot</button>
+            <button type="button" class="btn" id="reportHazard" data-pro-feature="danger reports">Report danger spot</button>
           </div>
           <p class="dest-note">Routing by OpenStreetMap/OSRM demo — free test service, may be slow or unavailable. Voice uses your browser speechSynthesis (prototype guidance, not a certified navigation system).</p>
         </div>
@@ -513,7 +615,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
     <div class="credit-copy">&copy; 2026 Curve Guide — Automotive Division of <a href="https://adeniyiltd.com/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Adeniyi Investments &amp; Property Ltd.</a> All rights reserved.</div>
     <div class="contact-line">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a><span class="sep"> · </span><a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></div>
   </div>
-  <footer>Curve Guide 7.0.5 · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
+  <footer>Curve Guide 7.1 · Road safety development prototype · Map data © OpenStreetMap contributors · Routing © OSRM</footer>
   </div>
 </div>
 
@@ -548,6 +650,190 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
   </form>
   <p class="niyi-mic-note" id="niyiMicNote" hidden>Mic turns speech into text for Niyi's keyword helper — not a smart AI. Nothing is uploaded by Curve Guide.</p>
 </div>
+
+<!-- Account menu -->
+<div class="account-menu" id="accountMenu" hidden role="menu" aria-label="Account">
+  <div id="accountMenuBody"></div>
+</div>
+
+<!-- Sign-in -->
+<div class="cg-overlay" id="authModal" hidden role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="cg-sheet">
+    <div class="sheet-head">
+      <div>
+        <h2 id="authTitle">Sign in</h2>
+        <div class="sheet-sub">Curve Guide · Automotive Division of Adeniyi Investments &amp; Property Ltd.</div>
+      </div>
+      <button type="button" class="icon-close" data-close-overlay="authModal" aria-label="Close">✕</button>
+    </div>
+    <p class="auth-preview-note" id="authPreviewNote" hidden></p>
+    <div id="authSignInPane">
+      <button type="button" class="btn primary auth-google" id="authGoogleBtn">Continue with Google</button>
+      <div class="auth-divider">or email</div>
+      <div class="auth-fields">
+        <input id="authEmail" type="email" autocomplete="username" placeholder="Email" aria-label="Email">
+        <input id="authPassword" type="password" autocomplete="current-password" placeholder="Password" aria-label="Password">
+        <button type="button" class="btn primary" id="authEmailBtn">Sign in</button>
+      </div>
+      <div class="auth-links">
+        <button type="button" data-auth-mode="create">Create account</button>
+        <button type="button" data-auth-mode="forgot">Forgot password</button>
+      </div>
+    </div>
+    <div id="authCreatePane" hidden>
+      <div class="auth-fields">
+        <input id="authCreateName" type="text" placeholder="Name" aria-label="Name">
+        <input id="authCreateEmail" type="email" autocomplete="email" placeholder="Email" aria-label="Email">
+        <input id="authCreatePassword" type="password" autocomplete="new-password" placeholder="Password (min 6)" aria-label="Password">
+        <button type="button" class="btn primary" id="authCreateBtn">Create account</button>
+      </div>
+      <div class="auth-links"><button type="button" data-auth-mode="signin">Back to sign in</button></div>
+    </div>
+    <div id="authForgotPane" hidden>
+      <div class="auth-fields">
+        <input id="authForgotEmail" type="email" placeholder="Email" aria-label="Email">
+        <button type="button" class="btn primary" id="authForgotBtn">Send reset link</button>
+      </div>
+      <div class="auth-links"><button type="button" data-auth-mode="signin">Back to sign in</button></div>
+    </div>
+    <p class="auth-msg" id="authMsg" hidden></p>
+    <button type="button" class="btn" id="authGuestBtn" style="width:100%;margin-top:8px">Continue without account</button>
+  </div>
+</div>
+
+<!-- Apex -->
+<div class="cg-overlay" id="premiumScreen" hidden role="dialog" aria-modal="true" aria-labelledby="premiumTitle">
+  <div class="cg-sheet">
+    <div class="sheet-head">
+      <div>
+        <h2 id="premiumTitle">Curve Guide Apex</h2>
+        <div class="sheet-sub" id="premiumStatusLine">Unlock the full driving companion.</div>
+      </div>
+      <button type="button" class="icon-close" data-close-overlay="premiumScreen" aria-label="Close">✕</button>
+    </div>
+    <p class="auth-msg" id="premiumGateTip" hidden></p>
+    <ul class="benefit-list">
+      <li>Voice turn-by-turn navigation</li>
+      <li>Bend warnings with speed alerts</li>
+      <li>Smarter Niyi with no limits</li>
+      <li>Favourites and danger reports synced across phones</li>
+    </ul>
+    <section class="why-apex" id="whyApex" aria-labelledby="whyApexTitle">
+      <div class="why-head"><h3 id="whyApexTitle">Why Apex?</h3><span class="why-hint">Swipe →</span></div>
+      <div class="why-track" id="whyApexTrack" role="list"></div>
+      <p class="why-src" id="whyApexSources"></p>
+      <div class="why-brand"><img src="assets/adeniyi-logo.png" alt="" loading="lazy"><span>Curve Guide Apex · Automotive Division of Adeniyi Investments &amp; Property Ltd.</span></div>
+      <p class="why-disclaimer">Curve Guide is a driving aid in early development. It can't prevent crashes. Always obey road signs and drive at a safe speed.</p>
+    </section>
+    <div class="compare">
+      <div class="col"><h3>Free</h3><ul><li>Map &amp; GPS curve awareness</li><li>Search &amp; basic routing</li><li>Local favourites on this device</li><li>Niyi keyword helper (limits in future)</li></ul></div>
+      <div class="col"><h3>Apex</h3><ul><li>Everything in Free</li><li>Voice guidance</li><li>Bend speed alerts</li><li>Synced favourites &amp; hazards</li><li>Priority Niyi</li></ul></div>
+    </div>
+    <div class="currency-switch" role="group" aria-label="Currency">
+      <span class="ngn-only-note">Prices in Naira (₦). Visa/Mastercard cards from outside Nigeria can still pay in ₦; your bank converts the amount.</span>
+    </div>
+    <div class="plan-cards">
+      <div class="plan-card">
+        <strong>Monthly</strong>
+        <div class="price" id="priceMonthly">₦450 / month</div>
+        <button type="button" class="btn primary" data-pay-plan="monthly">Pay with Paystack</button>
+      </div>
+      <div class="plan-card">
+        <strong>Yearly <span class="save-badge">Save 30%</span></strong>
+        <div class="price" id="priceYearly"><span class="price-strike" id="priceYearlyStrike">₦5,400</span> ₦3,780 / year</div>
+        <button type="button" class="btn primary" data-pay-plan="yearly">Pay with Paystack</button>
+      </div>
+    </div>
+    <p class="pay-msg" id="paystackMsg" hidden aria-live="polite"></p>
+    <p class="sheet-sub">Secure payment by Paystack. <strong>One-time payment, no auto-renew:</strong> Monthly gives 1 month of Apex, Yearly gives 1 year. Pay again any time to add more time. Sign in first so Apex is saved to your account. Curve Guide remains a prototype — never a substitute for careful driving.</p>
+  </div>
+</div>
+
+<!-- Profile -->
+<div class="cg-overlay" id="profileScreen" hidden role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+  <div class="cg-sheet">
+    <div class="sheet-head">
+      <div class="profile-head" id="profileHead"></div>
+      <button type="button" class="icon-close" data-close-overlay="profileScreen" aria-label="Close">✕</button>
+    </div>
+
+    <section class="profile-section" data-profile-section="car">
+      <h3>Car</h3>
+      <p class="small">Map marker icon &amp; colour.</p>
+      <div class="car-icon-row" id="carIconRow"></div>
+      <label class="small">Colour <input type="color" id="carColorPick" value="#20c477" aria-label="Car colour"></label>
+      <div class="profile-grid two" style="margin-top:10px">
+        <input id="carField_make" placeholder="Make" aria-label="Make">
+        <input id="carField_model" placeholder="Model" aria-label="Model">
+        <input id="carField_year" placeholder="Year" aria-label="Year" inputmode="numeric">
+        <input id="carField_colour" placeholder="Colour" aria-label="Colour">
+        <input id="carField_plate" placeholder="Plate (optional)" aria-label="Plate number">
+      </div>
+      <button type="button" class="btn primary sm" id="saveCarDetails" style="margin-top:8px">Save car details</button>
+      <p class="small auth-msg good" id="carSaveMsg" hidden></p>
+    </section>
+
+    <section class="profile-section" data-profile-section="saved">
+      <h3>Saved locations</h3>
+      <div id="profileFavList"></div>
+    </section>
+
+    <section class="profile-section" data-profile-section="appearance">
+      <h3>Appearance</h3>
+      <div class="theme-opts" role="group" aria-label="Theme">
+        <button type="button" class="btn sm" data-theme-opt="dark">Dark</button>
+        <button type="button" class="btn sm" data-theme-opt="light">Light</button>
+        <button type="button" class="btn sm" data-theme-opt="auto">Auto</button>
+      </div>
+      <div class="actions" style="margin-top:8px">
+        <button type="button" class="btn sm" id="profileNight">Night map</button>
+        <button type="button" class="btn sm" id="profileUnits">Units</button>
+      </div>
+    </section>
+
+    <section class="profile-section" data-profile-section="premium">
+      <h3>Apex</h3>
+      <div id="profilePlanLine" class="small"></div>
+      <button type="button" class="btn sm danger-outline" id="profileCancelPremium" hidden style="margin-top:8px">Cancel Apex</button>
+    </section>
+
+    <section class="profile-section" data-profile-section="support">
+      <h3>Support</h3>
+      <div class="profile-grid">
+        <select id="feedbackCat" class="cg-input" aria-label="Category">
+          <option>General</option><option>Bug</option><option>Billing</option><option>Safety concern</option><option>Other</option>
+        </select>
+        <textarea id="feedbackMsg" class="cg-input" rows="3" placeholder="Your message" aria-label="Message"></textarea>
+        <button type="button" class="btn primary sm" id="sendFeedbackBtn">Email feedback</button>
+      </div>
+      <p class="small" style="margin-top:8px">Contact: <a class="contact" href="tel:+2348053529802">+234 805 352 9802</a> ·
+        <a class="contact" href="https://wa.me/2348053529802" target="_blank" rel="noopener">WhatsApp</a> ·
+        <a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a></p>
+    </section>
+
+    <section class="profile-section" data-profile-section="privacy">
+      <h3>Privacy</h3>
+      <p class="small">Location stays on your device in this prototype. Full privacy policy coming with Firebase accounts. By using Curve Guide you accept the welcome Terms.</p>
+      <button type="button" class="btn sm" id="clearLocalDataBtn">Clear local data</button>
+    </section>
+
+    <section class="profile-section" data-profile-section="account">
+      <h3>Account</h3>
+      <button type="button" class="btn sm" id="profileSignOut">Sign out</button>
+      <button type="button" class="btn sm danger" id="deleteAccountBtn" style="margin-left:6px">Delete account</button>
+    </section>
+  </div>
+</div>
+
+
+
+<!-- FIREBASE_SDK: compat bundles from gstatic (v13.0.0 verified). Analytics skipped. -->
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
+<script src="auth.js"></script>
+<script src="premium-ui.js"></script>
+
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
 (function(){
@@ -711,6 +997,7 @@ function initMap(){
     map.addControl(new maplibregl.NavigationControl({showCompass:true,showZoom:false,visualizePitch:true}),'bottom-left');
     var el=document.createElement('div');el.className='car-marker';el.setAttribute('aria-label','Your approximate GPS position');
     carMarker=new maplibregl.Marker({element:el,rotationAlignment:'map',pitchAlignment:'map'}).setLngLat([3.3792,6.5244]).addTo(map);
+    if(window.__cgPremiumUI&&window.__cgPremiumUI.applyCarMarker)window.__cgPremiumUI.applyCarMarker();
     map.on('error',function(){setStatus('Some map data failed to load','warn')});
     map.on('load',function(){
       try{
@@ -1206,7 +1493,7 @@ function loadFavs(){
   try{var raw=localStorage.getItem(FAV_KEY);var o=raw?JSON.parse(raw):{};return o&&typeof o==='object'?o:{}}catch(e){return {}}
 }
 function saveFavs(o){try{localStorage.setItem(FAV_KEY,JSON.stringify(o))}catch(e){}}
-function renderFavRow(){
+function renderFavRow(){window.__cgRefreshFavs=renderFavRow;
   var row=$('favRow'); if(!row)return;
   row.textContent='';
   var favs=loadFavs();
@@ -1812,6 +2099,7 @@ function bindMapDestinationGestures(){
   map.on('touchcancel',function(){clearTimeout(pressTimer)});
 }
 bindDestinationUi();
+document.addEventListener('cg:favs-changed',function(){try{renderFavRow()}catch(e){}});
 bindFocusUi();
 
 setText('unit','Units: '+(useMph?'mph':'km/h'));
@@ -1999,6 +2287,36 @@ function doPageAction(t){
   if(/\b(unmute voice|unmute navigation|voice on)\b/.test(t)){
     A.setNavVoice(true);return confirm('Navigation voice unmuted.');
   }
+
+  if(/\b(premium|apex|upgrade|paystack|subscription|pro plan|apex plan)\b/.test(t)){
+    if(window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
+    return confirm('Curve Guide Apex: ₦450 for 1 month, or ₦3,780 for 1 year (save 30%). One-time Paystack payment, no auto-renew.');
+  }
+  if(/\b(sign in|sign-in|login|log in|create account)\b/.test(t)){
+    if(window.__cgPremiumUI)window.__cgPremiumUI.showAuth('signin');
+    return confirm('Opening sign-in. Firebase Auth is configured — enable Google & Email providers and authorized domains in the console.');
+  }
+  if(/\b(price|pricing|how much|cost|₦|naira|dollar)\b/.test(t)){
+    if(window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
+    return confirm('Curve Guide Apex: ₦450/month, or yearly with 30% off: ₦3,780/year (was ₦5,400). One-time payment by Paystack in Naira, no auto-renew. Open Apex to pay.');
+  }
+  if(/\b(profile|settings|account page)\b/.test(t)){
+    if(window.__cgPremiumUI)window.__cgPremiumUI.showProfile();
+    return confirm('Opening Profile & settings.');
+  }
+  if(/\b(car icon|map marker|change car)\b/.test(t)){
+    if(window.__cgPremiumUI)window.__cgPremiumUI.showProfile('car');
+    return confirm('Open Profile → Car to change the map icon and colour.');
+  }
+  if(/\b(delete account)\b/.test(t)){
+    if(window.__cgPremiumUI)window.__cgPremiumUI.showProfile('account');
+    return confirm('Account deletion is under Profile → Account. It permanently deletes your account and saved data.');
+  }
+  if(/\b(complaint|feedback|support)\b/.test(t)){
+    if(window.__cgPremiumUI)window.__cgPremiumUI.showProfile('support');
+    return confirm('Open Profile → Support to email info@adeniyiltd.com or use Call/WhatsApp.');
+  }
+
   if(/\b(reset (map|view)|recenter( map)?|reset camera|follow (me|gps))\b/.test(t)||/^(reset|recenter)$/i.test(t)){
     if(A.resetMapView)A.resetMapView();
     else if(A.setFollow){A.setFollow(true)}
@@ -2062,6 +2380,10 @@ function explainButton(t){
     'stop navigation':'Stop navigation ends voice guidance and hides the next-turn banner.',
     'clear':'Clear removes the destination pin and driving route.',
     'clear route':'Clear route removes the green GPS trail you have driven.',
+    'premium':'Apex: ₦450 for 1 month or ₦3,780 for 1 year (save 30%). One-time Paystack payment, no auto-renew.',
+    'apex':'Apex is the paid Curve Guide plan: voice nav, bend alerts, synced favourites/hazards, and priority Niyi.',
+    'sign in':'Sign in opens the account screen. Firebase Auth is configured for Google and email/password.',
+    'profile':'Profile stores your car icon, theme, car details and saved places, synced to your account when signed in.',
     'recenter':'Reset view (or say reset map) turns follow back on and flies to your GPS position, or Lagos if GPS is off.',
     'reset map':'Reset view turns follow back on and restores the camera (GPS or default start view).',
     'ask niyi':'Ask Niyi opens this helper. I match keywords and can tap a few page controls — I am not a smart AI.',
@@ -2112,7 +2434,7 @@ function pickPlace(it){
 }
 function answer(q){
   var t=String(q||'').toLowerCase().trim();
-  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 7.0.5.";
+  if(!t)return "Ask me how Curve Guide works, say “go to Ikeja”, or ask me to start GPS. I am a simple keyword helper for Curve Guide 7.1.";
   var explained=explainButton(t);
   if(explained)return explained;
   if(/voice|speak|mute|unmute|speech|talk|announce|mic|microphone/.test(t))
@@ -2122,7 +2444,7 @@ function answer(q){
   if(/destin|search|route|how do i (set|find)|directions?/.test(t)&&!extractPlace(q))
     return 'Say “go to …” or “take me to …”, or type in Search destination on the map. Then Route and Start navigation.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
-    return 'Curve Guide 7.0.5 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
+    return 'Curve Guide 7.1 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
   if(/disclaim|liabilit|certified|safe to use|replace|prototype/.test(t))
     return 'Curve Guide is an experimental prototype, not a certified safety or navigation system. Warnings and routes can be wrong. Always obey the road.';
   if(/gps|accur|±|plus.?minus|poor|fair|green|yellow|red chip/.test(t))
@@ -2132,14 +2454,14 @@ function answer(q){
   if(/satellit|3d|2d|map type|aerial|street/.test(t))
     return 'Say “satellite”, “street map”, “3D on”, or “3D off” — or use the map buttons. Views do not change curve estimates.';
   if(/how (does|do)|work|estimat|curve|heading|detect|what is curve guide/.test(t))
-    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Version 7.0.5 adds free search, OSRM routing, voice navigation, bend estimates, favourites, and more — still a prototype aid only.';
+    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Version 7.1 adds free search, OSRM routing, voice navigation, bend estimates, favourites, and more — still a prototype aid only.';
   if(/tip|advice|safe|prevent|brake|tyre|tire|seatbelt|distance|headlight|fatigue/.test(t)){
     var tip=tips[tipI%tips.length];
     tipI++;
     return tip+' (Ask for another safety tip anytime.)';
   }
   if(/hello|hi\b|hey|good (morning|afternoon|evening)/.test(t))
-    return "Hi! I'm Niyi for Curve Guide 7.0.5 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
+    return "Hi! I'm Niyi for Curve Guide 7.1 — keyword helper, not a smart AI. Try a chip, say “go to …”, or “start GPS”.";
   return "I'm still learning — I match simple keywords and a few page actions. Try: go to …, start GPS, satellite, Contact us, or Navigation.";
 }
 function refreshDriveNote(){
