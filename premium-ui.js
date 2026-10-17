@@ -1,4 +1,4 @@
-/* Curve Guide Apex / Auth / Profile UI (preview)
+/* Curve Guide Apex / Auth / Profile UI (7.1)
  * Local-only until Firebase + Paystack are wired (see auth.js).
  * Profile fields: curveGuide.profile — comment markers show where cloud sync goes.
  */
@@ -174,7 +174,7 @@
 
   function syncPreviewBar(snap) {
     var bar = $('previewGateBar');
-    if (!bar) return;
+    if (!bar) return; // removed in production 7.1
     snap = snap || (auth() && auth().snapshot()) || {};
     var note = $('previewAuthNote');
     if (note) {
@@ -199,16 +199,7 @@
     openOverlay('authModal');
     setAuthMode(mode || 'signin');
     var note = $('authPreviewNote');
-    if (note) {
-      var snap2 = auth() && auth().snapshot();
-      if (snap2 && snap2.firebaseReady) {
-        note.textContent = snap2.firestoreOk
-          ? 'Firebase Auth on · Firestore ok · Paystack TEST' + (snap2.verifyReady ? ' · server verify on' : ' · server verify not deployed')
-          : ('Firebase Auth on · Firestore offline' + (snap2.lastFsError ? ': ' + String(snap2.lastFsError).slice(0, 60) : '') + ' · using local');
-      } else {
-        note.textContent = 'Auth SDK not ready · local preview';
-      }
-    }
+    if (note) note.hidden = true;
   }
 
   function setAuthMode(mode) {
@@ -272,7 +263,7 @@
   };
 
   function renderWhyApex(cur) {
-    var data = WHY_APEX[cur === 'USD' ? 'USD' : 'NGN'];
+    var data = WHY_APEX[cur === 'USD' && auth() && auth().snapshot().usdEnabled ? 'USD' : 'NGN'];
     var track = $('whyApexTrack');
     var src = $('whyApexSources');
     if (!track || !src) return;
@@ -315,17 +306,45 @@
     if (status && snap) {
       status.textContent = snap.serverPremium === true
         ? 'You are on Apex.'
-        : snap.testApex
-          ? 'Apex is on for this device as a TEST (test payment ' + snap.testApex.reference + '). Server activation pending.'
-          : snap.premium
-            ? 'You are on Apex (preview toggle).'
-            : snap.signedIn
-              ? 'You are on the Free plan.'
-              : 'Sign in first to buy Apex, so it is saved to your account.';
+        : snap.pendingPayment
+          ? 'Payment received (reference ' + snap.pendingPayment.reference + '). Activating Apex…'
+          : snap.signedIn
+            ? 'You are on the Free plan.'
+            : 'Sign in first to buy Apex, so it is saved to your account.';
     }
   }
 
-  /* ---------- Apex checkout (Paystack TEST mode) ---------- */
+  /* ---------- Apex checkout (Paystack) ---------- */
+  var SUPPORT_HTML = 'WhatsApp <a class="contact" href="https://wa.me/2348053529802" target="_blank" rel="noopener">+234 805 352 9802</a> or email ' +
+    '<a class="contact" href="mailto:info@adeniyiltd.com">info@adeniyiltd.com</a>';
+  function activationFailedHtml(ref, err) {
+    return '<strong>Payment received, but Apex could not be activated yet.</strong>' +
+      (err ? ' (' + escapeHtml(String(err).slice(0, 120)) + ')' : '') +
+      '<br>Please <strong>don\'t pay again</strong>. Your Paystack reference is <code>' + escapeHtml(ref) + '</code>. ' +
+      'We\'ll retry automatically next time you open Curve Guide, or tap <button type="button" class="btn sm" id="retryActivateBtn">Try again</button>' +
+      '<br>Still stuck? Send the reference to ' + SUPPORT_HTML + '.';
+  }
+  function bindRetryButton(ref) {
+    var rb = $('retryActivateBtn');
+    if (!rb) return;
+    rb.onclick = function () {
+      rb.disabled = true;
+      payMsg('Checking your payment with Paystack… Reference: <code>' + escapeHtml(ref) + '</code>', 'good');
+      auth().verifyPayment(ref).then(function (v) {
+        if (v && v.ok) {
+          payMsg('<strong>Apex is active! 🎉</strong>' + (v.expiresAt ? ' Active until ' + escapeHtml(new Date(v.expiresAt).toLocaleDateString()) : ''), 'good');
+        } else {
+          payMsg(activationFailedHtml(ref, v && v.error), 'warn');
+          bindRetryButton(ref);
+        }
+        syncAccountButton(auth().snapshot());
+        renderPremium();
+      }).catch(function (e) {
+        payMsg(activationFailedHtml(ref, e && e.message), 'warn');
+        bindRetryButton(ref);
+      });
+    };
+  }
   var payBusy = false;
   function payMsg(text, kind) {
     var msg = $('paystackMsg');
@@ -350,10 +369,10 @@
     payBusy = true;
     setPayButtonsDisabled(true);
     var cur = a.currency();
-    payMsg('Opening Paystack secure checkout' + (snap.paystackTestMode ? ' (TEST mode, no real money)' : '') + '…');
+    payMsg('Opening Paystack secure checkout' + (snap.paystackTestMode ? ' (test mode)' : '') + '…');
     a.startApexCheckout(plan, {
       onOpen: function () {
-        payMsg('Paystack checkout is open' + (snap.paystackTestMode ? ' (TEST mode: use a Paystack test card, no real money)' : '') + '.');
+        payMsg('Paystack secure checkout is open' + (snap.paystackTestMode ? ' (test mode)' : '') + '.');
       },
       onPaid: function (rec) {
         payMsg('<strong>Payment received — activating Apex…</strong><br>Reference: <code>' + escapeHtml(rec.reference) + '</code>', 'good');
@@ -369,14 +388,9 @@
         payMsg('<strong>Apex is active! 🎉</strong> Plan: ' + escapeHtml(v.plan || plan) +
           (v.expiresAt ? ' · Active until ' + escapeHtml(new Date(v.expiresAt).toLocaleDateString()) : '') +
           '<br>Reference: <code>' + ref + '</code>', 'good');
-      } else if (v.notConfigured) {
-        payMsg('<strong>Test payment succeeded</strong> (reference <code>' + ref + '</code>).<br>' +
-          'Apex activation needs the server step, which is not deployed yet. ' +
-          'For this preview, Apex is switched on <strong>on this device only, as a TEST</strong>.', 'good');
       } else {
-        payMsg('<strong>Payment received</strong> (reference <code>' + ref + '</code>), but we could not activate Apex yet' +
-          (v.error ? ': ' + escapeHtml(String(v.error).slice(0, 120)) : '') +
-          '.<br>Don\'t pay again. Keep this reference and contact info@adeniyiltd.com. Apex is on for this device as a TEST for now.', 'warn');
+        payMsg(activationFailedHtml(res.reference, v.error), 'warn');
+        bindRetryButton(res.reference);
       }
       syncAccountButton(auth().snapshot());
       renderPremium();
@@ -389,7 +403,9 @@
       }
       if (cur === 'USD') {
         text = '<strong>USD payments aren\'t available yet.</strong> Paystack said: ' + text +
-          '<br>Please switch to <strong>NGN</strong> and try again. (USD has to be enabled on the Curve Guide Paystack account first.)';
+          '<br>Please pay in <strong>NGN</strong> instead.';
+      } else {
+        text = '<strong>Payment could not start.</strong> ' + text + '<br>You were not charged. Please try again, or contact ' + SUPPORT_HTML + '.';
       }
       payMsg(text, 'warn');
     }).then(function () {
@@ -535,10 +551,10 @@
             ? '<strong>Apex</strong> · ' + escapeHtml(snap.serverPremiumInfo.plan || '') + ' · Active until ' + escapeHtml(fmtDate(snap.serverPremiumInfo.expiresAt)) +
               (snap.serverPremiumInfo.test ? ' <span class="plan-badge free">Paystack test payment</span>' : '') +
               '<br><span class="small">One-time payment: it won\'t renew or charge you again automatically. Pay again any time to add more time.</span>'
-            : snap.testApex
-              ? '<strong>Apex (TEST)</strong> · test payment <code>' + escapeHtml(snap.testApex.reference) + '</code> · server activation pending'
-              : '<strong>Apex</strong> · Renewal date: <em>TBD (preview)</em>')
-        : '<strong>Free</strong> · <button type="button" class="btn primary sm" id="profilePlanUpgrade">Upgrade to Apex</button>';
+            : '<strong>Apex</strong>')
+        : (snap.pendingPayment
+            ? '<strong>Free</strong> · payment <code>' + escapeHtml(snap.pendingPayment.reference) + '</code> is being activated. If Apex doesn\'t appear soon, contact ' + SUPPORT_HTML + '.'
+            : '<strong>Free</strong> · <button type="button" class="btn primary sm" id="profilePlanUpgrade">Upgrade to Apex</button>');
       var pu = $('profilePlanUpgrade');
       if (pu) pu.onclick = function () { showPremium(); };
     }
@@ -561,7 +577,7 @@
       var tip = $('premiumGateTip');
       if (tip) {
         tip.hidden = false;
-        tip.textContent = '“' + featureId + '” is an Apex feature in this preview demo (gating is on).';
+        tip.textContent = '“' + featureId + '” is an Apex feature.';
       }
       return;
     }
@@ -581,7 +597,7 @@
           var tip = $('premiumGateTip');
           if (tip) {
             tip.hidden = false;
-            tip.textContent = 'This feature is marked APEX while preview gating is on.';
+            tip.textContent = 'This is an Apex feature.';
           }
         },
         true
@@ -750,7 +766,7 @@
         var m = $('carSaveMsg');
         if (m) {
           m.hidden = false;
-          m.textContent = 'Saved on this device (preview).';
+          m.textContent = 'Saved.';
         }
       };
 
@@ -796,7 +812,7 @@
           return;
         }
         var sub = encodeURIComponent('Curve Guide feedback — ' + cat);
-        var body = encodeURIComponent('Category: ' + cat + '\n\n' + msg + '\n\n— Sent from Curve Guide preview');
+        var body = encodeURIComponent('Category: ' + cat + '\n\n' + msg + '\n\n— Sent from Curve Guide 7.1');
         window.location.href = 'mailto:info@adeniyiltd.com?subject=' + sub + '&body=' + body;
       };
 

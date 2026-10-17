@@ -3,12 +3,12 @@
  * Firebase web config is set below. Auth uses the compat SDK loaded from gstatic
  * (firebase-app, firebase-auth, firebase-firestore) — see index.html FIREBASE_SDK.
  *
- * Apex payments use Paystack Inline (Popup) v2 in TEST mode (pk_test_ key).
+ * Apex payments use Paystack Inline (Popup) v2 with the LIVE public key.
  * The Firestore `premium` field is read-only for clients (see firestore.rules);
  * only the server step (server/verify-payment, Cloudflare Worker) may set it,
  * after verifying the reference with Paystack using the SECRET key.
- * Until VERIFY_URL is set, a successful test payment only turns on a local,
- * clearly-labelled "test" Apex flag on this device (preview only).
+ * Apex is NEVER granted locally: if verification fails the user sees the
+ * reference + support contacts, and the app retries verification later.
  */
 (function (global) {
   'use strict';
@@ -23,12 +23,16 @@
     measurementId: 'G-GP56ZC45WC'
   };
 
-  // Public TEST key — safe to commit. Never put the secret key (sk_...) in this file.
-  var PAYSTACK_PUBLIC_KEY = 'pk_test_94e4ea814054a2a166783d3982176f703f516c07';
+  // Public LIVE key — safe to commit (public keys are meant for the browser).
+  // Never put a secret key (sk_...) in this file. Test key for local testing:
+  // pk_test_94e4ea814054a2a166783d3982176f703f516c07
+  var PAYSTACK_PUBLIC_KEY = 'pk_live_ed38d5ade620e3c8c042020934d608662a112f97';
+  // USD is not enabled on the Paystack merchant account yet, so only NGN is offered.
+  var USD_ENABLED = false;
   var PAYSTACK_INLINE_SRC = 'https://js.paystack.co/v2/inline.js';
   // Server verification endpoint (Cloudflare Worker, server/verify-payment).
   // Empty = server step not deployed. If the Worker's secrets are missing it answers
-  // 503 notConfigured and the app falls back to the local TEST flag.
+  // 503 notConfigured and the app shows an error (never a local grant).
   var VERIFY_URL = 'https://curveguide-verify.thealtim8.workers.dev/verify';
 
   // Prices in the smallest unit (kobo / cents). Must match server/verify-payment PRICES.
@@ -36,7 +40,8 @@
     NGN: { monthly: 45000, yearly: 378000 },
     USD: { monthly: 100, yearly: 840 }
   };
-  var TEST_REF_KEY = 'curveGuide.testApexPayment';
+  var TEST_REF_KEY = 'curveGuide.testApexPayment'; // legacy preview flag, always cleared
+  var PENDING_KEY = 'curveGuide.pendingApexPayment'; // paid but not yet verified -> retry
 
   var AUTH_KEY = 'curveGuide.previewAuth';
   var PLAN_KEY = 'curveGuide.previewPlan';
@@ -119,22 +124,23 @@
     return loadJson(AUTH_KEY, null);
   }
 
-  function testApexPayment() { return loadJson(TEST_REF_KEY, null); }
-
-  function plan() {
-    if (serverPremium === true) return 'premium';
-    var t = testApexPayment(); // local TEST flag only (preview), tied to the signed-in user
+  function testApexPayment() { return null; } // local test grants removed in 7.1
+  function pendingApexPayment() {
+    var p = loadJson(PENDING_KEY, null);
     var u = currentUser();
-    if (t && u && t.uid === u.uid) return 'premium';
-    var p = loadJson(PLAN_KEY, 'free');
-    return p === 'premium' ? 'premium' : 'free';
+    return p && u && p.uid === u.uid ? p : null;
+  }
+
+  // Apex comes ONLY from the server-written Firestore field.
+  function plan() {
+    return serverPremium === true ? 'premium' : 'free';
   }
 
   function isPremium() { return plan() === 'premium'; }
   function gatingOn() { return loadJson(GATE_KEY, false) === true; }
   function setGating(on) { saveJson(GATE_KEY, !!on); emit(); }
-  function currency() { return loadJson(CURRENCY_KEY, 'NGN') === 'USD' ? 'USD' : 'NGN'; }
-  function setCurrency(c) { saveJson(CURRENCY_KEY, c === 'USD' ? 'USD' : 'NGN'); emit(); }
+  function currency() { return USD_ENABLED && loadJson(CURRENCY_KEY, 'NGN') === 'USD' ? 'USD' : 'NGN'; }
+  function setCurrency(c) { saveJson(CURRENCY_KEY, USD_ENABLED && c === 'USD' ? 'USD' : 'NGN'); emit(); }
 
   function snapshot() {
     return {
@@ -153,7 +159,9 @@
       verifyReady: !!VERIFY_URL,
       serverPremium: serverPremium,
       serverPremiumInfo: serverPremiumInfo,
-      testApex: serverPremium === true ? null : testApexPayment()
+      testApex: null,
+      usdEnabled: USD_ENABLED,
+      pendingPayment: pendingApexPayment()
     };
   }
 
@@ -415,7 +423,7 @@
     });
   }
 
-  /* ---------- Paystack Inline (Popup) checkout — TEST mode ---------- */
+  /* ---------- Paystack Inline (Popup) checkout ---------- */
   var paystackLoading = null;
   function loadPaystack() {
     if (typeof global.PaystackPop === 'function') return Promise.resolve(global.PaystackPop);
@@ -479,7 +487,7 @@
       });
     }).then(function (body) {
       if (body.ok) {
-        try { localStorage.removeItem(TEST_REF_KEY); } catch (e) {}
+        try { localStorage.removeItem(PENDING_KEY); } catch (e) {}
         var u = fb.auth && fb.auth.currentUser;
         return (u ? pullUserCloud(u.uid) : Promise.resolve()).then(function () { emit(); return body; });
       }
@@ -541,17 +549,14 @@
               if (settled) return;
               settled = true;
               var ref = (transaction && (transaction.reference || transaction.trxref)) || reference;
-              var record = { reference: ref, plan: planId, currency: cur, amount: amount, uid: user.uid, at: Date.now(), test: true };
+              var record = { reference: ref, plan: planId, currency: cur, amount: amount, uid: user.uid, at: Date.now() };
+              // Remember the reference so activation can be retried; this does NOT grant Apex.
+              saveJson(PENDING_KEY, record);
               if (hooks.onPaid) try { hooks.onPaid(record); } catch (e) {}
               verifyPayment(ref).then(function (v) {
-                if (!v.ok) {
-                  // Server step missing or failed: keep a LOCAL test flag only (never Firestore).
-                  saveJson(TEST_REF_KEY, record);
-                  emit();
-                }
+                emit();
                 resolve({ status: 'paid', reference: ref, record: record, verify: v });
               }).catch(function (err) {
-                saveJson(TEST_REF_KEY, record);
                 emit();
                 resolve({ status: 'paid', reference: ref, record: record, verify: { ok: false, error: String(err && err.message || err) } });
               });
@@ -576,8 +581,22 @@
     emit();
   }
 
+  // Retry activation for a payment that succeeded but was not verified yet.
+  var retrying = false;
+  function retryPendingPayment() {
+    var p = pendingApexPayment();
+    if (!p || retrying || !(fb.auth && fb.auth.currentUser)) return Promise.resolve(null);
+    retrying = true;
+    return verifyPayment(p.reference).catch(function () { return null; }).then(function (v) {
+      retrying = false;
+      emit();
+      return v;
+    });
+  }
+
   function setPlanLocal(planName) {
-    saveJson(PLAN_KEY, planName === 'premium' ? 'premium' : 'free');
+    // Kept for compatibility; has no effect on Apex any more (server-only).
+    try { localStorage.removeItem(PLAN_KEY); } catch (e) {}
     if (planName !== 'premium') { try { localStorage.removeItem(TEST_REF_KEY); } catch (e) {} }
     emit();
   }
@@ -649,8 +668,18 @@
     });
   }
 
-  // Boot
+  // Boot: remove legacy preview-only local Apex switches (Apex is server-only now).
+  try { localStorage.removeItem(TEST_REF_KEY); localStorage.removeItem(PLAN_KEY); } catch (e) {}
   var boot = initFirebase();
+  // After sign-in is known, retry any paid-but-unverified Apex payment.
+  var autoRetried = {}; // at most one automatic retry per reference per page load
+  onChange(function (snap) {
+    var p = snap.signedIn && snap.firebaseReady && snap.pendingPayment;
+    if (p && !retrying && !autoRetried[p.reference]) {
+      autoRetried[p.reference] = true;
+      setTimeout(retryPendingPayment, 1500);
+    }
+  });
 
   global.__cgAuth = {
     FIREBASE_CONFIG: FIREBASE_CONFIG,
@@ -678,6 +707,8 @@
     startApexCheckout: startApexCheckout,
     verifyPayment: verifyPayment,
     testApexPayment: testApexPayment,
+    pendingApexPayment: pendingApexPayment,
+    retryPendingPayment: retryPendingPayment,
     clearTestApex: clearTestApex,
     setPlanLocal: setPlanLocal,
     requiresPremium: requiresPremium,

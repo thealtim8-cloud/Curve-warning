@@ -5,8 +5,8 @@ compatibility_date = "2026-10-01"
 [vars]
 FIREBASE_PROJECT_ID = "curve-guide"
 ALLOWED_ORIGINS = "https://curveguide.name.ng,https://thealtim8-cloud.github.io,http://localhost:8080"
-# Keep "true" while testing with sk_test_. Set to "false" when you switch to the live key.
-ALLOW_TEST_PAYMENTS = "true"
+# "false" in production (live key). Set "true" only while testing with sk_test_.
+ALLOW_TEST_PAYMENTS = "false"
 # Set to "true" to refuse /verify calls without a Firebase sign-in token.
 REQUIRE_ID_TOKEN = "true"
 
