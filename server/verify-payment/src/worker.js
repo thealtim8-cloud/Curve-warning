@@ -6,7 +6,7 @@
  *        -> verifies the reference with Paystack, then sets users/{uid}.premium
  *   POST /webhook  Paystack webhook (charge.success), signed with x-paystack-signature
  *   POST /niyi     { messages, context } (Authorization: Bearer <Firebase ID token>)
- *        -> smart Niyi chat via Workers AI (binding AI). Free: 10/day, Apex: fair use.
+ *        -> smart Niyi chat via Workers AI (binding AI). Free: 20/day, Apex: fair use.
  *   GET  /health   quick check
  *
  * Secrets (set with `npx wrangler secret put NAME`, NEVER commit them):
@@ -294,7 +294,7 @@ async function grantApex(env, info) {
 /* ---------------- Smart Niyi (Workers AI) ---------------- */
 const NIYI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const NIYI_FALLBACK_MODEL = '@cf/meta/llama-3.1-8b-instruct-fp8';
-const NIYI_FREE_PER_DAY = 10;
+const NIYI_FREE_PER_DAY = 20;
 const NIYI_APEX_PER_DAY = 150; // "unlimited" for people, but stops abuse of the free AI allowance
 const NIYI_ACTIONS = ['set_destination', 'go_favourite', 'map_view', 'night_mode', 'tilt_3d', 'units', 'start_nav', 'stop_nav',
   'start_gps', 'stop_gps', 'voice', 'focus_mode', 'reset_view', 'clear_destination', 'open'];
@@ -305,7 +305,7 @@ FACTS (only use these; never invent features, prices or numbers):
 - Curve Guide is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Contact: phone/WhatsApp +234 805 352 9802, email info@adeniyiltd.com.
 - It is a prototype driving aid, NOT a certified safety or navigation system. Curve warnings are estimates from phone GPS heading changes and route shape. Always obey road signs.
 - Maps use OpenStreetMap data; routes use the free OSRM demo; search uses Nominatim/Photon. If a place (like an estate or house) is missing, the user can open Google Maps, long-press the spot, copy the coordinates (e.g. 6.5982, 3.2765) and paste them into Curve Guide search, or long-press the Curve Guide map to drop a pin.
-- Free plan: map, live GPS curve alert, bend dots and on-screen slow-down alert, search, routing, on-screen directions, favourites and danger reports saved on the phone, Niyi 10 chats a day.
+- Free plan: map, live GPS curve alert, bend dots and on-screen slow-down alert, search, routing, on-screen directions, favourites and danger reports saved on the phone, Niyi 20 chats a day.
 - Apex plan: spoken turn-by-turn voice, bends-ahead list with suggested safe speeds and spoken bend warnings, favourites and danger reports synced across phones, unlimited smart Niyi. Price: ₦450 for 1 month or ₦3,780 for 1 year. One-time Paystack payment in Naira (₦), no auto-renew.
 - Emergency in Nigeria: call 112. The app has an Emergency button.
 RULES:

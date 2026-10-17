@@ -732,7 +732,7 @@ body.focus-mode .focus-niyi{display:inline-flex!important;position:fixed;z-index
       <p class="why-disclaimer">Curve Guide is a driving aid in early development. It can't prevent crashes. Always obey road signs and drive at a safe speed.</p>
     </section>
     <div class="compare">
-      <div class="col"><h3>Free</h3><ul><li>Map &amp; live GPS curve alert</li><li>Bend dots + on-screen slow-down alert</li><li>Search, routing &amp; on-screen directions</li><li>Favourites &amp; reports on this phone</li><li>Niyi: 10 chats a day</li></ul></div>
+      <div class="col"><h3>Free</h3><ul><li>Map &amp; live GPS curve alert</li><li>Bend dots + on-screen slow-down alert</li><li>Search, routing &amp; on-screen directions</li><li>Favourites &amp; reports on this phone</li><li>Niyi: 20 chats a day</li></ul></div>
       <div class="col"><h3>Apex</h3><ul><li>Everything in Free</li><li>Spoken turn-by-turn voice</li><li>Bends-ahead list, safe-speed tips &amp; spoken bend warnings</li><li>Favourites &amp; reports synced across phones</li><li>Unlimited smart Niyi</li></ul></div>
     </div>
     <div class="currency-switch" role="group" aria-label="Currency">
@@ -2667,7 +2667,7 @@ function aiAvailable(){var Au=window.__cgAuth;return !!(Au&&Au.niyiChat&&Au.isSi
 
 /* 7.2 Smart Niyi: Cloudflare Workers AI via the Curve Guide Worker (no AI key in the browser).
    Free: NIYI_FREE_LIMIT chats per day (counted here + enforced on the server). Apex: unlimited (fair use). */
-var NIYI_FREE_LIMIT=10, NIYI_USAGE_KEY='curveGuide.niyiUsage', aiHistory=[], aiBusy=false, aiSigninHinted=false;
+var NIYI_FREE_LIMIT=20, NIYI_USAGE_KEY='curveGuide.niyiUsage', aiHistory=[], aiBusy=false, aiSigninHinted=false;
 function isApexNow(){try{return !!(window.__cgAuth&&window.__cgAuth.isPremium())}catch(e){return false}}
 function todayKey(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function niyiUsed(){try{var u=JSON.parse(localStorage.getItem(NIYI_USAGE_KEY)||'{}');return u.day===todayKey()?(u.n||0):0}catch(e){return 0}}

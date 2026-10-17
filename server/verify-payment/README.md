@@ -101,7 +101,7 @@ Both are blocked for the app by `firestore.rules`; only this server writes them.
   10,000 neurons/day per account.
 * Needs a Firebase sign-in token. Apex is read from `users/{uid}.premium` (active + `expiresAt` in the
   future; plan `creator` with a far-future date counts).
-* Limits: Free 10 chats/day, Apex 150/day (fair use), 1 request / 2 s per user. Counts live in
+* Limits: Free 20 chats/day, Apex 150/day (fair use), 1 request / 2 s per user. Counts live in
   Firestore `niyiUsage/{uid}_{YYYYMMDD}` (server only; clients can't read/write it).
 * Returns `{ ok, reply, actions[], apex, used, limit }`. Actions are whitelisted
   (set_destination, map_view, units, start_nav, stop_nav, …) and run by the app.
