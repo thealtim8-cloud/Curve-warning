@@ -1,6 +1,6 @@
 // Offline test: mocks Paystack, Google OAuth and Firestore. Run: node test/worker.test.mjs
 import assert from 'node:assert/strict';
-import { generateKeyPairSync, createHmac } from 'node:crypto';
+import { generateKeyPairSync, createHmac, createSign } from 'node:crypto';
 import worker from '../src/worker.js';
 
 const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
@@ -20,6 +20,17 @@ const txs = {
   'CG-cheap': { status: 'success', domain: 'test', amount: 100, currency: 'NGN', reference: 'CG-cheap', metadata: { uid: 'user123abc', plan: 'yearly' } },
   'CG-failed': { status: 'failed', domain: 'test', amount: 45000, currency: 'NGN', reference: 'CG-failed', metadata: { uid: 'user123abc', plan: 'monthly' } }
 };
+// Fake Firebase sign-in key for /niyi tests
+const userKeys = generateKeyPairSync('rsa', { modulusLength: 2048 });
+const userJwk = Object.assign(userKeys.publicKey.export({ format: 'jwk' }), { kid: 'k1', alg: 'RS256', use: 'sig' });
+function idToken(uid) {
+  const b = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
+  const now = Math.floor(Date.now() / 1000);
+  const h = b({ alg: 'RS256', kid: 'k1' });
+  const p = b({ aud: 'curve-guide', iss: 'https://securetoken.google.com/curve-guide', sub: uid, iat: now, exp: now + 3600 });
+  const sig = createSign('RSA-SHA256').update(h + '.' + p).sign(userKeys.privateKey).toString('base64url');
+  return h + '.' + p + '.' + sig;
+}
 const store = {}; // path -> fields
 let commits = 0;
 
@@ -35,6 +46,9 @@ globalThis.fetch = async (url, init = {}) => {
     assert.match(String(init.body), /assertion=[\w-]+\.[\w-]+\.[\w-]+/);
     return J({ access_token: 'ya29.fake', expires_in: 3600 });
   }
+  if (url.startsWith('https://www.googleapis.com/service_accounts/v1/jwk/securetoken')) {
+    return new Response(JSON.stringify({ keys: [userJwk] }), { headers: { 'Cache-Control': 'max-age=3600' } });
+  }
   const base = 'https://firestore.googleapis.com/v1/projects/curve-guide/databases/(default)/documents';
   if (url === base + ':commit') {
     commits++;
@@ -43,11 +57,21 @@ globalThis.fetch = async (url, init = {}) => {
       const path = w.update.name.split('/documents/')[1];
       if (w.currentDocument && w.currentDocument.exists === false && store[path]) return J({ error: { status: 'ALREADY_EXISTS' } }, 409);
     }
+    const writeResults = [];
     for (const w of body.writes) {
       const path = w.update.name.split('/documents/')[1];
       store[path] = Object.assign({}, store[path] || {}, w.update.fields);
+      const tr = [];
+      for (const t of w.updateTransforms || []) {
+        if (t.increment) {
+          const cur = Number((store[path][t.fieldPath] || {}).integerValue || 0) + Number(t.increment.integerValue);
+          store[path][t.fieldPath] = { integerValue: String(cur) };
+          tr.push({ integerValue: String(cur) });
+        } else tr.push({ timestampValue: new Date().toISOString() });
+      }
+      writeResults.push({ transformResults: tr });
     }
-    return J({ writeResults: [] });
+    return J({ writeResults });
   }
   if (url.startsWith(base + '/')) {
     const path = url.slice(base.length + 1);
@@ -108,4 +132,33 @@ env.ALLOW_TEST_PAYMENTS = 'false';
 txs['CG-t2'] = Object.assign({}, txs['CG-good-M'], { reference: 'CG-t2' });
 r = await call('/verify', { reference: 'CG-t2' }); assert.equal(r.status, 400);
 console.log('✓ test payments refused when ALLOW_TEST_PAYMENTS=false');
+
+// Smart Niyi
+let aiCalls = 0;
+env.AI = { run: async (model, input) => {
+  aiCalls++;
+  assert.equal(input.messages[0].role, 'system');
+  assert.match(input.messages[0].content, /\+234 805 352 9802/);
+  return { response: '{"reply":"Switching to satellite. Keep your eyes on the road.","actions":[{"type":"map_view","view":"satellite"},{"type":"delete_everything"}]}' };
+} };
+r = await call('/niyi', { messages: [{ role: 'user', content: 'satellite please' }] }); b = await r.json();
+assert.equal(r.status, 401); console.log('✓ /niyi needs sign-in');
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+r = await call('/niyi', { messages: [{ role: 'user', content: 'satellite please' }], context: { driving: true } }, { Authorization: 'Bearer ' + idToken('freeuser1') }); b = await r.json();
+assert.equal(r.status, 200, JSON.stringify(b)); assert.equal(b.ok, true); assert.equal(b.apex, false); assert.equal(b.used, 1);
+assert.deepEqual(b.actions, [{ type: 'map_view', view: 'satellite' }]);
+console.log('✓ /niyi free user answered, unknown actions dropped:', b.reply);
+r = await call('/niyi', { messages: [{ role: 'user', content: 'again' }] }, { Authorization: 'Bearer ' + idToken('freeuser1') });
+assert.equal(r.status, 429); console.log('✓ /niyi burst limit');
+for (const k of Object.keys(store)) if (k.startsWith('niyiUsage/freeuser1_')) store[k].count = { integerValue: '10' };
+await sleep(2100);
+r = await call('/niyi', { messages: [{ role: 'user', content: 'hi' }] }, { Authorization: 'Bearer ' + idToken('freeuser1') }); b = await r.json();
+assert.equal(r.status, 429); assert.equal(b.code, 'limit'); console.log('✓ /niyi free daily limit (10) enforced on server');
+store['users/creator1'] = { premium: { mapValue: { fields: { active: { booleanValue: true }, plan: { stringValue: 'creator' }, expiresAt: { timestampValue: '2099-12-31T00:00:00Z' } } } } };
+r = await call('/niyi', { messages: [{ role: 'user', content: 'hi' }] }, { Authorization: 'Bearer ' + idToken('creator1') }); b = await r.json();
+assert.equal(r.status, 200); assert.equal(b.apex, true); assert.equal(b.used, undefined);
+console.log('✓ /niyi creator plan (far-future expiry) counts as Apex');
+store['users/expired1'] = { premium: { mapValue: { fields: { active: { booleanValue: true }, plan: { stringValue: 'monthly' }, expiresAt: { timestampValue: '2020-01-01T00:00:00Z' } } } } };
+r = await call('/niyi', { messages: [{ role: 'user', content: 'hi' }] }, { Authorization: 'Bearer ' + idToken('expired1') }); b = await r.json();
+assert.equal(b.apex, false); console.log('✓ /niyi expired Apex treated as Free');
 console.log('\nAll worker tests passed.');
