@@ -586,7 +586,11 @@ body[data-accent="red"]{--acc:#e5484d;--acc-rgb:229 72 77;--acc-hi:#ef6468;--acc
 @keyframes nfBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 @keyframes nfHop{0%{transform:translateY(0) scale(1)}45%{transform:translateY(-3px) scale(1.04)}100%{transform:none}}
 @keyframes nfTilt{to{transform:rotate(-8deg)}}
-.niyi-fab .niyi-face{width:34px;height:34px}
+.niyi-face .nf-ink{fill:none;stroke:#f7fff9;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.niyi-face .nf-dot{fill:#f7fff9}
+body.theme-light .niyi-msg .nf-ink,body.theme-light .niyi-head .nf-ink{stroke:#102018}
+body.theme-light .niyi-msg .nf-dot,body.theme-light .niyi-head .nf-dot{fill:#102018}
+.niyi-fab .niyi-face{width:40px;height:40px}
 .niyi-header-btn .niyi-face{width:20px;height:20px;margin:-2px 0}
 .niyi-head-face{flex:none;width:34px;height:34px;display:block}
 .niyi-head-face .niyi-face{width:34px;height:34px}
@@ -788,7 +792,9 @@ body[data-tab="drive"] .side-stack{display:grid;gap:12px}
   body[data-tab="drive"] .metrics{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr))!important}
   body[data-tab="drive"] .metric{display:block!important}
 }
-.about-name{margin:18px 0 6px;font-size:17px;font-weight:800;letter-spacing:-.3px}
+.hive-car{width:18px;height:18px;position:relative}
+.hive-car i{display:block;width:0;height:0;margin-left:2px;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:16px solid #5ee0a4;transform:rotate(var(--h,0deg));transform-origin:50% 70%;filter:drop-shadow(0 1px 2px #000a)}
+.hive-car b{position:absolute;left:20px;top:-4px;font:800 10px/1.3 Inter,system-ui,sans-serif;color:#f7fff9;background:#0b100ee6;border-radius:8px;padding:2px 5px;white-space:nowrap}
 .about-kicker{margin:0;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--green)}
 body[data-tab="drive"] .route-blurb{display:none}
 body[data-tab="drive"] .dashboard{gap:10px}
@@ -992,6 +998,7 @@ body.focus-mode .niyi-panel.open{bottom:max(16px,env(safe-area-inset-bottom))!im
             <button class="btn" id="follow">Follow: On</button>
             <button class="btn" id="unit">Units: km/h</button>
             <button class="btn" id="focusToggle" aria-pressed="false">Focus mode</button>
+            <button class="btn" id="hiveBtn" aria-pressed="false">Nearby drivers: Off</button>
           </div>
         </div>
       </section>
@@ -1028,7 +1035,7 @@ body.focus-mode .niyi-panel.open{bottom:max(16px,env(safe-area-inset-bottom))!im
   </section>
 
 <section class="panel tips only-about" aria-label="Road safety tips" aria-roledescription="carousel">
-        <div class="panel-head"><h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h4v4c0 3-2 5-4 6M14 7h4v4c0 3-2 5-4 6"/></svg>Road Safety Tips</h2><span class="small" id="tipCount">1 / 12</span></div>
+        <div class="panel-head"><h2 id="tipTitle"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h4v4c0 3-2 5-4 6M14 7h4v4c0 3-2 5-4 6"/></svg>Tips for your car</h2><span class="small" id="tipCount">1 / 12</span></div>
         <div class="tips-body">
           <blockquote class="tip-quote" id="tipQuote" aria-live="polite">Prevention is better than cure.</blockquote>
           <div class="tips-nav"><div class="tip-dots" id="tipDots"></div><div class="tip-arrows"><button class="tip-arrow" id="tipPrev" aria-label="Previous tip">&#8249;</button><button class="tip-arrow" id="tipNext" aria-label="Next tip">&#8250;</button></div></div>
@@ -1318,6 +1325,8 @@ body.focus-mode .niyi-panel.open{bottom:max(16px,env(safe-area-inset-bottom))!im
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="auth.js"></script>
 <script src="vehicles.js"></script>
+<script src="tips.js"></script>
+<script src="hive.js"></script>
 <script src="premium-ui.js"></script>
 <script src="carfacts.js"></script>
 <script src="ambient.js"></script>
@@ -1390,8 +1399,35 @@ function distance(a,b){
   return 6371000*2*Math.atan2(Math.sqrt(h),Math.sqrt(Math.max(0,1-h)));
 }
 function angleDiff(a,b){return ((a-b+540)%360)-180}
+var speedSamples=[], lastSpeedMs=null, lastSpeedAt=0;
+function speedMps(pos){
+  if(!pos||!pos.coords)return null;
+  var t=pos.timestamp||Date.now();
+  if(t===lastSpeedAt)return lastSpeedMs;
+  var reported=Number.isFinite(pos.coords.speed)&&pos.coords.speed>=0?pos.coords.speed:null;
+  if(previous&&previous.coords&&Number.isFinite(previous.coords.latitude)&&Number.isFinite(pos.coords.latitude)){
+    var dt=(t-(previous.timestamp||0))/1000;
+    if(dt>=0.35&&dt<=8){
+      var metres=distance([previous.coords.longitude,previous.coords.latitude],[pos.coords.longitude,pos.coords.latitude]);
+      if(metres<=dt*75){
+        speedSamples.push(metres/dt);
+        if(speedSamples.length>5)speedSamples.shift();
+      }
+    }
+  }
+  var smooth=null;
+  if(speedSamples.length){
+    var sum=0;speedSamples.forEach(function(n){sum+=n});
+    smooth=sum/speedSamples.length;
+    if(smooth<0.7)smooth=0;
+  }
+  var picked=(reported!=null&&reported>=1)?reported:(smooth!=null?smooth:reported);
+  lastSpeedAt=t;lastSpeedMs=picked;
+  return picked;
+}
 function updateMetrics(pos){
-  var speed=Number.isFinite(pos.coords.speed)&&pos.coords.speed>=0?pos.coords.speed*3.6:null;
+  var ms=speedMps(pos);
+  var speed=ms==null?null:ms*3.6;
   setText('speed',speed===null?'—':fmt(speed*(useMph?0.621371:1),0));
   setText('speedUnit',useMph?'mph':'km/h');
   var h=Number.isFinite(pos.coords.heading)&&pos.coords.heading>=0?pos.coords.heading:(lastHeading!==null?lastHeading:null);
@@ -1412,7 +1448,7 @@ function updateCurveFeature(coord){
   if(!ready||!map.getSource('curve'))return;
   map.getSource('curve').setData(coord?{type:'FeatureCollection',features:[{type:'Feature',properties:{kind:'estimated-curve'},geometry:{type:'Point',coordinates:coord}}]}:EMPTY);
 }
-var mapFree=false, camLock=false, DEFAULT_CENTER=[3.3792,6.5244], DEFAULT_ZOOM=13, FOLLOW_ZOOM=16;
+var mapFree=false, camLock=false, DEFAULT_CENTER=[3.3792,6.5244], DEFAULT_ZOOM=13, FOLLOW_ZOOM=17;
 function syncResetBtn(){
   var b=$('mapReset');
   if(!b)return;
@@ -1427,7 +1463,7 @@ function setFollow(on){
   if(fb){setText('follow','Follow: '+(follow?'On':'Off'));fb.classList.toggle('active',follow)}
   syncResetBtn();
 }
-function pitchNow(){return tilted?68:0}
+function pitchNow(){return tilted?72:0}
 function applyCamera(){
   if(!map)return;
   runCam(function(){
@@ -1522,6 +1558,7 @@ function apply3DLook(){
   if(!map)return;
   try{
     if(map.getLayer('curve-guide-3d-buildings'))map.setLayoutProperty('curve-guide-3d-buildings','visibility',tilted?'visible':'none');
+    if(map.setPadding)map.setPadding(tilted?{top:30,bottom:130,left:0,right:0}:{top:0,bottom:0,left:0,right:0});
     if(map.setSky){
       map.setSky(tilted?{
         'sky-color':nightMode?'#07131c':'#7eb6dc',
@@ -1547,7 +1584,7 @@ function ease3D(){
   if(tilted&&!headingUp&&Math.abs(bearing)<8)bearing=-26;
   map.easeTo({
     pitch:pitchNow(),
-    zoom:tilted&&z<15?15.3:z,
+    zoom:tilted&&z<16.2?16.6:z,
     bearing:bearing,
     duration:800
   });
@@ -1618,7 +1655,7 @@ function maybeEstimateCurve(pos){
     if(turn>22&&d<75){
       curveEstimate={coord:b,at:Date.now()};
       updateCurveFeature(b);
-      var speed=Number.isFinite(pos.coords.speed)?pos.coords.speed*3.6:null;
+      var speedMs=speedMps(pos);var speed=speedMs==null?null:speedMs*3.6;
       setText('curveDistance','Nearby (est.)');
       setWarning('A change in travel direction was detected. This is only a rough prototype estimate, not a verified road-curve warning.','warn');
       setText('analysisState','Curve change detected (estimate)');
@@ -1712,7 +1749,7 @@ function startGps(){
   if(!navigator.geolocation){setWarning('This browser does not support geolocation.','warn');return}
   if(watchId!==null)return;
   setStatus('Requesting GPS','warn');setWarning('Waiting for your device to provide a GPS position…','warn');
-  watchId=navigator.geolocation.watchPosition(onPosition,onGpsError,{enableHighAccuracy:true,maximumAge:1500,timeout:15000});
+  watchId=navigator.geolocation.watchPosition(onPosition,onGpsError,{enableHighAccuracy:true,maximumAge:0,timeout:10000});
   try{cgGpsIntro.show()}catch(e){}
   $('gps').disabled=true;$('stopGps').disabled=false;setText('analysisState','Waiting for GPS');
 }
@@ -1723,6 +1760,7 @@ function stopGps(){
   watchId=null;$('gps').disabled=false;$('stopGps').disabled=true;
   setText('gpsChip','GPS off');$('gpsChip').classList.remove('acc-good','acc-fair','acc-poor');setText('analysisState','Not active');
   setStatus('GPS stopped','warn');setWarning('GPS tracking is stopped. Curve Guide is not a certified safety system.','warn');
+  speedSamples=[];lastSpeedMs=null;lastSpeedAt=0;
 }
 function clearRoute(){route=[];updateRoute();updateCurveFeature(null);setText('curveDistance','—');setText('analysisState',watchId===null?'Not active':'Monitoring')}
 $('gps').addEventListener('click',function(){this.classList.remove('cg-pop');void this.offsetWidth;this.classList.add('cg-pop');startGps()});
@@ -1755,13 +1793,14 @@ window.__cgParseCoords=function(q){return parseCoordQuery(q)};
 window.__cgParseMapLink=function(q){return parseMapLink(q)};
 window.__cgIsDriving=function(){
   if(watchId===null||!current)return false;
-  var s=current.coords.speed;
-  return Number.isFinite(s)&&s>=0&&(s*3.6)>10;
+  return lastSpeedMs!=null&&(lastSpeedMs*3.6)>10;
 };
 window.__cgApi={
   startGps:startGps,stopGps:stopGps,setSatellite:setSatellite,getSatellite:function(){return satellite},
   setUnitsMph:function(on){useMph=!!on;setText('unit','Units: '+(useMph?'mph':'km/h'));setText('speedUnit',useMph?'mph':'km/h');saveSettings({useMph:useMph});if(current)updateMetrics(current)},
-  getUseMph:function(){return useMph},
+  getMap:function(){return map},
+  getSpeedMs:function(){return lastSpeedMs},
+  getFix:function(){return current},
   setTilt3d:function(on){tilted=!!on;setText('tilt',tilted?'3D':'2D');ease3D();setText('mapMode',tilted?'3D perspective':'Flat view')},
   getTilt3d:function(){return tilted},
   clearGpsTrail:clearRoute,clearDestination:clearDestination,
@@ -2407,7 +2446,7 @@ function checkBendSpeedWarning(pos){
   var banner=$('speedBendBanner');
   if(!routeBends.length||!pos){if(banner)banner.classList.remove('open');return}
   var coord=[pos.coords.longitude,pos.coords.latitude];
-  var speed=Number.isFinite(pos.coords.speed)&&pos.coords.speed>=0?pos.coords.speed*3.6:null;
+  var speedMs=speedMps(pos);var speed=speedMs==null?null:speedMs*3.6;
   if(speed===null){if(banner)banner.classList.remove('open');return}
   var hit=null;
   for(var i=0;i<routeBends.length;i++){
@@ -2699,7 +2738,7 @@ function onNavPosition(pos){
   if(!navigating||!destination||!destination.steps||!destination.steps.length)return;
   var coord=[pos.coords.longitude,pos.coords.latitude];
   var acc=pos.coords.accuracy;
-  var speedMs=Number.isFinite(pos.coords.speed)&&pos.coords.speed>=0?pos.coords.speed:null;
+  var speedMs=speedMps(pos);
   var snap=snapToRoute(coord);
   if(snap&&Number.isFinite(acc)&&acc<=25){
     if(snap.dist>50){
@@ -2961,19 +3000,56 @@ initMap();
 </script>
 <script>
 (function(){
-var T=["Prevention is better than cure.","Service your car regularly — a well-maintained vehicle is a safer vehicle.","Check your tyres and brakes before every long trip.","Slow down before the curve, not in it.","Speed thrills but kills.","Always wear your seatbelt.","Don't drink and drive.","Keep a safe distance from the vehicle ahead.","Phones down, eyes on the road.","Better late than never.","Rest when tired — fatigue kills.","Obey traffic signs; they are there to protect you."];
-var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches,FD=rm?0:450;
-var q=document.getElementById('tipQuote'),dots=document.getElementById('tipDots'),cnt=document.getElementById('tipCount'),i=0,timer=null;
-T.forEach(function(_,k){var b=document.createElement('button');b.className='tip-dot';b.setAttribute('aria-label','Show tip '+(k+1));b.addEventListener('click',function(){show(k);restart()});dots.appendChild(b)});
-function paint(){q.textContent=T[i];cnt.textContent=(i+1)+' / '+T.length;[].forEach.call(dots.children,function(d,k){d.setAttribute('aria-current',k===i?'true':'false')})}
+var FALLBACK=["Prevention is better than cure.","Slow down before the curve, not in it.","Always wear your seatbelt.","Phones down, eyes on the road.","Rest when tired — fatigue kills."];
+var NAMES={sedan:'saloon',suv:'SUV',bus:'bus',bike:'bike',arrow:'vehicle'};
+function carKey(){
+  try{var p=window.__cgPremiumUI&&window.__cgPremiumUI.loadProfile&&window.__cgPremiumUI.loadProfile();return (p&&p.carIcon)||'sedan'}catch(e){return 'sedan'}
+}
+function listFor(key){
+  var pool=window.CG_TIPS||[];
+  var mine=[], rest=[];
+  pool.forEach(function(t){
+    if(!t||!t[1])return;
+    if(t[0]===key)mine.push(t[1]);
+    else if(t[0]==='all')rest.push(t[1]);
+  });
+  var out=mine.concat(rest);
+  return out.length?out:FALLBACK.slice();
+}
+var T=listFor(carKey()), rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches,FD=rm?0:450;
+var q=document.getElementById('tipQuote'),dots=document.getElementById('tipDots'),cnt=document.getElementById('tipCount'),title=document.getElementById('tipTitle'),i=0,timer=null;
+function paint(){
+  q.textContent=T[i];
+  cnt.textContent=(i+1)+' / '+T.length;
+  [].forEach.call(dots.children,function(d,k){d.setAttribute('aria-current',k===i?'true':'false')});
+}
 function show(k){i=(k+T.length)%T.length;q.classList.add('fade');setTimeout(function(){paint();q.classList.remove('fade')},FD)}
 function restart(){clearInterval(timer);if(!rm)timer=setInterval(function(){show(i+1)},7000)}
+function reload(){
+  var key=carKey();
+  T=listFor(key);
+  i=0;
+  dots.innerHTML='';
+  dots.hidden=T.length>16;
+  if(!dots.hidden)T.forEach(function(_,k){var b=document.createElement('button');b.className='tip-dot';b.setAttribute('aria-label','Show tip '+(k+1));b.addEventListener('click',function(){show(k);restart()});dots.appendChild(b)});
+  var label=title&&title.lastChild; 
+  if(title){
+    var name=NAMES[key]||'car';
+    var svg=title.querySelector('svg');
+    title.textContent='';
+    if(svg)title.appendChild(svg);
+    title.appendChild(document.createTextNode(' Tips for your '+name));
+  }
+  paint();restart();
+}
+window.__cgLoadTips=reload;
 document.getElementById('tipPrev').addEventListener('click',function(){show(i-1);restart()});
 document.getElementById('tipNext').addEventListener('click',function(){show(i+1);restart()});
 var card=q.parentNode.parentNode;card.addEventListener('mouseenter',function(){clearInterval(timer)});card.addEventListener('mouseleave',restart);
-paint();restart();
+document.addEventListener('cg:profile',reload);
+reload();
 var wq=document.getElementById('welcomeQuote'),w=document.getElementById('welcome'),j=0;
-if(!rm)var wt=setInterval(function(){if(w.hidden){clearInterval(wt);return}j=(j+1)%T.length;wq.classList.add('fade');setTimeout(function(){wq.textContent='“'+T[j]+'”';wq.classList.remove('fade')},FD)},4500);
+if(!rm&&wq&&w)var wt=setInterval(function(){if(w.hidden){clearInterval(wt);return}j=(j+1)%FALLBACK.length;wq.classList.add('fade');setTimeout(function(){wq.textContent='“'+FALLBACK[j]+'”';wq.classList.remove('fade')},FD)},4500);
 })();
 </script>
 <script>(function(){var v=document.getElementById('welcomeVideo');if(v&&window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){v.removeAttribute('autoplay');v.pause()}})();</script>
@@ -3014,13 +3090,15 @@ function escText(s){return String(s==null?'':s)}
 /* 7.2.5 Niyi mascot (original design: rounded bot head, curve-shaped antenna). */
 function niyiFaceSvg(live){
   return '<svg class="niyi-face'+(live?' live':'')+'" data-state="idle" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><g class="nf-all">'+
-    '<path class="nf-ant" d="M20 9c0-3 2-4.6 4.4-5.2"/><circle class="nf-ant-dot" cx="26" cy="3.4" r="2.3"/>'+
-    '<rect class="nf-head" x="4" y="9" width="32" height="28" rx="11"/><ellipse class="nf-shine" cx="12" cy="13.5" rx="5" ry="2.2"/>'+
-    '<rect class="nf-screen" x="8" y="14.5" width="24" height="17" rx="7.5"/>'+
-    '<g class="nf-eyes"><rect class="nf-eye l" x="13.2" y="18.6" width="4" height="6" rx="2"/><rect class="nf-eye r" x="22.8" y="18.6" width="4" height="6" rx="2"/></g>'+
-    '<path class="nf-happy" d="M12.8 22.6q2.4-3 4.8 0M22.4 22.6q2.4-3 4.8 0"/>'+
-    '<circle class="nf-cheek" cx="11.6" cy="27" r="1.5"/><circle class="nf-cheek" cx="28.4" cy="27" r="1.5"/>'+
-    '<path class="nf-smile" d="M17.2 27.2q2.8 2 5.6 0"/><path class="nf-wavy" d="M16.4 28q1.2-1.2 2.4 0t2.4 0t2.4 0"/>'+
+    '<g class="nf-eyes">'+
+      '<path class="nf-eye l nf-ink" d="M10.6 17.4c.1-4.2 4.4-5 4.8-.4"/>'+
+      '<path class="nf-ink" d="M18.4 15.2l2.7 3.4 2.8-2.8"/>'+
+      '<circle class="nf-eye r nf-dot" cx="29.2" cy="13.4" r="1.45"/>'+
+    '</g>'+
+    '<path class="nf-smile nf-ink" d="M13.2 23.2c2.4 4.8 11 5 14.4-.3"/>'+
+    '<path class="nf-happy nf-ink" d="M11.4 16.4c1.3 1.8 2.8 1.7 4 0M24.8 14.2c1.2 1.7 2.6 1.6 3.8-.1"/>'+
+    '<path class="nf-wavy nf-ink" d="M13.5 24.4q2.3-2 4.4.3t4.3.2 4.2-.5"/>'+
+    '<circle class="nf-cheek" cx="11.2" cy="21" r="1.15"/><circle class="nf-cheek" cx="31" cy="20.2" r="1.15"/>'+
   '</g></svg>';
 }
 var niyiMoodT=null;

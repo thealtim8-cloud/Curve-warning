@@ -71,9 +71,8 @@
     if (partial.bg != null && /^(waves|trees|road|city|stars|bokeh|glow|off)$/.test(partial.bg)) cur.bg = partial.bg;
     if (Array.isArray(partial.sosContacts)) cur.sosContacts = partial.sosContacts.slice(0, 5);
     if (partial.car) cur.car = Object.assign({}, cur.car, partial.car);
-    try {
-      localStorage.setItem(PROFILE_KEY, JSON.stringify(cur));
-    } catch (e) {}
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify(cur)); } catch (e) {}
+    try { document.dispatchEvent(new CustomEvent('cg:profile')); } catch (e3) {}
     /* Firestore sync (users/{uid}.profile) — falls back silently if Firestore unavailable */
     try {
       if (window.__cgAuth && window.__cgAuth.saveProfileLocalAndCloud) {

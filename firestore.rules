@@ -20,6 +20,22 @@ service cloud.firestore {
       }
     }
 
+    // Nearby drivers. One live document per signed-in user. No name is stored.
+    // Other signed-in drivers may read it. It is overwritten while sharing is on, then deleted.
+    match /live/{userId} {
+      allow read: if request.auth != null;
+      allow create, update: if isOwner(userId)
+        && request.resource.data.keys().hasOnly(['lat', 'lng', 'speed', 'heading', 'area', 'at'])
+        && request.resource.data.lat is number
+        && request.resource.data.lng is number
+        && request.resource.data.speed is number
+        && request.resource.data.heading is number
+        && request.resource.data.area is string
+        && request.resource.data.area.size() <= 8
+        && request.resource.data.at is number;
+      allow delete: if isOwner(userId);
+    }
+
     // payments/{reference} is written only by server/verify-payment (service account).
     match /{document=**} {
       allow read, write: if false;
