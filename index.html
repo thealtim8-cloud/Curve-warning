@@ -792,6 +792,13 @@ body[data-tab="drive"] .side-stack{display:grid;gap:12px}
   body[data-tab="drive"] .metrics{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr))!important}
   body[data-tab="drive"] .metric{display:block!important}
 }
+.drive-readout{position:absolute;z-index:3;left:12px;bottom:14px;display:flex;align-items:flex-end;gap:10px;background:#0b100ee8;border:1px solid var(--line2);border-radius:16px;padding:8px 12px 8px 14px;pointer-events:none;backdrop-filter:blur(10px)}
+.drive-speed{font-size:34px;font-weight:800;letter-spacing:-1.2px;line-height:.9;font-variant-numeric:tabular-nums}
+.drive-speed small{font-size:11px;font-weight:700;color:var(--muted);margin-left:3px}
+.drive-bend{font-size:12px;font-weight:700;color:var(--silver);max-width:150px;line-height:1.25;padding-bottom:3px}
+.drive-readout.hot{border-color:#f0716788}
+.drive-readout.hot .drive-speed{color:#ffd2cc}
+body.focus-mode .drive-readout{display:none}
 .speed-note{display:block;margin-top:4px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--orange)}
 .speed-note[hidden]{display:none}
 .bend-pin{display:grid;justify-items:center;gap:3px;pointer-events:none}
@@ -920,6 +927,10 @@ body.focus-mode .niyi-panel.open{bottom:max(16px,env(safe-area-inset-bottom))!im
         <button type="button" class="focus-exit" id="focusExit" title="Exit focus mode">Exit focus</button>
         <button type="button" class="focus-niyi" id="focusNiyi" hidden>Ask Niyi</button>
         <div id="map" aria-label="Interactive map"></div>
+        <div class="drive-readout" id="driveReadout">
+          <div class="drive-speed"><span id="mapSpeed">—</span><small id="mapSpeedUnit">km/h</small></div>
+          <div class="drive-bend" id="mapBend">No bend ahead</div>
+        </div>
         <div class="map-status">
           <div class="status-chip"><span class="status-dot" id="statusDot"></span><span id="topStatus">Map loading…</span></div>
           <div class="status-chip" id="gpsChip">GPS off</div>
@@ -1374,7 +1385,7 @@ function saveSettings(partial){
 var current=null, previous=null, route=[], lastCurveAt=0, lastHeading=null, curveEstimate=null, overpassBusy=false;
 var EMPTY={type:'FeatureCollection',features:[]};
 var $=function(id){return document.getElementById(id)};
-function setText(id,text){var el=$(id);if(el)el.textContent=text;if(id==='speed'){var fs=$('focusSpeed');if(fs)fs.textContent=text}if(id==='speedUnit'){var fsu=$('focusSpeedUnit');if(fsu)fsu.textContent=text}if(id==='curveDistance'){var fc=$('focusCurve');if(fc)fc.textContent=text}}
+function setText(id,text){var el=$(id);if(el)el.textContent=text;if(id==='speed'){var fs=$('focusSpeed');if(fs)fs.textContent=text;var ms=$('mapSpeed');if(ms)ms.textContent=text}if(id==='speedUnit'){var fsu=$('focusSpeedUnit');if(fsu)fsu.textContent=text;var mu=$('mapSpeedUnit');if(mu)mu.textContent=text}if(id==='curveDistance'){var fc=$('focusCurve');if(fc)fc.textContent=text;var mb=$('mapBend');if(mb&&!mb.dataset.lock)mb.textContent=text==='—'?'No bend ahead':'Bend '+text}}
 function setStatus(text,kind){
   setText('topStatus',text);
   var dot=$('statusDot');
@@ -2492,7 +2503,13 @@ function checkBendSpeedWarning(pos){
 var bendPin=null;
 function showBendPin(hit){
   if(!map||!window.maplibregl)return;
-  if(!hit){if(bendPin){bendPin.remove();bendPin=null}return}
+  if(!hit){
+    if(bendPin){bendPin.remove();bendPin=null}
+    var mb0=$('mapBend'), box0=$('driveReadout');
+    if(box0)box0.classList.remove('hot');
+    if(mb0){delete mb0.dataset.lock;if(!routeBends.length)mb0.textContent='No bend ahead'}
+    return;
+  }
   var el=bendPin&&bendPin.getElement();
   if(!el){
     el=document.createElement('div');
@@ -2503,6 +2520,9 @@ function showBendPin(hit){
   el.classList.toggle('hot',!!hit.hot);
   el.querySelector('b').textContent='≤'+Math.round(hit.lim*(useMph?0.621371:1));
   el.querySelector('span').textContent=(hit.hot?'slow · ':'')+fmtNearDist(hit.d);
+  var mb=$('mapBend'), box=$('driveReadout');
+  if(box)box.classList.toggle('hot',!!hit.hot);
+  if(mb){mb.dataset.lock='1';mb.textContent=(hit.hot?'Slow · ':'')+fmtNearDist(hit.d)+' · ≤'+Math.round(hit.lim*(useMph?0.621371:1))}
 }
 
 /* Voice turn-by-turn navigation (browser speechSynthesis) */
@@ -2993,7 +3013,9 @@ initMap();
   var w=document.getElementById('welcome'),c=document.getElementById('acceptTerms'),b=document.getElementById('welcomeContinue'),card=document.getElementById('welcomeCard');
   var last=null;
   var si=document.getElementById('welcomeSignIn'),gu=document.getElementById('welcomeGuest'),hint=document.getElementById('welcomeHint');
-  function closeWelcome(focusApp){w.hidden=true;var wv=document.getElementById('welcomeVideo');if(wv)wv.pause();document.body.classList.remove('welcome-open');if(focusApp){var g=document.getElementById('gps');if(g)g.focus()}if(typeof window.__cgPulseNiyi==='function')window.__cgPulseNiyi()}
+  function closeWelcome(focusApp){
+    try{if(c.checked)localStorage.setItem('curveGuide.accepted','1')}catch(e){}
+    w.hidden=true;var wv=document.getElementById('welcomeVideo');if(wv)wv.pause();document.body.classList.remove('welcome-open');if(focusApp){var g=document.getElementById('gps');if(g)g.focus()}if(typeof window.__cgPulseNiyi==='function')window.__cgPulseNiyi()}
   function snap(){try{var A=window.__cgAuth;return (A&&A.snapshot&&A.snapshot())||{}}catch(e){return {}}}
   function signedUser(){var s=snap();return s.signedIn?s.user:null}
   var pendingRedirect=false;try{pendingRedirect=localStorage.getItem('curveGuide.authRedirect')==='1'}catch(e){}
@@ -3024,6 +3046,7 @@ initMap();
     if(window.__cgPremiumUI&&window.__cgPremiumUI.showAuth)window.__cgPremiumUI.showAuth('signin');
   });
   syncAccount();
+  try{if(localStorage.getItem('curveGuide.accepted')==='1'){c.checked=true;closeWelcome(false)}}catch(e){}
   (function attach(n){var A=window.__cgAuth;if(A&&A.onChange){A.onChange(syncAccount);syncAccount()}else if(n<20)setTimeout(function(){attach(n+1)},300)})(0);
   w.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var f=[].slice.call(w.querySelectorAll('input,button:not([disabled]),[tabindex="0"]'));if(!f.length)return;var a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}});
   card.focus();
