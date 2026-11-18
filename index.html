@@ -777,7 +777,19 @@ body:not([data-tab="about"]) .only-about{display:none!important}
 body:not([data-tab="drive"]) .only-drive{display:none!important}
 body[data-tab="profile"] .app>header,
 body[data-tab="about"] .app>header{position:sticky;top:0;z-index:30}
-body[data-tab="drive"] .map-wrap{height:min(64vh,680px)}
+body[data-tab="drive"] .map-wrap{height:min(62vh,720px)}
+body[data-tab="drive"] .map-panel .panel-head{display:none}
+body[data-tab="drive"] .dashboard{display:flex;flex-direction:column;grid-template-columns:minmax(0,1fr)!important;gap:12px}
+body[data-tab="drive"] .map-panel{grid-row:auto}
+body[data-tab="drive"] .side-stack{display:grid;gap:12px}
+@media(min-width:760px){
+  body[data-tab="drive"] .map-wrap{height:min(68vh,760px)!important}
+  body[data-tab="drive"] .side-stack{grid-template-columns:1fr 1fr;align-items:start}
+  body[data-tab="drive"] .metrics{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  body[data-tab="drive"] .metric{display:block!important}
+}
+.about-name{margin:18px 0 6px;font-size:17px;font-weight:800;letter-spacing:-.3px}
+.about-kicker{margin:0;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--green)}
 body[data-tab="drive"] .route-blurb{display:none}
 body[data-tab="drive"] .dashboard{gap:10px}
 .tabbar{position:fixed;z-index:60;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px 10px calc(8px + env(safe-area-inset-bottom));background:#0c1216f2;border-top:1px solid var(--line2);backdrop-filter:blur(16px);box-shadow:0 -10px 30px -18px #000}
@@ -984,9 +996,14 @@ body.focus-mode .niyi-panel.open{bottom:max(16px,env(safe-area-inset-bottom))!im
   
   <section class="panel only-about" id="aboutIntro">
     <div class="content">
-      <div class="section-title">About Curve Guide</div>
-      <p class="about-lead">A prototype from the Automotive Division of Adeniyi Investments & Property Ltd. It gives an early heads-up on sharp bends, with Niyi to help and one-tap SOS. It supports careful driving. It does not replace it.</p>
-      <p class="small" style="margin-top:10px;line-height:1.55"><strong>Drive</strong> is the map. <strong>Profile</strong> is your car, SOS contacts, look, and account. <strong>About</strong> is this page.</p>
+      <div class="section-title">About</div>
+      <p class="about-kicker">The maker</p>
+      <h3 class="about-name">Adeniyi Adeola</h3>
+      <p class="about-lead">Adeniyi Adeola built Curve Guide. He wanted Nigerian drivers to get an earlier heads-up before a sharp bend, using the phone they already carry. Niyi, the map, and one-tap SOS are his prototype. It supports careful driving. It does not replace it.</p>
+      <p class="about-kicker">The sponsor</p>
+      <h3 class="about-name">Adeniyi Investments & Property Ltd.</h3>
+      <p class="about-lead">Adeniyi Investments & Property Ltd. sponsors Curve Guide. The app belongs to the company’s Automotive Division. The company stands behind the name, the work, and the aim of fewer surprises on the road.</p>
+      <p class="small" style="margin-top:10px;line-height:1.55">Learn more at <a class="contact" href="https://adeniyiltd.com/" target="_blank" rel="noopener">adeniyiltd.com</a>. <strong>Drive</strong> is the map. <strong>Profile</strong> is your car, SOS contacts, and account. <strong>About</strong> is this page.</p>
     </div>
   </section>
 
@@ -1299,7 +1316,7 @@ vv.addEventListener('resize',fit);vv.addEventListener('scroll',fit);document.add
 <script>
 (function(){
 'use strict';
-var map=null, carMarker=null, watchId=null, ready=false, follow=true, tilted=!(window.matchMedia&&matchMedia('(max-width:759px)').matches), headingUp=true, useMph=false;
+var map=null, carMarker=null, watchId=null, ready=false, follow=true, tilted=true, headingUp=true, useMph=false;
 var SETTINGS_KEY='curveGuide.settings';
 function loadSettings(){
   try{
@@ -1381,15 +1398,16 @@ function setFollow(on){
   if(fb){setText('follow','Follow: '+(follow?'On':'Off'));fb.classList.toggle('active',follow)}
   syncResetBtn();
 }
+function pitchNow(){return tilted?68:0}
 function applyCamera(){
   if(!map)return;
   runCam(function(){
     if(current&&Number.isFinite(current.coords.longitude)){
       var center=[current.coords.longitude,current.coords.latitude];
       var h=Number.isFinite(current.coords.heading)&&current.coords.heading>=0?current.coords.heading:(lastHeading||0);
-      map.easeTo({center:center,zoom:Math.max(map.getZoom(),FOLLOW_ZOOM),pitch:tilted?55:0,bearing:headingUp?h:0,duration:450,essential:true});
+      map.easeTo({center:center,zoom:Math.max(map.getZoom(),FOLLOW_ZOOM),pitch:pitchNow(),bearing:headingUp?h:0,duration:450,essential:true});
     }else{
-      map.easeTo({center:DEFAULT_CENTER,zoom:DEFAULT_ZOOM,pitch:tilted?55:0,bearing:0,duration:500,essential:true});
+      map.easeTo({center:DEFAULT_CENTER,zoom:DEFAULT_ZOOM,pitch:pitchNow(),bearing:0,duration:500,essential:true});
     }
   });
 }
@@ -1441,6 +1459,71 @@ function setSatellite(on){
   satHidden.forEach(function(id){if(map.getLayer(id))map.setLayoutProperty(id,'visibility',on?'none':'visible')});
   var b=$('mapType');if(b){b.textContent=on?'Map':'Sat';b.setAttribute('aria-pressed',on?'true':'false');b.title=on?'Switch to map view':'Switch to satellite view'}
 }
+function add3DBuildings(){
+  if(!map||map.getLayer('curve-guide-3d-buildings'))return;
+  try{
+    var style=map.getStyle(), sources=style&&style.sources?style.sources:{};
+    var vectorSource=Object.keys(sources).find(function(k){return sources[k]&&sources[k].type==='vector'});
+    var sourceId=sources.openmaptiles?'openmaptiles':vectorSource;
+    if(!sourceId)return;
+    var layers=style.layers||[];
+    var labelLayer=layers.find(function(l){return l.type==='symbol'&&l.layout&&l.layout['text-field']});
+    var height=['coalesce',['to-number',['get','render_height']],['to-number',['get','height']],8];
+    map.addLayer({
+      id:'curve-guide-3d-buildings',
+      source:sourceId,
+      'source-layer':'building',
+      type:'fill-extrusion',
+      minzoom:13,
+      filter:['!=',['get','hide_3d'],true],
+      layout:{visibility:tilted?'visible':'none'},
+      paint:{
+        'fill-extrusion-vertical-gradient':true,
+        'fill-extrusion-color':nightMode
+          ?['interpolate',['linear'],height,0,'#2a3d4e',16,'#3d566b',50,'#1a2834']
+          :['interpolate',['linear'],height,0,'#e4ebf0',16,'#c3d0d9',50,'#8ea0ad'],
+        'fill-extrusion-height':['interpolate',['linear'],['zoom'],13,0,14.2,['*',height,0.7],16,height],
+        'fill-extrusion-base':['coalesce',['to-number',['get','render_min_height']],['to-number',['get','min_height']],0],
+        'fill-extrusion-opacity':nightMode?0.94:0.9
+      }
+    },labelLayer?labelLayer.id:undefined);
+  }catch(e){}
+}
+function apply3DLook(){
+  if(!map)return;
+  try{
+    if(map.getLayer('curve-guide-3d-buildings'))map.setLayoutProperty('curve-guide-3d-buildings','visibility',tilted?'visible':'none');
+    if(map.setSky){
+      map.setSky(tilted?{
+        'sky-color':nightMode?'#07131c':'#7eb6dc',
+        'sky-horizon-blend':0.62,
+        'horizon-color':nightMode?'#1c3a52':'#f3f8fb',
+        'horizon-fog-blend':0.72,
+        'fog-color':nightMode?'#0d1a24':'#d7e6ef',
+        'fog-ground-blend':0.28,
+        'atmosphere-blend':0.6
+      }:{
+        'sky-color':'rgba(0,0,0,0)',
+        'atmosphere-blend':0,
+        'fog-ground-blend':0,
+        'horizon-fog-blend':0
+      });
+    }
+  }catch(e){}
+}
+function ease3D(){
+  if(!map)return;
+  var z=map.getZoom();
+  var bearing=map.getBearing();
+  if(tilted&&!headingUp&&Math.abs(bearing)<8)bearing=-26;
+  map.easeTo({
+    pitch:pitchNow(),
+    zoom:tilted&&z<15?15.3:z,
+    bearing:bearing,
+    duration:800
+  });
+  apply3DLook();
+}
 function initMap(){
   if(!window.maplibregl){setStatus('Map library did not load', 'danger');setWarning('The map library could not load. Check your internet connection and reload.');return}
   try{
@@ -1450,7 +1533,7 @@ function initMap(){
       style:nightMode?STYLE_NIGHT:STYLE_DAY,
       center:[3.3792,6.5244],
       zoom:13,
-      pitch:tilted?50:0,
+      pitch:pitchNow(),
       bearing:0,
       antialias:true,
       attributionControl:true
@@ -1478,30 +1561,9 @@ function initMap(){
         map.addLayer({id:'curve-guide-hazards',type:'circle',source:'hazards',paint:{
           'circle-radius':8,'circle-color':'#c084fc','circle-stroke-color':'#fff','circle-stroke-width':2
         }});
-        // Add 3D buildings only when the public vector style exposes the expected source and layer.
-        var style=map.getStyle(), sources=style&&style.sources?style.sources:{};
-        var vectorSource=Object.keys(sources).find(function(k){return sources[k]&&sources[k].type==='vector'&&sources[k]['url']});
-        var sourceId=(sources.openmaptiles?'openmaptiles':vectorSource);
-        if(sourceId){
-          var existing=map.getStyle().layers||[];
-          var labelLayer=existing.find(function(l){return l.type==='symbol'&&l.layout&&l.layout['text-field']});
-          try{
-            map.addLayer({
-              id:'curve-guide-3d-buildings',
-              source:sourceId,
-              'source-layer':'building',
-              type:'fill-extrusion',
-              minzoom:14,
-              filter:['all',['!=',['get','hide_3d'],'true']],
-              paint:{
-                'fill-extrusion-color':['interpolate',['linear'],['coalesce',['to-number',['get','render_height']],['to-number',['get','height']],3],0,'#b9c9d2',30,'#728b9b',100,'#526b7b'],
-                'fill-extrusion-height':['interpolate',['linear'],['zoom'],14,0,15,['coalesce',['to-number',['get','render_height']],['to-number',['get','height']],3]],
-                'fill-extrusion-base':['coalesce',['to-number',['get','render_min_height']],['to-number',['get','min_height']],0],
-                'fill-extrusion-opacity':0.82
-              }
-            },labelLayer?labelLayer.id:undefined);
-          }catch(e){/* The base map remains usable if 3D building data is not available. */}
-        }
+        // Buildings and sky. The base map still works if a style has no building layer.
+        add3DBuildings();
+        apply3DLook();
         setupSatellite();
         ready=true;setStatus('Map ready · 3D view enabled','good');setText('mapMode','3D perspective');setFollow(true);bindMapDestinationGestures();bindMapFreeControl();paintHazards();
         if(!sourceId)setText('mapMode','Tilted map');
@@ -1562,7 +1624,7 @@ function onPosition(pos){
     lastCamAt=now;
     var h=Number.isFinite(pos.coords.heading)&&pos.coords.heading>=0?pos.coords.heading:(lastHeading||0);
     runCam(function(){
-      map.easeTo({center:coord,zoom:Math.max(map.getZoom(),FOLLOW_ZOOM),pitch:tilted?50:0,bearing:headingUp?h:0,duration:380,essential:true});
+      map.easeTo({center:coord,zoom:Math.max(map.getZoom(),FOLLOW_ZOOM),pitch:pitchNow(),bearing:headingUp?h:0,duration:380,essential:true});
     });
   }
   if(now-lastStatusAt>2000){lastStatusAt=now;setStatus(navigating?'Navigating':'GPS active','good')}
@@ -1640,7 +1702,7 @@ $('follow').addEventListener('click',function(){var next=!follow;setFollow(next)
 $('unit').addEventListener('click',function(){useMph=!useMph;setText('unit','Units: '+(useMph?'mph':'km/h'));setText('speedUnit',useMph?'mph':'km/h');saveSettings({useMph:useMph});if(current)updateMetrics(current)});
 $('zin').addEventListener('click',function(){if(map)map.zoomTo(Math.min(20,map.getZoom()+1),{duration:250})});
 $('zout').addEventListener('click',function(){if(map)map.zoomTo(Math.max(2,map.getZoom()-1),{duration:250})});
-$('tilt').addEventListener('click',function(){tilted=!tilted;setText('tilt',tilted?'3D':'2D');if(map)map.easeTo({pitch:tilted?55:0,duration:450});setText('mapMode',tilted?'3D perspective':'Flat view')});
+$('tilt').addEventListener('click',function(){tilted=!tilted;setText('tilt',tilted?'3D':'2D');ease3D();setText('mapMode',tilted?'3D perspective':'Flat view')});
 $('orient').addEventListener('click',function(){headingUp=!headingUp;setText('orient',headingUp?'↗':'N');if(map)map.easeTo({bearing:headingUp&&current&&Number.isFinite(current.coords.heading)?current.coords.heading:0,duration:400});});
 $('recenter').addEventListener('click',function(){resetMapView()});
 var mapResetBtn=$('mapReset');
@@ -1671,7 +1733,7 @@ window.__cgApi={
   startGps:startGps,stopGps:stopGps,setSatellite:setSatellite,getSatellite:function(){return satellite},
   setUnitsMph:function(on){useMph=!!on;setText('unit','Units: '+(useMph?'mph':'km/h'));setText('speedUnit',useMph?'mph':'km/h');saveSettings({useMph:useMph});if(current)updateMetrics(current)},
   getUseMph:function(){return useMph},
-  setTilt3d:function(on){tilted=!!on;setText('tilt',tilted?'3D':'2D');if(map)map.easeTo({pitch:tilted?55:0,duration:450});setText('mapMode',tilted?'3D perspective':'Flat view')},
+  setTilt3d:function(on){tilted=!!on;setText('tilt',tilted?'3D':'2D');ease3D();setText('mapMode',tilted?'3D perspective':'Flat view')},
   getTilt3d:function(){return tilted},
   clearGpsTrail:clearRoute,clearDestination:clearDestination,
   setDestination:setDestination,routeToDestination:routeToDestination,
@@ -1923,7 +1985,7 @@ function setDestination(place){
   setText('destName',destination.name);
   updateDestMeta();
   syncNavButtons();
-  if(map)map.flyTo({center:place.coord,zoom:Math.max(map.getZoom(),14),pitch:tilted?55:0,duration:1200,essential:true});
+  if(map)map.flyTo({center:place.coord,zoom:Math.max(map.getZoom(),14),pitch:pitchNow(),duration:1200,essential:true});
   setStatus('Destination set','good');
 }
 function clearDestination(){
@@ -2041,6 +2103,8 @@ function restoreMapOverlays(){
       map.getSource('directions').setData({type:'FeatureCollection',features:[{type:'Feature',properties:{},geometry:destination.routeGeom}]});
     }
     paintBends(); paintHazards();
+    add3DBuildings();
+    apply3DLook();
   }catch(e){}
 }
 function setNightMode(on, persist){
@@ -2573,7 +2637,7 @@ function applyOsrmRoute(data,opts){
   if(!opts.silentFit&&geom&&geom.coordinates&&geom.coordinates.length&&map&&!navigating){
     var bounds=new maplibregl.LngLatBounds(geom.coordinates[0],geom.coordinates[0]);
     geom.coordinates.forEach(function(c){bounds.extend(c)});
-    map.fitBounds(bounds,{padding:{top:90,bottom:160,left:40,right:70},duration:900,pitch:tilted?45:0});
+    map.fitBounds(bounds,{padding:{top:90,bottom:160,left:40,right:70},duration:900,pitch:pitchNow()});
   }
   setStatus((opts.reroute?'Rerouted':'Route ready')+' · '+fmtKm(r.distance),'good');
   syncNavButtons();
@@ -3229,7 +3293,7 @@ function answer(q){
   if(/destin|search|route|how do i (set|find)|directions?/.test(t)&&!extractPlace(q))
     return 'Say “go to …” or “take me to …”, or type in Search destination on the map. Then Route and Start navigation.';
   if(/compan|adeniyi|who made|who built|about you|niyi\b/.test(t))
-    return 'Curve Guide 8.0 is a product of the Automotive Division of Adeniyi Investments & Property Ltd. Learn more at adeniyiltd.com.';
+    return 'Curve Guide was built by Adeniyi Adeola and is sponsored by Adeniyi Investments & Property Ltd., through its Automotive Division. More at adeniyiltd.com.';
   if(/disclaim|liabilit|certified|safe to use|replace|prototype/.test(t))
     return 'Curve Guide is an experimental prototype, not a certified safety or navigation system. Warnings and routes can be wrong. Always obey the road.';
   if(/gps|accur|±|plus.?minus|poor|fair|green|yellow|red chip/.test(t))
