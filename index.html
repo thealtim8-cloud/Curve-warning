@@ -769,51 +769,68 @@ html,body{overflow-x:clip}
 #acceptTerms{width:22px;height:22px;flex:none}
 label.accept{min-height:40px}
 @media(max-width:540px){header .subtitle{display:none}.brand h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
-@media(max-width:759px){.app{padding-bottom:calc(88px + env(safe-area-inset-bottom))}}
+@media(max-width:759px){.app{padding-bottom:calc(92px + env(safe-area-inset-bottom))}}
+
+/* 8.1 layout: welcome, then Drive / Profile / About */
+.pill,.subtitle,.niyi-header-btn{display:none!important}
+body:not([data-tab="about"]) .only-about{display:none!important}
+body:not([data-tab="drive"]) .only-drive{display:none!important}
+body[data-tab="profile"] .app>header,
+body[data-tab="about"] .app>header{position:sticky;top:0;z-index:30}
+body[data-tab="drive"] .map-wrap{height:min(64vh,680px)}
+body[data-tab="drive"] .route-blurb{display:none}
+body[data-tab="drive"] .dashboard{gap:10px}
+.tabbar{position:fixed;z-index:60;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px 10px calc(8px + env(safe-area-inset-bottom));background:#0c1216f2;border-top:1px solid var(--line2);backdrop-filter:blur(16px);box-shadow:0 -10px 30px -18px #000}
+.tabbar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;border:0;border-radius:14px;background:transparent;color:#8ea0aa;font-size:11px;font-weight:700;letter-spacing:.2px}
+.tabbar button svg{width:22px;height:22px}
+.tabbar button[aria-current="page"]{color:var(--acc-text);background:rgb(var(--acc-rgb) / 0.12)}
+body.focus-mode .tabbar,body.welcome-open .tabbar{display:none!important}
+body[data-tab="profile"] #profileScreen.cg-overlay,
+body[data-tab="profile"] #profileScreen.cg-overlay.open{position:relative;inset:auto;display:block;z-index:1;background:transparent;backdrop-filter:none;padding:0 16px calc(96px + env(safe-area-inset-bottom));animation:none}
+body[data-tab="profile"] #profileScreen .cg-sheet{width:min(720px,100%);max-height:none;overflow:visible;margin:0 auto;border:0;box-shadow:none;background:transparent;animation:none;padding:8px 0 20px}
+body[data-tab="profile"] #profileScreen [data-close-overlay="profileScreen"]{display:none}
+.welcome{padding:0;background:#07090b;place-items:stretch}
+.welcome-card{width:min(100%,520px);max-height:100dvh;height:100%;margin:0 auto;border:0;border-radius:0;box-shadow:none;display:flex;flex-direction:column;justify-content:center;background:radial-gradient(520px 280px at 50% 0,rgb(var(--acc-rgb) / 0.16),transparent 70%),#07090b}
+.welcome-video{max-width:min(100%,340px);margin:0 auto 10px}
+.welcome .btn.welcome-link{width:100%;padding:11px;font-size:13px;font-weight:650;background:transparent;border:0;color:var(--silver);text-decoration:underline;text-underline-offset:3px}
+.about-lead{font-size:14.5px;line-height:1.6;color:#d5dee3;margin:8px 0 0}
+.emerg-fab{bottom:calc(76px + env(safe-area-inset-bottom))!important}
+.niyi-fab{bottom:calc(76px + env(safe-area-inset-bottom))!important}
+.niyi-panel{bottom:calc(74px + env(safe-area-inset-bottom));height:min(68dvh,560px)}
+body.focus-mode .niyi-panel.open{bottom:max(16px,env(safe-area-inset-bottom))!important}
+@media(min-width:760px){.welcome-card{border-left:1px solid var(--line);border-right:1px solid var(--line)}.tabbar{left:50%;right:auto;transform:translateX(-50%);width:min(560px,100%);border:1px solid var(--line2);border-bottom:0;border-radius:18px 18px 0 0}}
 </style>
 </head>
-<body class="welcome-open">
+<body class="welcome-open" data-tab="drive">
 <div class="offline-banner" id="offlineBanner">Offline — map tiles may not load</div>
 <div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="welcomeIntro">
   <div class="welcome-card" tabindex="-1" id="welcomeCard">
     <video class="welcome-video" id="welcomeVideo" autoplay muted loop playsinline preload="auto" poster="assets/welcome-poster.jpg" aria-label="Curve Guide — Safer turns. Smarter drives." disablepictureinpicture><source src="assets/welcome.mp4" type="video/mp4"></video>
     <h2 id="welcomeTitle">Welcome to Curve Guide</h2>
-    <p class="welcome-intro" id="welcomeIntro">Curve Guide is a product of the Automotive Division of <strong>Adeniyi Investments &amp; Property Ltd.</strong>, built to help prevent road accidents on dangerous bends and curves. By giving drivers early awareness of sharp turns ahead, it supports safer, more confident driving on Nigerian roads. Curve Guide is currently a prototype: it is designed to supplement, never replace, careful and attentive driving.</p>
-    <details class="whats-new" id="whatsNew"><summary>✨ What’s new in 8.0</summary><ul>
-      <li><strong>Smart Niyi</strong> answers everyday questions too, now with its own animated face</li>
-      <li><strong>Apex</strong> plan: voice navigation, bends-ahead list, synced favourites</li>
-      <li><strong>Sign in</strong> right here on the welcome screen</li>
-      <li><strong>SOS contacts</strong>: text or WhatsApp your location in one tap</li>
-      <li><strong>App colours</strong>, smooth animations and a cleaner layout</li>
-      <li><strong>Car picker</strong> for make, model and year</li>
-      <li><strong>Google Maps links</strong>: paste any link into search</li>
-      <li><strong>Backgrounds</strong>: Waves, Trees &amp; hills, Road lines, City skyline, Night sky, Bokeh or Glow (Profile › Appearance)</li>
-      <li><strong>Car facts</strong>: pick your make and model to see quick facts</li>
-      <li><strong>Start GPS</strong> now shows your car driving a curvy road while it finds you</li>
-    </ul></details>
+    <p class="welcome-intro" id="welcomeIntro">Safer turns on Nigerian roads. Tap continue, then pick <strong>Drive</strong>, <strong>Profile</strong>, or <strong>About</strong> at the bottom.</p>
     <p class="welcome-quote" id="welcomeQuote" aria-live="off">“Prevention is better than cure.”</p>
-    <h3 class="terms-title">Terms &amp; Conditions</h3>
+    <details class="whats-new"><summary>Terms & Conditions</summary>
     <ol class="terms-box" tabindex="0" aria-label="Terms and Conditions">
       <li><strong>Experimental prototype.</strong> Curve Guide is under development and is provided "as is", without warranties of any kind.</li>
       <li><strong>Not a certified safety system.</strong> It is not an approved driver-assistance or navigation device, and its warnings may be missing, late, or wrong.</li>
       <li><strong>You remain responsible.</strong> Always obey traffic laws, road signs, speed limits, and actual road conditions.</li>
       <li><strong>Do not operate while driving.</strong> Set it up before your trip, or have a passenger operate it.</li>
-      <li><strong>Location privacy.</strong> Your exact GPS location is processed only on your device, in your browser. Curve Guide does not store it. When you search, your search text and a rough area (about 10 km) are sent to free OpenStreetMap search services to find nearby places.</li>
-      <li><strong>Smart Niyi.</strong> When you are signed in, messages you send to Niyi are processed on Curve Guide's server (Cloudflare AI) to write a reply. Don't share passwords or card details with Niyi.</li>
-      <li><strong>Map data.</strong> Maps come from OpenStreetMap contributors and may be incomplete or inaccurate.</li>
-      <li><strong>No liability.</strong> Adeniyi Investments &amp; Property Ltd. accepts no liability for any accident, injury, loss, or damage arising from use of Curve Guide. You use it at your own risk.</li>
-      <li><strong>Changes.</strong> These terms may be updated at any time; continued use means you accept the current terms.</li>
+      <li><strong>Location privacy.</strong> Your exact GPS location is processed only on your device. Curve Guide does not store it.</li>
+      <li><strong>Smart Niyi.</strong> When you are signed in, messages to Niyi are answered on Curve Guide's server. Don't share passwords or card details.</li>
+      <li><strong>Map data.</strong> Maps come from OpenStreetMap and may be incomplete.</li>
+      <li><strong>No liability.</strong> Adeniyi Investments & Property Ltd. accepts no liability for any accident, injury, loss, or damage from using Curve Guide.</li>
     </ol>
-    <label class="accept"><input type="checkbox" id="acceptTerms"> I have read and accept the Terms &amp; Conditions</label>
+    </details>
+    <label class="accept"><input type="checkbox" id="acceptTerms"> I have read and accept the Terms</label>
     <div class="welcome-account" id="welcomeAccount">
-      <p class="welcome-why" id="welcomeWhy">✨ <strong>Sign in</strong> to use smart Niyi, keep your account, and unlock Apex.</p>
       <div class="welcome-signed" id="welcomeSigned" hidden>
         <span class="welcome-avatar" id="welcomeAvatar" aria-hidden="true">D</span>
         <div><div class="welcome-signed-name" id="welcomeSignedName"></div><div class="welcome-signed-email" id="welcomeSignedEmail"></div></div>
       </div>
-      <button class="btn primary" id="welcomeSignIn" disabled>Sign in / Create account</button>
-      <button class="btn primary" id="welcomeContinue" disabled hidden>Continue</button>
-      <button class="btn welcome-guest" id="welcomeGuest" disabled>Continue as guest</button>
+      <button class="btn primary" id="welcomeContinue" disabled>Continue</button>
+      <button class="btn welcome-link" id="welcomeSignIn" disabled>Sign in instead</button>
+      <button class="btn welcome-guest" id="welcomeGuest" disabled hidden>Continue as guest</button>
+      <p class="welcome-why" id="welcomeWhy" hidden>Sign in from Profile for smart Niyi and Apex.</p>
       <p class="welcome-hint" id="welcomeHint">Tick the box above to continue.</p>
       <p class="welcome-authnote" id="welcomeAuthNote" role="status" hidden></p>
     </div>
@@ -844,9 +861,9 @@ label.accept{min-height:40px}
     </div>
   </header>
   <div class="install-bar" id="installBar"><span id="installText">Install Curve Guide on your phone for quicker access.</span><button type="button" class="btn primary" id="installBtn">Install</button></div>
-  <div class="hero" role="note"><div><b>Arrive alive.</b> Real-time curve awareness for safer journeys on Nigerian roads.</div><div class="hero-items"><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Safety first</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Satellite &amp; 3D</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>On-device GPS</span></div></div>
+  <div class="hero only-about" role="note"><div><b>Arrive alive.</b> Real-time curve awareness for safer journeys on Nigerian roads.</div><div class="hero-items"><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>Safety first</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Satellite &amp; 3D</span><span class="hero-item"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>On-device GPS</span></div></div>
 
-  <main class="dashboard">
+  <main class="dashboard only-drive">
     <section class="panel map-panel" aria-label="Map">
       <div class="panel-head">
         <h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Live road view</h2>
@@ -935,7 +952,7 @@ label.accept{min-height:40px}
             <span class="small" id="analysisState">Not active</span>
           </div>
           <div class="status-box warn" id="warningBox" role="status" aria-live="polite">
-            Curve analysis is a development feature. Start GPS to test the prototype; do not rely on its warnings for driving decisions.
+            Curve analysis is a guide only. Start GPS before you move, and do not rely on it for driving decisions.
           </div>
           <div class="actions">
             <button class="btn primary" id="gps">Start GPS</button>
@@ -953,27 +970,38 @@ label.accept{min-height:40px}
             <div class="section-title"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h8"/></svg>Route &amp; map data</div>
             <span class="small" id="routeState">No route yet</span>
           </div>
-          <div class="small" style="line-height:1.6;margin-top:9px">The map uses community map data. Destination search uses Nominatim and Photon (OpenStreetMap data); driving routes use the public OSRM demo. Road geometry, routes, and curve estimates may be incomplete or inaccurate.</div>
+          <div class="small route-blurb" style="line-height:1.6;margin-top:9px">The map uses community map data. Destination search uses Nominatim and Photon (OpenStreetMap data); driving routes use the public OSRM demo. Road geometry, routes, and curve estimates may be incomplete or inaccurate.</div>
           <div class="actions">
             <button class="btn" id="recenter">Reset view</button>
             <button class="btn" id="clearRoute">Clear route</button>
           </div>
         </div>
       </section>
-      <section class="panel tips" aria-label="Road safety tips" aria-roledescription="carousel">
+      
+    </div>
+  </main>
+
+  
+  <section class="panel only-about" id="aboutIntro">
+    <div class="content">
+      <div class="section-title">About Curve Guide</div>
+      <p class="about-lead">A prototype from the Automotive Division of Adeniyi Investments & Property Ltd. It gives an early heads-up on sharp bends, with Niyi to help and one-tap SOS. It supports careful driving. It does not replace it.</p>
+      <p class="small" style="margin-top:10px;line-height:1.55"><strong>Drive</strong> is the map. <strong>Profile</strong> is your car, SOS contacts, look, and account. <strong>About</strong> is this page.</p>
+    </div>
+  </section>
+
+<section class="panel tips only-about" aria-label="Road safety tips" aria-roledescription="carousel">
         <div class="panel-head"><h2><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h4v4c0 3-2 5-4 6M14 7h4v4c0 3-2 5-4 6"/></svg>Road Safety Tips</h2><span class="small" id="tipCount">1 / 12</span></div>
         <div class="tips-body">
           <blockquote class="tip-quote" id="tipQuote" aria-live="polite">Prevention is better than cure.</blockquote>
           <div class="tips-nav"><div class="tip-dots" id="tipDots"></div><div class="tip-arrows"><button class="tip-arrow" id="tipPrev" aria-label="Previous tip">&#8249;</button><button class="tip-arrow" id="tipNext" aria-label="Next tip">&#8250;</button></div></div>
         </div>
       </section>
-    </div>
-  </main>
 
-  <section class="panel notice">
+  <section class="panel notice only-about">
     <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.01"/></svg><div><strong>Safety notice:</strong> Curve Guide is an experimental road-awareness prototype, not a certified driver-assistance or navigation system. GPS accuracy, map data, device sensors, and curve estimates can be wrong or delayed. Never interact with this page while driving; set it up before a trip and have a passenger operate it. Always obey road signs, speed limits, and actual road conditions.</div>
   </section>
-  <div class="site-footer">
+  <div class="site-footer only-about">
   <div class="credit">
     <div class="credit-label">An Automotive Division of</div>
     <a class="credit-card" href="https://adeniyiltd.com/" target="_blank" rel="noopener" title="Visit Adeniyi Investments &amp; Property Ltd." style="display:inline-block"><img src="assets/adeniyi-logo.png" alt="Adeniyi Investments &amp; Property Ltd."></a>
@@ -984,6 +1012,22 @@ label.accept{min-height:40px}
   </div>
 </div>
 
+
+
+<nav class="tabbar" id="tabbar" aria-label="Sections">
+  <button type="button" data-tab="drive" aria-current="page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    <span>Drive</span>
+  </button>
+  <button type="button" data-tab="profile" aria-current="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Profile</span>
+  </button>
+  <button type="button" data-tab="about" aria-current="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>
+    <span>About</span>
+  </button>
+</nav>
 
 <button type="button" class="emerg-fab" id="emergFab" title="Emergency">SOS</button>
 <div class="emerg-sheet" id="emergSheet" hidden role="dialog" aria-label="Emergency options">
@@ -1002,7 +1046,7 @@ label.accept{min-height:40px}
     <span class="niyi-head-face" id="niyiHeadFace" aria-hidden="true"></span>
     <div class="niyi-head-title">
       <strong id="niyiTitle">Niyi · Curve Guide helper</strong>
-      <span id="niyiSubtitle">Ask me anything when you're signed in · simple keyword helper offline.</span>
+      <span id="niyiSubtitle">Ask me anything. Signed in, I answer properly. Otherwise I can still run the map.</span>
     </div>
     <div class="niyi-head-actions">
       <button type="button" class="niyi-icon" id="niyiSpeak" aria-pressed="false" title="Read answers aloud" aria-label="Read answers aloud">🔊</button>
@@ -2746,6 +2790,36 @@ initMap();
 </script>
 <script>
 (function(){
+  function setTab(name, fromProfile){
+    if(name!=='drive'&&name!=='profile'&&name!=='about')name='drive';
+    document.body.setAttribute('data-tab', name);
+    var bar=document.getElementById('tabbar');
+    if(bar)[].forEach.call(bar.querySelectorAll('button'), function(b){
+      b.setAttribute('aria-current', b.getAttribute('data-tab')===name?'page':'false');
+    });
+    var ps=document.getElementById('profileScreen');
+    if(name==='profile'){
+      if(ps){ps.hidden=false;ps.classList.add('open');}
+      if(!fromProfile&&window.__cgPremiumUI&&window.__cgPremiumUI.showProfile){
+        window.__cgPremiumUI.showProfile();
+        return;
+      }
+    }else if(ps){
+      ps.hidden=true;
+      ps.classList.remove('open');
+    }
+    window.scrollTo(0,0);
+  }
+  window.__cgSetTab=setTab;
+  var bar=document.getElementById('tabbar');
+  if(bar)bar.addEventListener('click', function(e){
+    var b=e.target.closest&&e.target.closest('button[data-tab]');
+    if(b)setTab(b.getAttribute('data-tab'));
+  });
+})();
+</script>
+<script>
+(function(){
   var w=document.getElementById('welcome'),c=document.getElementById('acceptTerms'),b=document.getElementById('welcomeContinue'),card=document.getElementById('welcomeCard');
   var last=null;
   var si=document.getElementById('welcomeSignIn'),gu=document.getElementById('welcomeGuest'),hint=document.getElementById('welcomeHint');
@@ -2761,8 +2835,8 @@ initMap();
       else note.hidden=true;
     }
     document.getElementById('welcomeSigned').hidden=!u;
-    document.getElementById('welcomeWhy').hidden=!!u;
-    si.hidden=!!u; gu.hidden=!!u; b.hidden=!u;
+    var why=document.getElementById('welcomeWhy'); if(why) why.hidden=true;
+    si.hidden=!!u; gu.hidden=true; b.hidden=false;
     if(u){
       var nm=u.displayName||'Driver';
       document.getElementById('welcomeSignedName').textContent='Signed in as '+nm;
@@ -2832,7 +2906,7 @@ var tips=[
   "Obey traffic signs; they are there to protect you.",
   'Phones down, eyes on the road.'
 ];
-var chips=['How does it work?','Set destination','Take me home','Navigation','Contact us','Emergency','Start GPS'];
+var chips=['How do I use this?','Go to Ikeja','Start GPS','Road tip','Emergency','About Curve Guide'];
 
 function api(){return window.__cgApi||null}
 
@@ -3004,16 +3078,18 @@ function doPageAction(t){
     return confirm('Curve Guide Apex: ₦450 for 1 month, or ₦3,780 for 1 year (save 30%). One-time Paystack payment, no auto-renew.');
   }
   if(/\b(sign in|sign-in|login|log in|create account)\b/.test(t)){
+    if(window.__cgSetTab)window.__cgSetTab('profile');
     if(window.__cgPremiumUI)window.__cgPremiumUI.showAuth('signin');
-    return confirm('Opening sign-in. Firebase Auth is configured — enable Google & Email providers and authorized domains in the console.');
+    return confirm('Opening sign-in. Use Google or your email, then I can answer properly.');
   }
   if(/\b(price|pricing|how much|cost|₦|naira|dollar)\b/.test(t)){
     if(window.__cgPremiumUI)window.__cgPremiumUI.showPremium();
     return confirm('Curve Guide Apex: ₦450/month, or yearly with 30% off: ₦3,780/year (was ₦5,400). One-time payment by Paystack in Naira, no auto-renew. Open Apex to pay.');
   }
-  if(/\b(profile|settings|account page)\b/.test(t)){
-    if(window.__cgPremiumUI)window.__cgPremiumUI.showProfile();
-    return confirm('Opening Profile & settings.');
+  if(/\b(profile|settings|account page)\b/.test(t)||/\b(open|show|go to) (my )?profile\b/.test(t)){
+    if(window.__cgSetTab)window.__cgSetTab('profile');
+    else if(window.__cgPremiumUI)window.__cgPremiumUI.showProfile();
+    return confirm('Profile is open. Your car, SOS contacts, colours, and account are here.');
   }
   if(/\b(car icon|map marker|change car)\b/.test(t)){
     if(window.__cgPremiumUI)window.__cgPremiumUI.showProfile('car');
@@ -3055,6 +3131,14 @@ function doPageAction(t){
   if(/\btake me to work\b|go to work/.test(t)){
     A.goFavourite('work').then(function(){confirm('Routing to Work.')}).catch(function(){confirm('No Work favourite saved yet.')});
     return 'Working on Work…';
+  }
+  if(/\b(open|show|go to) (the )?about\b/.test(t)||/^about( curve guide)?$/.test(t)){
+    if(window.__cgSetTab)window.__cgSetTab('about');
+    return confirm('About is open. That page covers what Curve Guide is, safety tips, and how to reach Adeniyi Investments.');
+  }
+  if(/\b(open|show|go to) (the )?(drive|map|home screen)\b/.test(t)){
+    if(window.__cgSetTab)window.__cgSetTab('drive');
+    return confirm('Back on Drive. Search a place or start GPS.');
   }
   if(/\b(emergency|sos|call 112)\b/.test(t)){
     if(typeof window.__cgOpenEmergency==='function')window.__cgOpenEmergency();
@@ -3154,16 +3238,22 @@ function answer(q){
     return 'Say “switch to mph” or “switch to km/h”, or tap Units. Preference is saved on this device.';
   if(/satellit|3d|2d|map type|aerial|street/.test(t))
     return 'Say “satellite”, “street map”, “3D on”, or “3D off” — or use the map buttons. Views do not change curve estimates.';
-  if(/how (does|do)|work|estimat|curve|heading|detect|what is curve guide/.test(t))
-    return 'Curve Guide uses phone GPS and heading changes (about 22°) as a rough curve estimate. Curve Guide adds free search, OSRM routing, voice navigation, bend estimates, favourites, and more — still a prototype aid only.';
-  if(/tip|advice|safe|prevent|brake|tyre|tire|seatbelt|distance|headlight|fatigue/.test(t)){
+  if(/how (does|do)|work|estimat|curve|heading|detect|what is curve guide|how do i use/.test(t))
+    return 'On Drive, start GPS and search where you are going. I can also do it if you say “go to Ikeja” or “start GPS”. Profile holds your car and SOS contacts. About has the safety notes. Warnings are estimates — always obey the road.';
+  if(/tab|section|bottom button|drive profile|three section|3 section/.test(t))
+    return 'There are three sections at the bottom. Drive is the map. Profile is you. About is the company, tips, and contact.';
+  if(/\b(how far|wetin|abeg|oya)\b/.test(t))
+    return "I dey here. Tell me where you wan go, or ask how Curve Guide works. If you sign in, I fit answer everyday questions too.";
+  if(/tip|advice|safe|prevent|brake|tyre|tire|seatbelt|distance|headlight|fatigue|rain|pothole/.test(t)){
     var tip=tips[tipI%tips.length];
     tipI++;
-    return tip+' (Ask for another safety tip anytime.)';
+    return tip+' Slow down before the bend, not inside it.';
   }
-  if(/hello|hi\b|hey|good (morning|afternoon|evening)/.test(t))
-    return "Hi! I'm Niyi for Curve Guide. Try a chip, say “go to …”, or “start GPS”.";
-  return "I'm still learning — I match simple keywords and a few page actions. Try: go to …, start GPS, satellite, Contact us, or Navigation.";
+  if(/hello|hi\b|hey|good (morning|afternoon|evening)|howdy/.test(t))
+    return "Hi, I'm Niyi. Say where you want to go, ask for a road tip, or sign in and ask me anything.";
+  if(/^(what|whats|what's|who|why|when|where|how|is|are|can|could|tell|explain)\b/.test(t))
+    return "I can answer that properly when you're signed in. Until then, say “go to …” , “start GPS”, or “road tip”. Sign-in is under Profile.";
+  return 'Say “go to Ikeja”, “start GPS”, “open profile”, or “road tip”. Sign in under Profile if you want a full answer.';
 }
 function refreshDriveNote(){
   var driving=typeof window.__cgIsDriving==='function'&&window.__cgIsDriving();
@@ -3180,7 +3270,7 @@ function openPanel(){
   if(headerBtn)headerBtn.setAttribute('aria-expanded','true');
   if(!greeted){
     greeted=true;
-    addMsg(aiAvailable()?"Hi, I'm Niyi! Ask me anything — Curve Guide, the road, or everyday questions — or say “go to …”.":"Hi, I'm Niyi! Ask how Curve Guide works, say “go to …”, or tap Contact us. Sign in for smart Niyi.",'bot');
+    addMsg(aiAvailable()?"Hi, I'm Niyi. Ask me anything, or say “go to Ikeja” and I'll set the route.":"Hi, I'm Niyi. I can start GPS, set a destination, and give road tips. Sign in under Profile and I can answer everyday questions too.",'bot');
     renderChips();
   }
   refreshDriveNote();
@@ -3259,7 +3349,8 @@ function appContext(){
     units:A.getUseMph&&A.getUseMph()?'mph':'kmh',
     satellite:!!(A.getSatellite&&A.getSatellite()),
     night:!!(A.getNightMode&&A.getNightMode()),
-    favourites:Object.keys((A.loadFavs&&A.loadFavs())||{}).filter(function(k){return k!=='custom'})
+    favourites:Object.keys((A.loadFavs&&A.loadFavs())||{}).filter(function(k){return k!=='custom'}),
+    tab:document.body.getAttribute('data-tab')||'drive'
   };
 }
 function runAiActions(actions){

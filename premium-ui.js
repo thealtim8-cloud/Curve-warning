@@ -133,6 +133,11 @@
     if (!wasOpen && el.classList.contains('cg-overlay')) stagger(el.querySelector('.cg-sheet'));
   }
   function closeOverlay(id) {
+    if (id === 'profileScreen' && document.body.getAttribute('data-tab') === 'profile') {
+      var keep = $(id);
+      if (keep) { keep.hidden = false; keep.classList.add('open'); }
+      return;
+    }
     var el = $(id);
     if (!el) return;
     var wasOpen = el.classList.contains('open');
@@ -146,7 +151,12 @@
     if (!document.querySelector('.cg-overlay.open')) document.body.classList.remove('cg-overlay-open');
   }
   function closeAllOverlays() {
-    ['authModal', 'premiumScreen', 'profileScreen', 'accountMenu'].forEach(closeOverlay);
+    ['authModal', 'premiumScreen', 'accountMenu'].forEach(closeOverlay);
+    if (document.body.getAttribute('data-tab') === 'profile') {
+      var el = $('profileScreen');
+      if (el) { el.hidden = false; el.classList.add('open'); }
+      renderProfile();
+    } else closeOverlay('profileScreen');
   }
 
   function celebrateApex(label) {
@@ -344,7 +354,9 @@
 
   function showProfile(section) {
     closeOverlay('accountMenu');
-    openOverlay('profileScreen');
+    if (window.__cgSetTab) window.__cgSetTab('profile', true);
+    var el = $('profileScreen');
+    if (el) { el.hidden = false; el.classList.add('open'); }
     renderProfile(section);
   }
 
